@@ -1,26 +1,28 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Provider } from 'react-redux';
+import { store } from './store';
+import socketService from './services/socket/socketService';
+import Dashboard from './pages/Dashboard';
 
-function App() {
+const App: React.FC = () => {
+  useEffect(() => {
+    // Initialize WebSocket connection
+    const cleanup = socketService.initialize(store.dispatch);
+    
+    return cleanup;
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Provider store={store}>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          {/* Add other routes here if needed */}
+        </Routes>
+      </Router>
+    </Provider>
   );
-}
+};
 
 export default App;

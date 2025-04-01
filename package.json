@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@reduxjs/toolkit": "^2.6.1",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.2.0",
@@ -11,9 +12,16 @@
     "@types/node": "^16.18.126",
     "@types/react": "^19.0.12",
     "@types/react-dom": "^19.0.4",
+    "axios": "^1.8.4",
+    "d3": "^7.9.0",
+    "date-fns": "^4.1.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "react-redux": "^9.2.0",
+    "react-router-dom": "^7.4.1",
     "react-scripts": "5.0.1",
+    "sass": "^1.86.1",
+    "styled-components": "^6.1.16",
     "typescript": "^4.9.5",
     "web-vitals": "^2.1.4"
   },
@@ -21,7 +29,12 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "generate-mock-data": "node mock-server/data/generate.js",
+    "mock-api": "json-server --watch mock-server/db.json --port 3001",
+    "mock-ws": "node mock-server/websocket.js",
+    "mock-servers": "npm run generate-mock-data && npm-run-all --parallel mock-api mock-ws",
+    "dev": "npm run generate-mock-data && npm-run-all --parallel start mock-api mock-ws"
   },
   "eslintConfig": {
     "extends": [
@@ -40,5 +53,15 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.0.17",
+    "@types/d3": "^7.4.3",
+    "autoprefixer": "^10.4.14",
+    "json-server": "^1.0.0-beta.3",
+    "npm-run-all": "^4.1.5",
+    "postcss": "^8.4.21",
+    "tailwindcss": "^3.3.0",
+    "ws": "^8.18.1"
   }
 }
