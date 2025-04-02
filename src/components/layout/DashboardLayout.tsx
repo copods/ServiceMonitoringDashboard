@@ -19,14 +19,16 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const timeRangeDisplay = `1HR - ${startTime} TO ${endTime}`;
   
   return (
-    <div className="flex flex-col min-h-screen bg-gray-900 text-white">
-      <header className="bg-black p-4 flex justify-between items-center">
-        <div className="text-sm">{timeRangeDisplay}</div>
-        <div className="text-xl font-bold">{location}</div>
-        <div className="text-sm">UTC {format(new Date(currentTimestamp), 'H:mm')}</div>
-        <div className="text-sm">{formattedDate}</div>
+    <div className="flex flex-col min-h-screen bg-gray-900 text-white font-roboto">
+      <header className="bg-black py-2 px-4 flex items-center border-b border-gray-800">
+        <div className="text-sm font-medium flex-1 text-left">{timeRangeDisplay}</div>
+        <div className="flex-1 flex font-medium justify-center items-center space-x-4">
+          <div className="text-2xl tracking-widest">{location}</div>
+          <div className="text-sm">UTC {format(new Date(currentTimestamp), 'H:mm')}</div>
+        </div>
+        <div className="text-sm font-medium flex-1 text-right">{formattedDate}</div>
       </header>
-      <main className="flex-1 p-4">
+      <main className="flex-1 px-4 py-3">
         {children}
       </main>
     </div>
