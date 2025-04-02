@@ -1,6 +1,7 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Service Dashboard",
+  "name": "Service Monitoring Dashboard",
+  "description": "Real-time monitoring dashboard for service health and performance",
   "icons": [
     {
       "src": "favicon.ico",
@@ -20,6 +21,8 @@
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#121212",
+  "background_color": "#121212",
+  "categories": ["monitoring", "dashboard", "devops"],
+  "orientation": "any"
 }

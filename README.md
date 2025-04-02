@@ -1,46 +1,86 @@
-# Getting Started with Create React App
+# Service Monitoring Dashboard
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A real-time dashboard for monitoring service health and performance across multiple domains. This application provides a comprehensive visualization of service metrics, allowing engineers and system administrators to quickly identify and resolve critical issues.
 
-## Available Scripts
+![Dashboard Preview](./random-ui-1_page-0001.jpg)
 
-In the project directory, you can run:
+## Features
 
-### `npm start`
+- **Domain Overview**: View summary metrics for each domain including total services and critical issues
+- **Polar Visualization**: Analyze service health and importance with an interactive bubble chart
+- **Critical Services Monitoring**: Track the 6 most critical services with 24-hour activity visualization
+- **Service List**: Browse all services with detailed metrics and status indicators
+- **Real-Time Updates**: Receive live updates of service metrics via WebSocket connection
+- **Detailed Service View**: Drill down into detailed service information with performance charts
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## Tech Stack
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+- **Frontend**: React 19 with TypeScript
+- **State Management**: Redux with Redux Toolkit
+- **Data Visualization**: D3.js
+- **Styling**: TailwindCSS
+- **API Communication**: Axios for REST API, WebSocket for real-time updates
 
-### `npm test`
+## Getting Started
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Prerequisites
 
-### `npm run build`
+- Node.js 16+
+- npm or yarn
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Installation
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+1. Clone the repository:
+```bash
+git clone https://github.com/your-org/dashboard-app.git
+cd dashboard-app
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+2. Install dependencies:
+```bash
+npm install
+```
 
-### `npm run eject`
+3. Generate mock data (first time only):
+```bash
+npm run generate-mock-data
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+### Available Scripts
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+- **`npm start`**: Runs the app in development mode at [http://localhost:3000](http://localhost:3000)
+- **`npm run build`**: Builds the app for production to the `build` folder
+- **`npm test`**: Launches the test runner in interactive watch mode
+- **`npm run mock-api`**: Starts the mock REST API server on port 3001
+- **`npm run mock-ws`**: Starts the mock WebSocket server on port 3002
+- **`npm run mock-servers`**: Runs both mock servers simultaneously
+- **`npm run dev`**: Runs the development environment with mock servers
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+### Recommended Development Workflow
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+For the best development experience, use:
+```bash
+npm run dev
+```
+
+This command will:
+1. Generate mock data
+2. Start the React development server
+3. Start the mock REST API server
+4. Start the mock WebSocket server
+
+## Application Structure
+
+- **`src/components`**: UI components organized by function
+- **`src/store`**: Redux store configuration and slices
+- **`src/services`**: API and WebSocket service implementations
+- **`src/hooks`**: Custom React hooks
+- **`src/types`**: TypeScript type definitions
+- **`mock-server`**: Mock data generation and API/WebSocket servers
 
 ## Learn More
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+- [React Documentation](https://reactjs.org/)
+- [Redux Toolkit Documentation](https://redux-toolkit.js.org/)
+- [D3.js Documentation](https://d3js.org/)
+- [TailwindCSS Documentation](https://tailwindcss.com/docs)
