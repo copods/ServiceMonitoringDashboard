@@ -1,11 +1,10 @@
 import React, { useEffect, useState, useCallback, useMemo, lazy, Suspense } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from 'store';
-// Removed direct API/action imports related to data fetching
 import { updateTimestamp } from 'store/slices/uiSlice';
-import { useDashboardData } from 'hooks/useDashboardData'; // Import the custom hook
-import DashboardLoadingIndicator from 'components/common/DashboardLoadingIndicator'; // Import loading component
-import DashboardErrorState from 'components/common/DashboardErrorState'; // Import error component
+import { useDashboardData } from 'hooks/useDashboardData';
+import DashboardLoadingIndicator from 'components/common/DashboardLoadingIndicator';
+import DashboardErrorState from 'components/common/DashboardErrorState';
 
 import DashboardLayout from 'components/layout/DashboardLayout';
 
@@ -17,33 +16,26 @@ const TopServicesGrid = lazy(() => import('components/service-cards/TopServicesG
 const ServiceList = lazy(() => import('components/service-cards/ServiceList'));
 const ServiceDetailsModal = lazy(() => import('components/modals/ServiceDetailsModal'));
 
-
-const TIMESTAMP_UPDATE_INTERVAL = 60000; // 1 minute
+const TIMESTAMP_UPDATE_INTERVAL = 60000;
 
 const LoadingFallback: React.FC = () => <div className="p-4 text-center">Loading...</div>;
 
 const Dashboard: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const domains = useSelector((state: RootState) => state.domains);
-  // Removed loading/error from service slice selector, using hook's state instead
   const { items: services, topCritical } = useSelector((state: RootState) => state.services);
-  const { isLoading: isDataLoading, error: dataError, refetchData } = useDashboardData(); // Use the hook
+  const { isLoading: isDataLoading, error: dataError, refetchData } = useDashboardData();
 
-  // State for selected service modal
   const [selectedService, setSelectedService] = useState<Service | null>(null);
 
-  // Update timestamp every minute
   useEffect(() => {
     const intervalId = setInterval(() => {
       dispatch(updateTimestamp());
-    }, TIMESTAMP_UPDATE_INTERVAL); // Use constant
+    }, TIMESTAMP_UPDATE_INTERVAL);
 
     return () => clearInterval(intervalId);
   }, [dispatch]);
 
-  // Data fetching logic is now handled by useDashboardData hook
-
-  // Handle service selection
   const handleServiceSelect = useCallback((serviceId: string) => {
     const service = services.find(s => s.id === serviceId);
     if (service) {
@@ -51,7 +43,6 @@ const Dashboard: React.FC = () => {
     }
   }, [services]);
 
-  // Handle modal close
   const handleCloseModal = useCallback(() => {
     setSelectedService(null);
   }, []);
@@ -60,17 +51,14 @@ const Dashboard: React.FC = () => {
     return services.filter(service => !topCritical.includes(service.id));
   }, [services, topCritical]);
 
-  // Use loading state component
   if (isDataLoading && services.length === 0) {
     return <DashboardLoadingIndicator />;
   }
 
-  // Use error state component
   if (dataError && services.length === 0) {
     return <DashboardErrorState error={dataError} onRetry={refetchData} />;
   }
 
-  // --- Main component render ---
   return (
     <DashboardLayout>
       {/* Domain Overview Section */}
@@ -78,7 +66,6 @@ const Dashboard: React.FC = () => {
         <DomainOverview />
       </Suspense>
 
-      {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
         {/* Left Side - Polar Chart */}
         <div className="lg:col-span-5">
@@ -117,7 +104,6 @@ const Dashboard: React.FC = () => {
         </Suspense>
       </div>
 
-      {/* Service Details Modal */}
       {selectedService && (
         <Suspense fallback={<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"><LoadingFallback /></div>}>
           <ServiceDetailsModal
