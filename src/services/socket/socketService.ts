@@ -8,14 +8,27 @@ class SocketService {
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 5;
   private reconnectTimeout: NodeJS.Timeout | null = null;
-  
-  initialize(dispatch: AppDispatch): () => void {
-    this.dispatch = dispatch;
+  private isConnecting = false; // Flag to prevent race conditions during initial connect
 
+  initialize(dispatch: AppDispatch): () => void {
+    this.dispatch = dispatch; // Always update dispatch if provided
+
+    // If a socket exists or we are already attempting to connect, do nothing more
+    if (this.socket !== null || this.isConnecting) {
+      console.log('SocketService: Initialization called but already connected or connecting.');
+      // Return a no-op cleanup for this specific effect run, 
+      // as it didn't initiate the connection.
+      return () => {}; 
+    }
+
+    console.log('SocketService: Initializing new connection.');
     const wsUrl = process.env.REACT_APP_WS_URL || 'ws://localhost:3002';
+    this.isConnecting = true; // Set flag before async operation
     this.connect(wsUrl);
     
+    // Return the actual cleanup function for the effect run that initiated the connection
     return () => {
+      console.log('SocketService: Cleanup function called.');
       this.disconnect();
     };
   }
@@ -31,26 +44,40 @@ class SocketService {
       
       this.socket.addEventListener('open', () => {
         this.reconnectAttempts = 0;
+        this.isConnecting = false; // Connection successful
       });
     } catch (error) {
       console.error('Failed to connect to WebSocket:', error);
+      this.isConnecting = false; // Connection failed
       this.attemptReconnect(wsUrl);
     }
   }
   
   private disconnect(): void {
-    if (this.socket) {
-      this.socket.close();
-      this.socket = null;
-    }
-    
     if (this.reconnectTimeout) {
       clearTimeout(this.reconnectTimeout);
       this.reconnectTimeout = null;
     }
+    
+    if (this.socket) {
+      console.log('SocketService: Disconnecting WebSocket.');
+      // Remove listeners to prevent errors during close
+      this.socket.onopen = null;
+      this.socket.onmessage = null;
+      this.socket.onerror = null;
+      this.socket.onclose = null;
+      this.socket.close();
+      this.socket = null; // Set to null *after* closing
+    }
+    this.isConnecting = false; // Reset connection attempt flag
   }
   
   private attemptReconnect(wsUrl: string): void {
+    // Don't attempt reconnect if already connecting or connected
+    if (this.isConnecting || (this.socket && this.socket.readyState === WebSocket.OPEN)) {
+      return;
+    }
+    
     if (this.reconnectAttempts >= this.maxReconnectAttempts) {
       console.error('Maximum reconnection attempts reached');
       return;
@@ -60,14 +87,16 @@ class SocketService {
     const delay = Math.min(1000 * Math.pow(2, this.reconnectAttempts), 30000);
     
     console.log(`Attempting to reconnect in ${delay / 1000} seconds... (Attempt ${this.reconnectAttempts})`);
-    
+    this.isConnecting = true; // Set flag before timeout
     this.reconnectTimeout = setTimeout(() => {
+      console.log(`SocketService: Executing reconnect attempt ${this.reconnectAttempts}...`);
       this.connect(wsUrl);
     }, delay);
   }
   
   private handleOpen = (): void => {
-    console.log('WebSocket connection established');
+    console.log('SocketService: WebSocket connection established');
+    this.isConnecting = false; // Update flag on successful open
   };
   
   private handleMessage = (event: MessageEvent): void => {
@@ -99,11 +128,13 @@ class SocketService {
   private handleError = (error: Event): void => {
     console.error('WebSocket error:', error);
   };
-  
   private handleClose = (event: CloseEvent): void => {
-    console.log('WebSocket connection closed:', event.code, event.reason);
+    console.log(`SocketService: WebSocket connection closed - Code: ${event.code}, Reason: ${event.reason || 'No reason given'}`);
+    this.isConnecting = false; // Update flag on close
+    this.socket = null; // Ensure socket is null on close
     
-    if (event.code !== 1000) {
+    // Attempt to reconnect only on abnormal closure and if not explicitly disconnected
+    if (event.code !== 1000 && event.code !== 1005) { // 1000 = Normal, 1005 = No Status Rcvd (often client-side disconnect)
       const wsUrl = process.env.REACT_APP_WS_URL || 'ws://localhost:3002';
       this.attemptReconnect(wsUrl);
     }
