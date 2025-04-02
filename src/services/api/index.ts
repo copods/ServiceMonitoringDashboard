@@ -1,6 +1,6 @@
 import axios from 'axios';
-import { Domain } from '../../types/domain';
-import { Service } from '../../types/service';
+import { Domain } from 'types/domain';
+import { Service } from 'types/service';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
 

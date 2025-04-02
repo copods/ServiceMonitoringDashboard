@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import * as d3 from 'd3';
-import { Service } from '../../../types/service';
-import { Domain } from '../../../types/domain';
+import { Service } from 'types/service';
+import { Domain } from 'types/domain';
 
 interface PolarChartProps {
   services: Service[];

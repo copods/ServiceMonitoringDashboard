@@ -1,6 +1,6 @@
 import React from 'react';
-import { Service } from '../../types/service';
-import { Domain } from '../../types/domain';
+import { Service } from 'types/service';
+import { Domain } from 'types/domain';
 
 interface ServiceListProps {
   services: Service[];

@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import * as d3 from 'd3';
-import { HourlyData } from '../../../types/service';
+import { HourlyData } from 'types/service';
 
 interface CircularBarChartProps {
   hourlyData: HourlyData[];

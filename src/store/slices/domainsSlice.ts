@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Domain } from '../../types/domain';
+import { Domain } from 'types/domain';
 
 const initialState: Domain[] = [];
 

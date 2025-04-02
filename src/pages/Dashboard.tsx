@@ -1,22 +1,22 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from '../store';
-import { fetchDomains, fetchServices } from '../services/api';
-import { setDomains } from '../store/slices/domainsSlice';
+import { AppDispatch, RootState } from 'store';
+import { fetchDomains, fetchServices } from 'services/api';
+import { setDomains } from 'store/slices/domainsSlice';
 import { 
-  fetchServicesStart, 
-  fetchServicesSuccess, 
-  fetchServicesFailure 
-} from '../store/slices/servicesSlice';
-import { updateTimestamp } from '../store/slices/uiSlice';
+  fetchServicesStart,
+  fetchServicesSuccess,
+  fetchServicesFailure
+} from 'store/slices/servicesSlice';
+import { updateTimestamp } from 'store/slices/uiSlice';
 
-import DashboardLayout from '../components/layout/DashboardLayout';
-import DomainOverview from '../components/domain-section/DomainOverview';
-import PolarChart from '../components/charts/polar-chart/PolarChart';
-import TopServicesGrid from '../components/service-cards/TopServicesGrid';
-import ServiceList from '../components/service-cards/ServiceList';
-import ServiceDetailsModal from '../components/modals/ServiceDetailsModal';
-import { Service } from '../types/service';
+import DashboardLayout from 'components/layout/DashboardLayout';
+import DomainOverview from 'components/domain-section/DomainOverview';
+import PolarChart from 'components/charts/polar-chart/PolarChart';
+import TopServicesGrid from 'components/service-cards/TopServicesGrid';
+import ServiceList from 'components/service-cards/ServiceList';
+import ServiceDetailsModal from 'components/modals/ServiceDetailsModal';
+import { Service } from 'types/service';
 
 const Dashboard: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();

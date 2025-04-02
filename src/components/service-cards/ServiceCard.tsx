@@ -1,6 +1,6 @@
 import React from 'react';
-import { Service } from '../../types/service';
-import CircularBarChart from '../../components/charts/circular-bar/CircularBarChart';
+import { Service } from 'types/service';
+import CircularBarChart from 'components/charts/circular-bar/CircularBarChart';
 
 interface ServiceCardProps {
   service: Service;
@@ -30,7 +30,7 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
           <h3 className="text-lg font-medium">{service.name}</h3>
           <div className="flex items-center">
             <span 
-              className="inline-block w-5 h-5 rounded-full mr-2 flex items-center justify-center"
+              className="w-5 h-5 rounded-full mr-2 flex items-center justify-center"
               style={{ backgroundColor: domainColor }}
             >
               <span className="text-xs font-bold text-white">{domainId}</span>

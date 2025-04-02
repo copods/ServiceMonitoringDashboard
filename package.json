@@ -31,7 +31,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "generate-mock-data": "node mock-server/data/generate.js",
-    "mock-api": "json-server --watch mock-server/db.json --port 3001",
+    "mock-api": "json-server mock-server/db.json --port 3001",
     "mock-ws": "node mock-server/websocket.js",
     "mock-servers": "npm run generate-mock-data && npm-run-all --parallel mock-api mock-ws",
     "dev": "npm run generate-mock-data && npm-run-all --parallel start mock-api mock-ws"

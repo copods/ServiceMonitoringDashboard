@@ -1,6 +1,6 @@
-import { AppDispatch } from '../../store';
-import { updateService } from '../../store/slices/servicesSlice';
-import { ServiceUpdate } from '../../types/service';
+import { AppDispatch } from 'store';
+import { updateService } from 'store/slices/servicesSlice';
+import { ServiceUpdate } from 'types/service';
 
 class SocketService {
   private socket: WebSocket | null = null;
@@ -11,12 +11,10 @@ class SocketService {
   
   initialize(dispatch: AppDispatch): () => void {
     this.dispatch = dispatch;
-    
-    // Connect to WebSocket server
+
     const wsUrl = process.env.REACT_APP_WS_URL || 'ws://localhost:3002';
     this.connect(wsUrl);
     
-    // Return cleanup function
     return () => {
       this.disconnect();
     };
@@ -26,13 +24,11 @@ class SocketService {
     try {
       this.socket = new WebSocket(wsUrl);
       
-      // Set up event handlers
       this.socket.onopen = this.handleOpen;
       this.socket.onmessage = this.handleMessage;
       this.socket.onerror = this.handleError;
       this.socket.onclose = this.handleClose;
       
-      // Reset reconnect attempts on successful connection attempt
       this.socket.addEventListener('open', () => {
         this.reconnectAttempts = 0;
       });
@@ -107,14 +103,12 @@ class SocketService {
   private handleClose = (event: CloseEvent): void => {
     console.log('WebSocket connection closed:', event.code, event.reason);
     
-    // Only attempt to reconnect if it wasn't a normal closure
     if (event.code !== 1000) {
       const wsUrl = process.env.REACT_APP_WS_URL || 'ws://localhost:3002';
       this.attemptReconnect(wsUrl);
     }
   };
   
-  // Method to send messages to the server
   sendMessage(type: string, payload: any): void {
     if (this.socket && this.socket.readyState === WebSocket.OPEN) {
       this.socket.send(JSON.stringify({ type, payload }));
@@ -123,13 +117,11 @@ class SocketService {
     }
   }
   
-  // Check if socket is connected
   isConnected(): boolean {
     return this.socket !== null && this.socket.readyState === WebSocket.OPEN;
   }
 }
 
-// Create singleton instance
 const socketService = new SocketService();
 
 export default socketService;

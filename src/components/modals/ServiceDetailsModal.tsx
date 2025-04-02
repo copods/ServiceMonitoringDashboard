@@ -1,8 +1,8 @@
 import React from 'react';
-import { Service } from '../../types/service';
-import { Domain } from '../../types/domain';
-import CircularBarChart from '../../components/charts/circular-bar/CircularBarChart';
-import LineChart from '../../components/charts/line-chart/LineChart';
+import { Service } from 'types/service';
+import { Domain } from 'types/domain';
+import CircularBarChart from 'components/charts/circular-bar/CircularBarChart';
+import LineChart from 'components/charts/line-chart/LineChart';
 
 interface ServiceDetailsModalProps {
   service: Service;
