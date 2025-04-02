@@ -62,15 +62,18 @@ const Dashboard: React.FC = () => {
   return (
     <DashboardLayout>
       {/* Domain Overview Section */}
-      <Suspense fallback={<LoadingFallback />}>
-        <DomainOverview />
-      </Suspense>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-1 mb-4"> 
+        {domains.map((domain) => (
+          <Suspense fallback={<LoadingFallback />} key={domain.id}>
+            <DomainOverview domain={domain} />
+          </Suspense>
+        ))}
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
         {/* Left Side - Polar Chart */}
         <div className="lg:col-span-5">
           <div className="bg-gray-800 p-4 rounded">
-            <h2 className="text-xl font-semibold mb-4">Service Status Overview</h2>
             <Suspense fallback={<LoadingFallback />}>
               <PolarChart
                 services={services}
@@ -85,7 +88,6 @@ const Dashboard: React.FC = () => {
 
         {/* Right Side - Service Cards */}
         <div className="lg:col-span-7">
-          <h2 className="text-xl font-semibold mb-4">Top Critical Services</h2>
           <Suspense fallback={<LoadingFallback />}>
             <TopServicesGrid onServiceSelect={handleServiceSelect} />
           </Suspense>

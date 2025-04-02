@@ -1,31 +1,51 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
-import { RootState } from 'store';
+import { Domain } from 'types/domain';
+import {
+  selectTotalServicesByDomainId,
+  selectCriticalServicesByDomainId
+} from 'store/selectors/domainSelectors';
+import { useAppSelector } from 'store';
+import { toRoman } from 'utils';
 
-const DomainOverview: React.FC = () => {
-  const domains = useSelector((state: RootState) => state.domains);
+interface DomainOverviewProps {
+  domain: Domain;
+}
+
+export const DomainOverview: React.FC<DomainOverviewProps> = ({ domain }) => {
+  const totalServices = useAppSelector(selectTotalServicesByDomainId(domain.id));
+  const criticalServices = useAppSelector(selectCriticalServicesByDomainId(domain.id));
+
+  const Icon = () => {
+    const match = domain.id.match(/\d+$/);
+    const number = match ? parseInt(match[0], 10) : NaN;
+    const romanNumeral = toRoman(number);
+
+    return (
+      <span
+        className="inline-flex items-center justify-center w-6 h-6 mr-2 border rounded-full text-xs font-bold"
+        style={{ borderColor: domain.colorCode, color: domain.colorCode }}
+      >
+        {romanNumeral}
+      </span>
+    );
+  };
 
   return (
-    <div className="grid grid-cols-4 gap-4 mb-6">
-      {domains.map((domain) => (
-        <div key={domain.id} className="bg-gray-800 p-4 rounded">
-          <div className="flex items-center">
-            <div 
-              className="w-8 h-8 rounded-full flex items-center justify-center mr-2"
-              style={{ backgroundColor: domain.colorCode }}
-            >
-              <span className="text-white font-bold">{domain.id}</span>
-            </div>
-            <h3 className="text-lg font-medium">{domain.name}</h3>
-          </div>
-          <div className="flex items-center mt-2">
-            <span className="text-3xl font-bold mr-2">{domain.totalServices}</span>
-            <span className="text-sm text-gray-400">Services</span>
-            <span className="ml-4 text-2xl font-bold text-red-500">{domain.criticalServices}</span>
-            <span className="text-sm text-gray-400 ml-1">Critical</span>
-          </div>
+    <div className="flex items-center align-middle py-2 px-4 gap-1 bg-[#2E2F34] border-b border-gray-700">
+      <Icon />
+      <div className='flex-row'>
+        <h2 className="text-lg font-semibold text-white mb-2">{domain.name}</h2>
+        <div className="flex items-center text-gray-300">
+          <span className="text-2xl font-bold mr-1">{totalServices}</span>
+          <span className="text-sm mr-4">Services</span>
+
+          <span className="inline-block w-2 h-2 bg-red-500 mr-1"></span>
+
+          <span className="text-2xl font-bold mr-1">{criticalServices}</span>
+          <span className="text-sm">Critical</span>
         </div>
-      ))}
+      </div>
+
     </div>
   );
 };

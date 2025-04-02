@@ -8,7 +8,7 @@ const randomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + mi
 // Generate domains
 const generateDomains = () => {
   const domainNames = ['Domain Enterprise', 'Domain name text', 'Domain 3', 'Domain 1'];
-  const colorCodes = ['#3498db', '#2ecc71', '#9b59b6', '#e74c3c'];
+  const colorCodes = ['#54D6FF', '#728E4F', '#9290F7', '#FF82FE'];
   
   return domainNames.map((name, index) => {
     const id = (index + 1).toString();

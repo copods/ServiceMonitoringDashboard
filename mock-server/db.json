@@ -5,28 +5,28 @@
       "name": "Domain Enterprise",
       "totalServices": 120,
       "criticalServices": 12,
-      "colorCode": "#3498db"
+      "colorCode": "#54D6FF"
     },
     {
       "id": "2",
       "name": "Domain name text",
       "totalServices": 430,
       "criticalServices": 8,
-      "colorCode": "#2ecc71"
+      "colorCode": "#728E4F"
     },
     {
       "id": "3",
       "name": "Domain 3",
       "totalServices": 45,
       "criticalServices": 32,
-      "colorCode": "#9b59b6"
+      "colorCode": "#9290F7"
     },
     {
       "id": "4",
       "name": "Domain 1",
       "totalServices": 84,
       "criticalServices": 16,
-      "colorCode": "#e74c3c"
+      "colorCode": "#FF82FE"
     }
   ],
   "services": [

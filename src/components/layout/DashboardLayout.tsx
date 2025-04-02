@@ -32,7 +32,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
           <span>{timePart} HRS</span><span>{datePart}</span>
         </div>
       </header>
-      <main className="flex-1 px-4 py-3">
+      <main className="flex-1 px-4 py-1 bg-[#232429]">
         {children}
       </main>
     </div>

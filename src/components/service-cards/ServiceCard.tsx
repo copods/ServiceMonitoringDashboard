@@ -21,7 +21,7 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
 
   return (
     <div 
-      className="bg-gray-800 p-4 rounded shadow-md hover:shadow-lg transition-all"
+      className="bg-[#27282D] p-4 rounded shadow-md hover:shadow-lg transition-all"
       onClick={onClick}
       style={{ cursor: onClick ? 'pointer' : 'default' }}
     >

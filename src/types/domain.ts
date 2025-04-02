@@ -3,5 +3,5 @@ export interface Domain {
   name: string;
   totalServices: number;
   criticalServices: number;
-  colorCode: string; // For UI representation
+  colorCode: string;
 }
