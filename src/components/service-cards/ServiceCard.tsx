@@ -1,75 +1,57 @@
 import React from 'react';
 import { Service } from 'types/service';
 import CircularBarChart from 'components/charts/circular-bar/CircularBarChart';
+import { Icon } from '../common/Icon';
+import { Domain } from 'types/domain';
 
 interface ServiceCardProps {
   service: Service;
-  domainColor: string;
-  domainId: string;
+  domain: Domain
   onClick?: () => void;
 }
 
-const ServiceCard: React.FC<ServiceCardProps> = ({ 
-  service, 
-  domainColor, 
-  domainId,
+const ServiceCard: React.FC<ServiceCardProps> = ({
+  service,
+  domain,
   onClick
 }) => {
-  const statusColor = 
-    service.status === 'critical' ? 'bg-red-500' :
-    service.status === 'warning' ? 'bg-yellow-500' : 'bg-gray-500';
-
   return (
-    <div 
-      className="bg-[#27282D] p-4 rounded shadow-md hover:shadow-lg transition-all"
+    <div
+      className="bg-[#27282D] py-2 px-4 rounded shadow-md hover:shadow-lg transition-all"
       onClick={onClick}
       style={{ cursor: onClick ? 'pointer' : 'default' }}
     >
-      <div className="flex justify-between items-start mb-2">
-        <div>
-          <h3 className="text-lg font-medium">{service.name}</h3>
-          <div className="flex items-center">
-            <span 
-              className="w-5 h-5 rounded-full mr-2 flex items-center justify-center"
-              style={{ backgroundColor: domainColor }}
-            >
-              <span className="text-xs font-bold text-white">{domainId}</span>
-            </span>
-            <span className={`inline-block w-2 h-2 rounded-full ${statusColor} mr-1`}></span>
-            <span className="text-sm text-gray-400 capitalize">{service.status}</span>
-          </div>
+      <div className="flex justify-between items-start mb-1">
+        <div className="flex-1">
+          <h3 className="text-l font-medium text-white mb-1 drop-shadow-sm">{service.name}</h3>
+        </div>
+
+        <div className="text-right">
+          <Icon domain={domain} border={false} />
+        </div>
+      </div>
+      
+      <div className="relative">
+        {/* Chart container with padding to create space */}
+        <div className="flex justify-center pl-2 pt-5">
+          <CircularBarChart
+            hourlyData={service.hourlyData}
+            width={220}
+            height={220}
+          />
         </div>
         
-        <div className="text-right">
-          <div className="flex items-center justify-end">
-            <span className="text-red-500 mr-1">•</span>
-            <span className="text-xl font-bold">{service.criticalityPercentage}%</span>
+        {/* Floating div positioned absolutely over the chart */}
+        <div className="absolute top-0 left-0 z-10">
+          <div className="flex items-baseline">
+            <span className="bg-red-500 w-2 h-2 mr-2"></span>
+            <span className="text-xl font-bold">{service.criticalityPercentage}
+              <span className="text-xl">%</span>
+            </span>
           </div>
-          <div className="text-sm text-gray-400">
-            {(service.totalRequests / 1000).toFixed(1)}K requests
+          <div className="text-base text-gray-400 mt-1">
+            {(service.totalRequests / 1000).toFixed(1)}K
           </div>
-        </div>
-      </div>
-      
-      <div className="flex justify-center mt-2">
-        <CircularBarChart 
-          hourlyData={service.hourlyData}
-          width={180}
-          height={180}
-        />
-      </div>
-      
-      <div className="grid grid-cols-2 gap-2 mt-2 text-sm">
-        <div>
-          <span className="text-gray-400">Failed:</span>
-          <span className="ml-1 text-red-500">{service.failedRequests.toLocaleString()}</span>
-        </div>
-        <div>
-          <span className="text-gray-400">Alerts:</span>
-          <span className="ml-1">{service.alerts}</span>
-          {service.criticalAlerts > 0 && (
-            <span className="ml-1 text-red-500">({service.criticalAlerts} critical)</span>
-          )}
         </div>
       </div>
     </div>

@@ -62,7 +62,7 @@ const Dashboard: React.FC = () => {
   return (
     <DashboardLayout>
       {/* Domain Overview Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-1 mb-4"> 
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-1 mb-1"> 
         {domains.map((domain) => (
           <Suspense fallback={<LoadingFallback />} key={domain.id}>
             <DomainOverview domain={domain} />

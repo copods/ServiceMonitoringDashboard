@@ -18,15 +18,14 @@ const TopServicesGrid: React.FC<TopServicesGridProps> = ({ onServiceSelect }) =>
   );
   
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1">
       {topServices.map(service => {
         const domain = domains.find(d => d.id === service.domainId);
         return (
           <ServiceCard 
             key={service.id}
             service={service}
-            domainColor={domain?.colorCode || '#666'}
-            domainId={domain?.id || ''}
+            domain={domain ? domain : { id: '', name: '', colorCode: '', totalServices: 0, criticalServices: 0 }}
             onClick={onServiceSelect ? () => onServiceSelect(service.id) : undefined}
           />
         );
@@ -35,7 +34,7 @@ const TopServicesGrid: React.FC<TopServicesGridProps> = ({ onServiceSelect }) =>
       {topServices.length < 6 && Array.from({ length: 6 - topServices.length }).map((_, index) => (
         <div 
           key={`placeholder-${index}`} 
-          className="bg-gray-800 p-4 rounded shadow-md opacity-50 flex items-center justify-center"
+          className="bg-[#2E2F34] p-6 rounded shadow-md opacity-50 flex items-center justify-center"
         >
           <span className="text-gray-400">No critical service</span>
         </div>

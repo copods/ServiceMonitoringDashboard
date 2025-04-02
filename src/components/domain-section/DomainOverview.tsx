@@ -5,7 +5,7 @@ import {
   selectCriticalServicesByDomainId
 } from 'store/selectors/domainSelectors';
 import { useAppSelector } from 'store';
-import { toRoman } from 'utils';
+import { Icon } from '../common/Icon';
 
 interface DomainOverviewProps {
   domain: Domain;
@@ -15,24 +15,9 @@ export const DomainOverview: React.FC<DomainOverviewProps> = ({ domain }) => {
   const totalServices = useAppSelector(selectTotalServicesByDomainId(domain.id));
   const criticalServices = useAppSelector(selectCriticalServicesByDomainId(domain.id));
 
-  const Icon = () => {
-    const match = domain.id.match(/\d+$/);
-    const number = match ? parseInt(match[0], 10) : NaN;
-    const romanNumeral = toRoman(number);
-
-    return (
-      <span
-        className="inline-flex items-center justify-center w-6 h-6 mr-2 border rounded-full text-xs font-bold"
-        style={{ borderColor: domain.colorCode, color: domain.colorCode }}
-      >
-        {romanNumeral}
-      </span>
-    );
-  };
-
   return (
     <div className="flex items-center align-middle py-2 px-4 gap-1 bg-[#2E2F34] border-b border-gray-700">
-      <Icon />
+      <Icon border={true} domain={domain} />
       <div className='flex-row'>
         <h2 className="text-lg font-semibold text-white mb-2">{domain.name}</h2>
         <div className="flex items-center text-gray-300">

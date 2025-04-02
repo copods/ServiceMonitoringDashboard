@@ -18,7 +18,8 @@ const CircularBarChart: React.FC<CircularBarChartProps> = ({ hourlyData, width, 
     d3.select(svgRef.current).selectAll('*').remove();
     
     const svg = d3.select(svgRef.current);
-    const radius = Math.min(width, height) / 2 - 10;
+    // Reduce the radius slightly to provide more space for labels
+    const radius = Math.min(width, height) / 2 - 30;
     const centerX = width / 2;
     const centerY = height / 2;
     
@@ -28,100 +29,128 @@ const CircularBarChart: React.FC<CircularBarChartProps> = ({ hourlyData, width, 
     
     // Calculate the angle for each hour (24 hours)
     const angleStep = (2 * Math.PI) / 24;
+    // Starting angle: we want 24/00 to be at the 9 o'clock position (left)
+    const startAngle = Math.PI; // This places 24/00 at the left (9 o'clock position)
     
     // Create scales for bar height
     const maxRequests = d3.max(hourlyData, d => d.totalRequests) || 0;
     const radiusScale = d3.scaleLinear()
       .domain([0, maxRequests])
-      .range([0, radius * 0.8]);
+      .range([radius * 0.35, radius * 0.8]);
     
-    // Draw hour markers
+    const mainHours = [0, 6, 12, 18];
+    
     for (let i = 0; i < 24; i++) {
-      const angle = i * angleStep - Math.PI / 2;
-      const isMainHour = i % 6 === 0;
+      const angle = i * angleStep + startAngle;
+      const isMainHour = mainHours.includes(i);
       
+      // Draw tick mark
       const outerX = radius * Math.cos(angle);
       const outerY = radius * Math.sin(angle);
-      
-      const innerX = (radius - 5) * Math.cos(angle);
-      const innerY = (radius - 5) * Math.sin(angle);
+      const innerX = (radius + 5) * Math.cos(angle);
+      const innerY = (radius + 5) * Math.sin(angle);
       
       chart.append('line')
         .attr('x1', innerX)
         .attr('y1', innerY)
         .attr('x2', outerX)
         .attr('y2', outerY)
-        .attr('stroke', '#555')
-        .attr('stroke-width', isMainHour ? 2 : 1);
+        .attr('stroke', '#4A4A54')
+        .attr('stroke-width', 1);
         
       if (isMainHour) {
-        const labelX = (radius + 15) * Math.cos(angle);
-        const labelY = (radius + 15) * Math.sin(angle);
+        // Adjust label position with more space from the chart edge
+        const labelDistance = radius + 20;
+        const labelX = labelDistance * Math.cos(angle);
+        const labelY = labelDistance * Math.sin(angle);
+        
+        // Format hours with leading zeros for consistency
+        const hourText = i === 0 ? '24' : i.toString().padStart(2, '0');
         
         chart.append('text')
           .attr('x', labelX)
           .attr('y', labelY)
           .attr('text-anchor', 'middle')
           .attr('dominant-baseline', 'middle')
-          .attr('fill', 'white')
-          .attr('font-size', '12px')
-          .text(i === 0 ? '24' : i.toString());
+          .attr('fill', '#C0C0C0')
+          .attr('font-size', '14px')
+          .text(hourText);
       }
     }
+    
+    // Create center circular area for AM/PM indicator - increased size
+    chart.append('circle')
+      .attr('r', radius * 0.35)
+      .attr('fill', '#1D1E24')
+      .attr('stroke', '#333')
+      .attr('stroke-width', 1);
+    
+    // Create dividing line between AM and PM
+    chart.append('line')
+      .attr('x1', -radius * 0.35)
+      .attr('y1', 0)
+      .attr('x2', radius * 0.35)
+      .attr('y2', 0)
+      .attr('stroke', '#9c9c9c')
+      .attr('stroke-width', 1.2);
     
     // Draw AM/PM indicator in the center
     chart.append('text')
       .attr('x', 0)
-      .attr('y', -8)
+      .attr('y', -10)
       .attr('text-anchor', 'middle')
-      .attr('fill', 'white')
+      .attr('fill', '#C0C0C0')
       .attr('font-size', '12px')
       .text('AM');
       
     chart.append('text')
       .attr('x', 0)
-      .attr('y', 8)
+      .attr('y', 14)
       .attr('text-anchor', 'middle')
-      .attr('fill', 'white')
+      .attr('fill', '#C0C0C0')
       .attr('font-size', '12px')
       .text('PM');
     
-    // Draw bars for each hour
     hourlyData.forEach(data => {
       const hour = data.hour;
-      const angle = hour * angleStep - Math.PI / 2;
+      const angle = hour * angleStep + startAngle;
       
       // Calculate bar width
-      const barWidth = angleStep * 0.7;
+      const barWidth = angleStep * 0.8;
       
-      // Draw total requests bar (grey)
+      // Draw total requests bar (gray)
       const totalBarHeight = radiusScale(data.totalRequests);
       const arcGenerator = d3.arc()
-        .innerRadius(0)
+        .innerRadius(radius * 0.35)
         .outerRadius(totalBarHeight)
         .startAngle(angle - barWidth/2)
-        .endAngle(angle + barWidth/2);
+        .endAngle(angle + barWidth/2)
+        .padAngle(0.02);
         
       chart.append('path')
         .attr('d', arcGenerator({} as any) as string)
-        .attr('fill', '#555')
+        .attr('fill', '#4A4A54')
+        .attr('opacity', 0.8)
         .append('title')
         .text(`Hour: ${hour}\nTotal Requests: ${data.totalRequests.toLocaleString()}`);
-        
+      
       // Draw failed requests bar (red)
       if (data.failedRequests > 0) {
-        const failedBarHeight = radiusScale(data.failedRequests);
+        const failedRatio = data.failedRequests / data.totalRequests;
+        const failedBarHeight = radius * 0.35 + (totalBarHeight - radius * 0.35) * failedRatio;
+        
         const failedArcGenerator = d3.arc()
-          .innerRadius(0)
+          .innerRadius(radius * 0.35)
           .outerRadius(failedBarHeight)
           .startAngle(angle - barWidth/2)
-          .endAngle(angle + barWidth/2);
+          .endAngle(angle + barWidth/2)
+          .padAngle(0.02);
           
         chart.append('path')
           .attr('d', failedArcGenerator({} as any) as string)
-          .attr('fill', '#FF0000')
+          .attr('fill', '#F40030')
           .append('title')
-          .text(`Hour: ${hour}\nFailed Requests: ${data.failedRequests.toLocaleString()}`);
+          .text(`Hour: ${hour}\nFailed Requests: ${data.failedRequests.toLocaleString()} (${(failedRatio * 100).toFixed(1)}%)`);
       }
     });
     
@@ -129,7 +158,7 @@ const CircularBarChart: React.FC<CircularBarChartProps> = ({ hourlyData, width, 
     chart.append('circle')
       .attr('r', radius)
       .attr('fill', 'none')
-      .attr('stroke', '#444')
+      .attr('stroke', '#4A4A54')
       .attr('stroke-width', 1);
     
   }, [hourlyData, width, height]);
@@ -139,7 +168,7 @@ const CircularBarChart: React.FC<CircularBarChartProps> = ({ hourlyData, width, 
       ref={svgRef} 
       width={width} 
       height={height}
-      className="bg-gray-900"
+      className="bg-transparent"
     />
   );
 };
