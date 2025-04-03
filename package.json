@@ -34,7 +34,7 @@
     "mock-api": "json-server mock-server/db.json --port 3001",
     "mock-ws": "node mock-server/websocket.js",
     "mock-servers": "npm run generate-mock-data && npm-run-all --parallel mock-api mock-ws",
-    "dev": "npm run generate-mock-data && npm-run-all --parallel start mock-api mock-ws"
+    "dev": "npm-run-all --parallel start mock-api mock-ws"
   },
   "eslintConfig": {
     "extends": [
