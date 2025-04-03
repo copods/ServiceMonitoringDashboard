@@ -1,6 +1,8 @@
 import React from 'react';
 import { Service } from 'types/service';
 import { Domain } from 'types/domain';
+import { Icon } from 'components/common/Icon';
+import LineChart from 'components/charts/line-chart/LineChart';
 
 interface ServiceListProps {
   services: Service[];
@@ -11,92 +13,88 @@ interface ServiceListProps {
 const ServiceList: React.FC<ServiceListProps> = ({ services, domains, onServiceSelect }) => {
   if (services.length === 0) {
     return (
-      <div className="bg-gray-800 p-6 rounded shadow text-center">
+      <div className="bg-[#232429] p-6 rounded text-center">
         <p className="text-gray-400">No additional services to display.</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-gray-800 rounded shadow overflow-hidden">
-      <table className="min-w-full">
-        <thead>
-          <tr className="bg-gray-900">
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-              Service
-            </th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-              Domain
-            </th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-              Status
-            </th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-              Criticality
-            </th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-              Requests
-            </th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-              Failed
-            </th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-              Alerts
-            </th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-gray-700">
-          {services.map(service => {
-            const domain = domains.find(d => d.id === service.domainId);
-            const statusColor = 
-              service.status === 'critical' ? 'bg-red-500' :
-              service.status === 'warning' ? 'bg-yellow-500' : 'bg-gray-500';
-            
-            return (
-              <tr 
-                key={service.id} 
-                className="hover:bg-gray-700 cursor-pointer"
-                onClick={() => onServiceSelect && onServiceSelect(service.id)}
-              >
-                <td className="px-4 py-3 whitespace-nowrap">
-                  <div className="font-medium">{service.name}</div>
-                </td>
-                <td className="px-4 py-3 whitespace-nowrap">
-                  <div className="flex items-center">
-                    <span 
-                      className="inline-block w-4 h-4 rounded-full mr-2"
-                      style={{ backgroundColor: domain?.colorCode || '#666' }}
-                    >
-                    </span>
-                    <span>{domain?.name || 'Unknown'}</span>
+    <div>
+      <div className="max-h-[500px] overflow-y-auto pr-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+        {services.map(service => {
+          const domain = domains.find(d => d.id === service.domainId) || { 
+            id: '', 
+            name: 'Unknown', 
+            colorCode: '#666',
+            totalServices: 0,
+            criticalServices: 0
+          };
+          
+          // Sort hourly data by hour to ensure it's in chronological order
+          const sortedHourlyData = [...service.hourlyData].sort((a, b) => a.hour - b.hour);
+          
+          // Take the most recent 6 hours of data to show a trend (shorter window)
+          const currentHour = new Date().getHours();
+          const recentHoursData = [];
+          
+          // Start from 5 hours ago and include current hour
+          for (let i = 5; i >= 0; i--) {
+            const hourToFind = (currentHour - i + 24) % 24; // Handle wrapping around midnight
+            const hourData = sortedHourlyData.find(data => data.hour === hourToFind);
+            if (hourData) {
+              recentHoursData.push(hourData.totalRequests);
+            } else {
+              // If no data, add a placeholder
+              recentHoursData.push(0);
+            }
+          }
+          
+          const hourlyTotalRequests = recentHoursData;
+          
+          return (
+            <div 
+              key={service.id}
+              className="bg-[#212226] p-4 rounded shadow-md hover:bg-[#2A2B30] cursor-pointer transition-colors"
+              onClick={() => onServiceSelect && onServiceSelect(service.id)}
+            >
+              <div className="flex justify-between items-start mb-2">
+                <div className="font-medium text-white truncate mr-2">{service.name}</div>
+                <Icon domain={domain} border={false} />
+              </div>
+              
+              <div className="flex justify-between items-center">
+                <div className="flex items-baseline">
+                  <div className="flex items-baseline mr-3">
+                    <span className="text-2xl font-bold mr-1">{service.alerts}</span>
+                    <span className="text-xs text-gray-400">Alerts</span>
                   </div>
-                </td>
-                <td className="px-4 py-3 whitespace-nowrap">
-                  <div className="flex items-center">
-                    <span className={`inline-block w-2 h-2 rounded-full ${statusColor} mr-2`}></span>
-                    <span className="capitalize">{service.status}</span>
-                  </div>
-                </td>
-                <td className="px-4 py-3 whitespace-nowrap">
-                  <div className="font-bold">{service.criticalityPercentage}%</div>
-                </td>
-                <td className="px-4 py-3 whitespace-nowrap">
-                  {service.totalRequests.toLocaleString()}
-                </td>
-                <td className="px-4 py-3 whitespace-nowrap">
-                  <span className="text-red-500">{service.failedRequests.toLocaleString()}</span>
-                </td>
-                <td className="px-4 py-3 whitespace-nowrap">
-                  <span>{service.alerts}</span>
                   {service.criticalAlerts > 0 && (
-                    <span className="ml-1 text-red-500">({service.criticalAlerts} critical)</span>
+                    <div className="flex items-baseline">
+                      <span className="bg-red-500 w-2 h-2 mr-1"></span>
+                      <span className="text-2xl font-bold mr-1">{service.criticalAlerts}</span>
+                      <span className="text-xs text-gray-400">Critical</span>
+                    </div>
                   )}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+                </div>
+                
+                <div>
+                  <div className="h-8 w-[120px]" title={`Last Hour Trend: ${hourlyTotalRequests[hourlyTotalRequests.length-1].toLocaleString()} requests in the most recent hour`}>
+                    <LineChart 
+                      data={hourlyTotalRequests}
+                      width={120}
+                      height={32}
+                      color="white"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+        </div>
+      </div>
     </div>
   );
 };

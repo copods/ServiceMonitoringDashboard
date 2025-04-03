@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from 'store';
 import { updateTimestamp } from 'store/slices/uiSlice';
 import { useDashboardData } from 'hooks/useDashboardData';
-import DashboardLoadingIndicator from 'components/common/DashboardLoadingIndicator';
 import DashboardErrorState from 'components/common/DashboardErrorState';
 
 import DashboardLayout from 'components/layout/DashboardLayout';
@@ -24,7 +23,7 @@ const Dashboard: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const domains = useSelector((state: RootState) => state.domains);
   const { items: services, topCritical } = useSelector((state: RootState) => state.services);
-  const { isLoading: isDataLoading, error: dataError, refetchData } = useDashboardData();
+  const { error: dataError, refetchData } = useDashboardData();
 
   const [selectedService, setSelectedService] = useState<Service | null>(null);
 
@@ -51,10 +50,6 @@ const Dashboard: React.FC = () => {
     return services.filter(service => !topCritical.includes(service.id));
   }, [services, topCritical]);
 
-  if (isDataLoading && services.length === 0) {
-    return <DashboardLoadingIndicator />;
-  }
-
   if (dataError && services.length === 0) {
     return <DashboardErrorState error={dataError} onRetry={refetchData} />;
   }
@@ -64,17 +59,17 @@ const Dashboard: React.FC = () => {
       {/* Domain Overview Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-1 mb-1">
         {domains.map((domain) => (
-          <Suspense fallback={<LoadingFallback />} key={domain.id}>
+          <Suspense key={domain.id}>
             <DomainOverview domain={domain} />
           </Suspense>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-1">
         {/* Left Side - Polar Chart */}
         <div className="lg:col-span-5">
           <div className="bg-[#232429]">
-            <Suspense fallback={<LoadingFallback />}>
+            <Suspense>
               <PolarChart
                 services={services}
                 domains={domains}
@@ -88,16 +83,15 @@ const Dashboard: React.FC = () => {
 
         {/* Right Side - Service Cards */}
         <div className="lg:col-span-7">
-          <Suspense fallback={<LoadingFallback />}>
+          <Suspense>
             <TopServicesGrid onServiceSelect={handleServiceSelect} />
           </Suspense>
         </div>
       </div>
 
       {/* Scrollable Service List */}
-      <div className="mt-6">
-        <h2 className="text-xl font-semibold mb-3">All Other Services</h2>
-        <Suspense fallback={<LoadingFallback />}>
+      <div>
+        <Suspense>
           <ServiceList
             services={otherServices}
             domains={domains}
