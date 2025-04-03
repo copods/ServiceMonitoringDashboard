@@ -6,7 +6,7 @@ import { Domain } from 'types/domain';
 
 interface ServiceCardProps {
   service: Service;
-  domain: Domain
+  domain: Domain;
   onClick?: () => void;
 }
 
