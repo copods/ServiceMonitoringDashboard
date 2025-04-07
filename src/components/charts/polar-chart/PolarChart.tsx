@@ -180,9 +180,9 @@ const PolarChart: React.FC<PolarChartProps> = ({
       const prevImportance = service.previousImportance !== undefined ? service.previousImportance : prevPosition.importance;
       const newImportance = service.importance;
       
-      // Calculate distances
-      const prevDistanceFactor = 1/3 + ((1 - prevImportance/100) * 2)/3;
-      const newDistanceFactor = 1/3 + ((1 - newImportance/100) * 2)/3;
+      // Calculate distances using the same formula as the updated positioning logic
+      const prevDistanceFactor = Math.max(0.1, 1 - (prevImportance/100 * 0.9));
+      const newDistanceFactor = Math.max(0.1, 1 - (newImportance/100 * 0.9));
       
       const prevDistance = radius * prevDistanceFactor;
       const newDistance = radius * newDistanceFactor;
@@ -384,11 +384,14 @@ const PolarChart: React.FC<PolarChartProps> = ({
       const random = mulberry32(parseInt(service.id, 16) + serviceIndex * 10);
 
       const importanceFactor = service.importance / 100;
-      const baseDistanceFactor = 1 / 3 + ((1 - importanceFactor) * 2) / 3;
+      // Reversed logic: high importance (99%) should be closest to center
+      // Allow services with very high importance to appear inside the red circle
+      const baseDistanceFactor = Math.max(0.1, 1 - (importanceFactor * 0.9)); // Higher importance = smaller distance factor
       const randomizedDistanceFactor =
         baseDistanceFactor * (0.95 + random() * 0.1);
+      // Allow services with very high importance to be positioned inside the red circle (removing the 1/3 minimum)
       const finalDistanceFactor = Math.max(
-        1 / 3,
+        0.1, // Lower minimum to allow positioning inside red circle
         Math.min(1, randomizedDistanceFactor)
       );
       const distance = radius * finalDistanceFactor;
@@ -640,5 +643,4 @@ const PolarChart: React.FC<PolarChartProps> = ({
     </div>
   );
 };
-
 export default PolarChart;

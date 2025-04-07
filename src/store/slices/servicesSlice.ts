@@ -71,11 +71,14 @@ export const servicesSlice = createSlice({
       // Find the service to update
       const serviceIndex = state.items.findIndex(service => service.id === id);
       if (serviceIndex !== -1) {
+        // Ensure importance doesn't go below 5
+        const validatedImportance = Math.max(5, importance);
+        
         // Update the service with animation metadata
         state.items[serviceIndex] = {
           ...state.items[serviceIndex],
           previousImportance,
-          importance,
+          importance: validatedImportance,
           animatingImportance: true,
           animationStartTime: Date.now()
         };

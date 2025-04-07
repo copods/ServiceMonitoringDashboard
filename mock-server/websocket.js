@@ -25,13 +25,35 @@ const generateImportanceUpdate = (services) => {
   const previousImportance = selectedService.importance;
   const newImportance = isIncreasing 
     ? Math.min(100, previousImportance + changeAmount)
-    : Math.max(0, previousImportance - changeAmount);
+    : Math.max(5, previousImportance - changeAmount);
   
   // Don't update if we've reached limits
   if (newImportance === previousImportance) return null;
   
   // Update the local service data
   selectedService.importance = newImportance;
+  
+  // If importance is increasing to above 75%, ensure totalRequests and failedRequests are capped at 11,000
+  if (isIncreasing && newImportance > 75 && previousImportance <= 75) {
+    // Check total and failed requests Math.max(10, previousImportance - changeAmount) adjust if needed
+    if (selectedService.totalRequests > 11000) {
+      selectedService.totalRequests = randomInt(9000, 11000);
+    }
+    
+    if (selectedService.failedRequests > 11000) {
+      selectedService.failedRequests = randomInt(1000, 11000);
+    }
+    
+    // Also adjust hourly data to be consistent
+    selectedService.hourlyData.forEach(hourData => {
+      if (hourData.totalRequests > 11000 / 24) {
+        hourData.totalRequests = randomInt(300, 450); // ~11000/24
+      }
+      if (hourData.failedRequests > 11000 / 24) {
+        hourData.failedRequests = randomInt(100, 450); // ~11000/24
+      }
+    });
+  }
   
   return {
     id: selectedService.id,
@@ -111,6 +133,9 @@ const startWebSocketServer = () => {
       const randomHour = randomInt(0, 23);
       const hourlyData = [...service.hourlyData];
       
+      // Get the service's importance
+      const serviceImportance = service.importance;
+      
       // Increase or decrease requests randomly
       const requestChange = randomInt(-50, 100);
       hourlyData[randomHour].totalRequests += requestChange;
@@ -118,11 +143,21 @@ const startWebSocketServer = () => {
       // Ensure totalRequests is not negative
       hourlyData[randomHour].totalRequests = Math.max(0, hourlyData[randomHour].totalRequests);
       
+      // For high importance services (>75), cap totalRequests at 11,000
+      if (serviceImportance > 75 && hourlyData[randomHour].totalRequests > 11000) {
+        hourlyData[randomHour].totalRequests = randomInt(9000, 11000);
+      }
+      
       // Update failed requests proportionally
       const failedRequestsPercentage = service.criticalityPercentage / 100;
       hourlyData[randomHour].failedRequests = Math.floor(
         hourlyData[randomHour].totalRequests * failedRequestsPercentage
       );
+      
+      // For high importance services (>75), cap failedRequests at 11,000
+      if (serviceImportance > 75 && hourlyData[randomHour].failedRequests > 11000) {
+        hourlyData[randomHour].failedRequests = randomInt(9000, 11000);
+      }
       
       // Create service update
       const serviceUpdate = {

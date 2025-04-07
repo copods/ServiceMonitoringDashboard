@@ -114,20 +114,38 @@ const generateServicesAndDomains = () => {
             ? randomInt(30, 59)
             : randomInt(1, 29);
 
-      // Generate total requests (higher for more critical services)
-      const baseRequests =
-        status === "critical"
-          ? randomInt(5000, 20000)
-          : status === "warning"
-            ? randomInt(1000, 4999)
-            : randomInt(100, 999);
+      // Generate importance value (0-100)
+      // Critical services tend to be more important
+      const importanceBase =
+        status === "critical" ? 50 : status === "warning" ? 30 : 10;
+      const importance = Math.min(100, importanceBase + randomInt(0, 50));
+
+      // Generate total requests based on importance
+      // Ensure services with importance > 75% have totalRequests <= 11,000
+      let baseRequests;
+      if (importance > 75) {
+        baseRequests = randomInt(1000, 11000); // Cap at 11,000 for high importance services
+      } else {
+        baseRequests =
+          status === "critical"
+            ? randomInt(5000, 20000)
+            : status === "warning"
+              ? randomInt(1000, 4999)
+              : randomInt(100, 999);
+      }
 
       const totalRequests = Math.floor(baseRequests);
 
       // Calculate failed requests based on criticality
-      const failedRequests = Math.floor(
+      // Ensure services with importance > 75% have failedRequests <= 11,000
+      let failedRequests = Math.floor(
         totalRequests * (criticalityPercentage / 100),
       );
+      
+      // Double-check the constraint for high importance services
+      if (importance > 75 && failedRequests > 11000) {
+        failedRequests = randomInt(1000, 11000);
+      }
 
       // Generate hourly data for 24 hours
       const hourlyData = [];
@@ -150,11 +168,6 @@ const generateServicesAndDomains = () => {
         });
       }
 
-      // Generate importance value (0-100)
-      // Critical services tend to be more important
-      const importanceBase =
-        status === "critical" ? 50 : status === "warning" ? 30 : 10;
-      const importance = Math.min(100, importanceBase + randomInt(0, 50));
 
       // Generate alerts
       const alerts =
