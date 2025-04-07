@@ -212,7 +212,6 @@ const PolarChart: React.FC<PolarChartProps> = ({
       const domain = domains[i];
       const midAngle = (domainPie.startAngle + domainPie.endAngle) / 2;
 
-      // *** CHANGE: Use the main chart radius for positioning ***
       const iconPlacementRadius = radius; // Position icons exactly on the border
 
       const cartesianMidAngle = midAngle - Math.PI / 2; // Angle correction
@@ -229,17 +228,15 @@ const PolarChart: React.FC<PolarChartProps> = ({
       .attr("class", "domain-icons-layer")
       .raise();
 
-    // Add domain icons
     domainIconPositions.forEach(({ domain, x, y }) => {
       const iconGroup = iconsLayer.append("g");
 
-      // Colored border circle (centered on the main chart border)
       iconGroup
         .append("circle")
         .attr("cx", x)
         .attr("cy", y)
-        .attr("r", iconRadiusSize) // Use the defined icon size
-        .attr("fill", "#232429") // Fill with background color to overlay chart lines if needed
+        .attr("r", iconRadiusSize)
+        .attr("fill", "#232429")
         .attr("stroke", domain.colorCode)
         .attr("stroke-width", 2);
 
