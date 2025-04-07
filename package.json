@@ -26,14 +26,16 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "generate-network-data": "node mock-server/data/generateNetworkData.js",
     "generate-dashboard-data": "node mock-server/data/generateDashboardData.js",
+    "generate-data": "npm run generate-network-data && npm run generate-dashboard-data",
     "mock-server": "node mock-server/server.js",
-    "dev": "npm run generate-network-data && npm run generate-dashboard-data && npm-run-all --parallel start mock-server"
+    "start-react": "react-scripts start",
+    "start": "npm-run-all --parallel start-react mock-server",
+    "dev": "npm run generate-data && npm-run-all --parallel start-react mock-server"
   },
   "eslintConfig": {
     "extends": [
