@@ -10,6 +10,10 @@ export interface Service {
   criticalAlerts: number;
   importance: number; // Value from 0-100 to determine position in polar chart
   hourlyData: HourlyData[];
+  // Animation properties
+  animatingImportance?: boolean;
+  previousImportance?: number;
+  animationStartTime?: number;
 }
 
 export interface HourlyData {
@@ -29,4 +33,11 @@ export interface ServiceUpdate {
   criticalAlerts?: number;
   importance?: number;
   hourlyData?: HourlyData[];
+}
+
+export interface ServiceImportanceUpdate {
+  id: string;
+  importance: number;
+  previousImportance: number;
+  isIncreasing: boolean;
 }

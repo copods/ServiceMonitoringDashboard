@@ -1,6 +1,6 @@
 import { AppDispatch } from 'store';
-import { updateService } from 'store/slices/servicesSlice';
-import { ServiceUpdate } from 'types/service';
+import { updateService, updateServiceImportance } from 'store/slices/servicesSlice';
+import { ServiceImportanceUpdate, ServiceUpdate } from 'types/service';
 
 class SocketService {
   private socket: WebSocket | null = null;
@@ -109,6 +109,12 @@ class SocketService {
         case 'SERVICE_UPDATE':
           if (this.dispatch) {
             this.dispatch(updateService(data.payload as ServiceUpdate));
+          }
+          break;
+          
+        case 'SERVICE_IMPORTANCE_UPDATE':
+          if (this.dispatch) {
+            this.dispatch(updateServiceImportance(data.payload as ServiceImportanceUpdate));
           }
           break;
           

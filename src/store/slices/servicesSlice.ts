@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Service, ServiceUpdate } from 'types/service';
+import { Service, ServiceImportanceUpdate, ServiceUpdate } from 'types/service';
 
 interface ServicesState {
   items: Service[];
@@ -64,6 +64,36 @@ export const servicesSlice = createSlice({
           .slice(0, 6)
           .map(service => service.id);
       }
+    },
+    updateServiceImportance: (state, action: PayloadAction<ServiceImportanceUpdate>) => {
+      const { id, importance, previousImportance } = action.payload;
+      
+      // Find the service to update
+      const serviceIndex = state.items.findIndex(service => service.id === id);
+      if (serviceIndex !== -1) {
+        // Update the service with animation metadata
+        state.items[serviceIndex] = {
+          ...state.items[serviceIndex],
+          previousImportance,
+          importance,
+          animatingImportance: true,
+          animationStartTime: Date.now()
+        };
+      }
+    },
+    completeServiceAnimation: (state, action: PayloadAction<string>) => {
+      const serviceId = action.payload;
+      const serviceIndex = state.items.findIndex(service => service.id === serviceId);
+      
+      if (serviceIndex !== -1) {
+        // Remove animation flags once animation is complete
+        state.items[serviceIndex] = {
+          ...state.items[serviceIndex],
+          animatingImportance: false,
+          previousImportance: undefined,
+          animationStartTime: undefined
+        };
+      }
     }
   }
 });
@@ -72,7 +102,9 @@ export const {
   fetchServicesStart, 
   fetchServicesSuccess, 
   fetchServicesFailure,
-  updateService 
+  updateService,
+  updateServiceImportance,
+  completeServiceAnimation
 } = servicesSlice.actions;
 
 export default servicesSlice.reducer;
