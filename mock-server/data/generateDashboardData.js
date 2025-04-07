@@ -121,31 +121,29 @@ const generateServicesAndDomains = () => {
       const importance = Math.min(100, importanceBase + randomInt(0, 50));
 
       // Generate total requests based on importance
-      // Ensure services with importance > 75% have totalRequests <= 11,000
+      // Ensure services with importance > 75% have totalRequests <= 10,000
       let baseRequests;
       if (importance > 75) {
-        baseRequests = randomInt(1000, 11000); // Cap at 11,000 for high importance services
+        baseRequests = randomInt(1000, 10000); // Cap at 10,000 for high importance services
       } else {
         baseRequests =
           status === "critical"
-            ? randomInt(5000, 20000)
+            ? randomInt(5000, 10000) // Cap at 10,000
             : status === "warning"
               ? randomInt(1000, 4999)
               : randomInt(100, 999);
       }
 
-      const totalRequests = Math.floor(baseRequests);
+      const totalRequests = Math.min(10000, Math.floor(baseRequests));
 
       // Calculate failed requests based on criticality
-      // Ensure services with importance > 75% have failedRequests <= 11,000
+      // Ensure all services have failedRequests <= 10,000
       let failedRequests = Math.floor(
         totalRequests * (criticalityPercentage / 100),
       );
       
-      // Double-check the constraint for high importance services
-      if (importance > 75 && failedRequests > 11000) {
-        failedRequests = randomInt(1000, 11000);
-      }
+      // Cap failed requests at 10,000
+      failedRequests = Math.min(10000, failedRequests);
 
       // Generate hourly data for 24 hours
       const hourlyData = [];

@@ -551,8 +551,6 @@ const PolarChart: React.FC<PolarChartProps> = ({
       .attr("transform", `translate(20, ${height - 60})`);
     const minSizeExample = 3;
     const maxSizeExample = 15;
-    const minReqExample = "100";
-    const maxReqExample = "20k+";
 
     sizeLegend
       .append("circle")
@@ -569,7 +567,7 @@ const PolarChart: React.FC<PolarChartProps> = ({
       .attr("fill", "white")
       .attr("font-size", "12px")
       .attr("dominant-baseline", "middle")
-      .text(`~${minReqExample} reqs`);
+      .text("~100 reqs");
 
     sizeLegend
       .append("circle")
@@ -586,7 +584,7 @@ const PolarChart: React.FC<PolarChartProps> = ({
       .attr("fill", "white")
       .attr("font-size", "12px")
       .attr("dominant-baseline", "middle")
-      .text(`~${maxReqExample} reqs`);
+      .text("~10k reqs");
 
     // --- Percentage Labels ---
     chart
