@@ -26,6 +26,9 @@ export const fetchServiceDetails = async (serviceId: string): Promise<Service> =
   return response.data;
 };
 
+// Export network API functions as well
+export * from './networkApi';
+
 // Error handling interceptor
 api.interceptors.response.use(
   response => response,

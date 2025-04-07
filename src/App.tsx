@@ -4,6 +4,7 @@ import { Provider } from 'react-redux';
 import { store } from 'store';
 import socketService from 'services/socket/socketService';
 import Dashboard from 'pages/Dashboard';
+import MOSDashboard from 'pages/MOSDashboard'; // Import the new page
 
 const App: React.FC = () => {
   useEffect(() => {
@@ -17,6 +18,7 @@ const App: React.FC = () => {
       <Router>
         <Routes>
           <Route path="/" element={<Dashboard />} />
+          <Route path="/mos" element={<MOSDashboard />} /> {/* Add the new route */}
         </Routes>
       </Router>
     </Provider>

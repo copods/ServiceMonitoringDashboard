@@ -2,7 +2,6 @@
 
 A real-time dashboard for monitoring service health and performance across multiple domains. This application provides a comprehensive visualization of service metrics, allowing engineers and system administrators to quickly identify and resolve critical issues.
 
-![Dashboard Preview](./random-ui-1_page-0001.jpg)
 
 ## Features
 
