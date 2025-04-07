@@ -1,8 +1,8 @@
-import React, { useRef, useEffect, useState } from 'react';
-import * as d3 from 'd3';
-import { Service } from 'types/service';
-import { Domain } from 'types/domain';
-import { mulberry32, toRoman } from 'utils';
+import React, { useRef, useEffect, useState } from "react";
+import * as d3 from "d3";
+import { Service } from "types/service";
+import { Domain } from "types/domain";
+import { mulberry32, toRoman } from "utils";
 
 interface PolarChartProps {
   services: Service[];
@@ -35,33 +35,36 @@ const PolarChart: React.FC<PolarChartProps> = ({
   });
 
   useEffect(() => {
-    if (!svgRef.current || services.length === 0 || domains.length === 0) return;
+    if (!svgRef.current || services.length === 0 || domains.length === 0)
+      return;
 
     // Clear previous chart
     d3.select(svgRef.current).selectAll("*").remove();
 
     const svg = d3.select(svgRef.current);
-    const radius = Math.min(width, height) / 2 - 40;
+    // Adjusted radius calculation to leave more space for icons ON the border
+    const iconRadiusSize = 16; // Radius of the icon circle itself
+    const radius = Math.min(width, height) / 2 - iconRadiusSize - 10; // Ensure space for icons + padding
     const centerX = width / 2;
     const centerY = height / 2;
 
-    // Create a group for the chart
+    // Create a group for the chart, translated to the center
     const chart = svg
       .append("g")
       .attr("transform", `translate(${centerX}, ${centerY})`);
 
     // Create pie layout with domain sizes proportional to service counts
-    const pie = d3.pie<Domain>().value((d) => d.totalServices).sort(null); // Don't sort to maintain domain order
+    const pie = d3.pie<Domain>().value((d) => d.totalServices).sort(null);
 
     const pieData = pie(domains);
 
-    // Define arc generator
+    // Define arc generator for domain sections
     const arc = d3
       .arc<d3.PieArcDatum<Domain>>()
       .innerRadius(0)
       .outerRadius(radius);
 
-    // Draw domain pie sections with alternating colors - thicker stroke
+    // Draw domain pie sections
     chart
       .selectAll(".domain-section")
       .data(pieData)
@@ -73,7 +76,7 @@ const PolarChart: React.FC<PolarChartProps> = ({
       .attr("stroke", "#333")
       .attr("stroke-width", 1.5);
 
-    // Draw circular sections (main circle outline)
+    // Draw the main outer circle outline
     chart
       .append("circle")
       .attr("r", radius)
@@ -81,84 +84,84 @@ const PolarChart: React.FC<PolarChartProps> = ({
       .attr("stroke", "#444")
       .attr("stroke-width", 1);
 
-    // Define variables for drawing percentage labels later (at the end of chart drawing)
-    const innerCircleFactors = [1 / 3, 2 / 3]; // Two equally dividing factors
-    const percentageLabels = ["50%", "25%", "05%"]; // Labels to display
-    const labelPositions = [0.25, 0.5, 0.8]; // Positions for the labels - repositioned as per requirements
+    // Inner circles and percentage labels setup
+    const innerCircleFactors = [1 / 3, 2 / 3];
+    const percentageLabels = ["50%", "25%", "05%"];
+    const labelPositions = [0.25, 0.5, 0.8];
 
-    // Draw the two inner circles
+    // Draw inner circles
     innerCircleFactors.forEach((factor, i) => {
       chart
         .append("circle")
         .attr("r", radius * factor)
         .attr("fill", "none")
-        .attr("stroke", i === 0 ? "#F30030" : "#444") // Make innermost circle red
+        .attr("stroke", i === 0 ? "#F30030" : "#444")
         .attr("stroke-width", i === 0 ? 1.5 : 1);
     });
 
-    // Create a domain lookup map for more efficient access
-    const domainMap = new Map();
+    // Domain lookup map
+    const domainMap = new Map<
+      string,
+      { domain: Domain; index: number; pieData: d3.PieArcDatum<Domain> }
+    >();
     domains.forEach((domain, index) => {
-      domainMap.set(domain.id, {
-        domain,
-        index,
-        pieData: pieData[index]
-      });
+      const domainPieData = pieData[index];
+      if (domainPieData) {
+        domainMap.set(domain.id, {
+          domain,
+          index,
+          pieData: domainPieData,
+        });
+      }
     });
 
-    // Plot each service in its respective domain section
+    // Plot services
     services.forEach((service, serviceIndex) => {
-      // Get the domain data for this service
       const domainInfo = domainMap.get(service.domainId);
-      
-      // Skip if we don't have domain information
-      if (!domainInfo) return;
-      
-      const { index: domainIndex, pieData: domainPie } = domainInfo;
-      
-      // Calculate angles for this domain
+      if (!domainInfo) {
+        console.warn(`Domain info not found for service: ${service.id}`);
+        return;
+      }
+      const { pieData: domainPie } = domainInfo;
+
       const domainStartAngle = domainPie.startAngle;
       const domainEndAngle = domainPie.endAngle;
       const domainAngleRange = domainEndAngle - domainStartAngle;
 
-      // Add padding to avoid services too close to domain boundaries
-      const paddingAngle = domainAngleRange * 0.1; // 10% padding
+      const paddingAngle = domainAngleRange * 0.05;
       const adjustedStartAngle = domainStartAngle + paddingAngle;
       const adjustedEndAngle = domainEndAngle - paddingAngle;
-      const adjustedAngleRange = adjustedEndAngle - adjustedStartAngle;
+      const adjustedAngleRange = Math.max(0, adjustedEndAngle - adjustedStartAngle);
 
-      // Create a deterministic but well-distributed random generator for this service
-      const random = mulberry32(parseInt(service.id) * 1000 + serviceIndex * 10);
+      const random = mulberry32(parseInt(service.id, 16) + serviceIndex * 10);
 
-      // Direct mapping from importance to distance (higher importance = closer to center)
-      const importanceFactor = service.importance / 100; // 0 to 1
-      // Map importance directly to a position between inner circle (1/3) and outer edge
-      // Higher importance (closer to 1) = closer to center
-      const distanceFactor = (1 / 3) + ((1 - importanceFactor) * 2 / 3);
-      // Add slight random variation (±10%) to prevent overlap
-      const adjustedDistanceFactor = distanceFactor * (0.95 + random() * 0.1);
-      // Random angle within domain section
+      const importanceFactor = service.importance / 100;
+      const baseDistanceFactor = 1 / 3 + ((1 - importanceFactor) * 2) / 3;
+      const randomizedDistanceFactor =
+        baseDistanceFactor * (0.95 + random() * 0.1);
+      const finalDistanceFactor = Math.max(
+        1 / 3,
+        Math.min(1, randomizedDistanceFactor)
+      );
+      const distance = radius * finalDistanceFactor;
+
       const randomAngle = adjustedStartAngle + random() * adjustedAngleRange;
-      // Calculate final position
-      const distance = radius * adjustedDistanceFactor;
-      const x = distance * Math.cos(randomAngle);
-      const y = distance * Math.sin(randomAngle);
+      const cartesianAngle = randomAngle - Math.PI / 2; // Angle correction
 
-      // Bubble size based on total requests
+      const x = distance * Math.cos(cartesianAngle);
+      const y = distance * Math.sin(cartesianAngle);
+
       const size = Math.max(
         3,
-        Math.min(20, Math.sqrt(service.totalRequests) / 12)
+        Math.min(15, Math.sqrt(service.totalRequests) / 10)
       );
-
-      // Bubble color based on status
       const color =
         service.status === "critical"
-          ? "#F30030" // Red for critical
+          ? "#F30030"
           : service.status === "warning"
-            ? "#FFCC00" // Yellow for warning
-            : "#4A4A52"; // Gray for normal
+            ? "#FFCC00"
+            : "#4A4A52";
 
-      // Create service bubble
       const bubble = chart
         .append("circle")
         .attr("cx", x)
@@ -170,48 +173,32 @@ const PolarChart: React.FC<PolarChartProps> = ({
         .attr("stroke-width", 1)
         .style("cursor", "pointer");
 
-      // Custom tooltip handling
+      // Tooltip Handling
       bubble
         .on("mouseover", (event) => {
-          const tooltipContent = `${service.name}\nRequests: ${service.totalRequests.toLocaleString()}\nCriticality: ${service.criticalityPercentage}%`;
-
-          // Calculate position relative to SVG
+          const tooltipContent = `${
+            service.name
+          }\nRequests: ${service.totalRequests.toLocaleString()}\nCriticality: ${
+            service.criticalityPercentage
+          }%`;
           const svgRect = svgRef.current?.getBoundingClientRect();
           if (!svgRect) return;
-
-          // Get mouse position
           const mouseX = event.clientX - svgRect.left;
           const mouseY = event.clientY - svgRect.top;
-
-          setTooltip({
-            visible: true,
-            x: mouseX,
-            y: mouseY,
-            content: tooltipContent,
-          });
+          setTooltip({ visible: true, x: mouseX, y: mouseY, content: tooltipContent });
         })
         .on("mousemove", (event) => {
-          // Update tooltip position on mouse move
           const svgRect = svgRef.current?.getBoundingClientRect();
           if (!svgRect) return;
-
           const mouseX = event.clientX - svgRect.left;
           const mouseY = event.clientY - svgRect.top;
-
-          setTooltip((prev) => ({
-            ...prev,
-            x: mouseX,
-            y: mouseY,
-          }));
+          setTooltip((prev) => ({ ...prev, x: mouseX, y: mouseY }));
         })
         .on("mouseout", () => {
-          setTooltip((prev) => ({
-            ...prev,
-            visible: false,
-          }));
+          setTooltip((prev) => ({ ...prev, visible: false }));
         });
 
-      // Add click event
+      // Click Handling
       if (onServiceSelect) {
         bubble.on("click", () => {
           onServiceSelect(service.id);
@@ -219,42 +206,45 @@ const PolarChart: React.FC<PolarChartProps> = ({
       }
     });
 
-    // Calculate domain icon positions to render them at the chart border
+    // --- Domain Icons ---
     const domainIconPositions: { domain: Domain; x: number; y: number }[] = [];
-
-    domains.forEach((domain, i) => {
-      const domainPie = pieData[i];
+    pieData.forEach((domainPie, i) => {
+      const domain = domains[i];
       const midAngle = (domainPie.startAngle + domainPie.endAngle) / 2;
 
-      // Position exactly on chart border
-      const labelRadius = radius;
-      const x = labelRadius * Math.cos(midAngle);
-      const y = labelRadius * Math.sin(midAngle);
+      // *** CHANGE: Use the main chart radius for positioning ***
+      const iconPlacementRadius = radius; // Position icons exactly on the border
 
-      // Store position for domain icon
+      const cartesianMidAngle = midAngle - Math.PI / 2; // Angle correction
+
+      const x = iconPlacementRadius * Math.cos(cartesianMidAngle);
+      const y = iconPlacementRadius * Math.sin(cartesianMidAngle);
+
       domainIconPositions.push({ domain, x, y });
     });
 
-    // Create a group for domain icons that will be on top of everything else
+    // Icons Layer
     const iconsLayer = chart
       .append("g")
       .attr("class", "domain-icons-layer")
-      .raise(); // Raise to ensure icons are on top
+      .raise();
 
-    // Add domain icons at the calculated positions
+    // Add domain icons
     domainIconPositions.forEach(({ domain, x, y }) => {
-      // Create a circle with border for the domain icon
-      iconsLayer
+      const iconGroup = iconsLayer.append("g");
+
+      // Colored border circle (centered on the main chart border)
+      iconGroup
         .append("circle")
         .attr("cx", x)
         .attr("cy", y)
-        .attr("r", 16)
-        .attr("fill", "transparent")
+        .attr("r", iconRadiusSize) // Use the defined icon size
+        .attr("fill", "#232429") // Fill with background color to overlay chart lines if needed
         .attr("stroke", domain.colorCode)
         .attr("stroke-width", 2);
 
-      // Add the domain ID as Roman numeral
-      iconsLayer
+      // Roman numeral text
+      iconGroup
         .append("text")
         .attr("x", x)
         .attr("y", y)
@@ -265,28 +255,25 @@ const PolarChart: React.FC<PolarChartProps> = ({
         .attr("font-weight", "bold")
         .text(() => {
           const match = domain.id.match(/\d+$/);
-          return match ? toRoman(parseInt(match[0], 10)) : "";
+          return match ? toRoman(parseInt(match[0], 10)) : "?";
         });
     });
 
-    // Add legend for service status
+    // --- Legends ---
+    // Status Legend
     const legend = svg.append("g").attr("transform", `translate(20, 20)`);
-
     const statuses = [
       { label: "Normal", color: "#4A4A52" },
       { label: "Warning", color: "#FFCC00" },
       { label: "Critical", color: "#F30030" },
     ];
-
     statuses.forEach((status, i) => {
-      // Create legend with colored dots
       legend
         .append("circle")
         .attr("cx", 8)
         .attr("cy", i * 22 + 8)
         .attr("r", 4)
         .attr("fill", status.color);
-
       legend
         .append("text")
         .attr("x", 20)
@@ -296,46 +283,54 @@ const PolarChart: React.FC<PolarChartProps> = ({
         .text(status.label);
     });
 
-    // Add bubble size legend at the bottom
+    // Size Legend
     const sizeLegend = svg
       .append("g")
-      .attr("transform", `translate(20, ${height - 50})`);
+      .attr("transform", `translate(20, ${height - 60})`);
+    const minSizeExample = 3;
+    const maxSizeExample = 15;
+    const minReqExample = "100";
+    const maxReqExample = "20k+";
 
     sizeLegend
       .append("circle")
-      .attr("cx", 8)
-      .attr("cy", 8)
-      .attr("r", 4)
-      .attr("fill", "#808080");
-
+      .attr("cx", maxSizeExample + 5)
+      .attr("cy", maxSizeExample + 5)
+      .attr("r", minSizeExample)
+      .attr("fill", "#808080")
+      .attr("stroke", "#ccc")
+      .attr("stroke-width", 0.5);
     sizeLegend
       .append("text")
-      .attr("x", 20)
-      .attr("y", 12)
+      .attr("x", maxSizeExample * 2 + 15)
+      .attr("y", maxSizeExample + 10)
       .attr("fill", "white")
       .attr("font-size", "12px")
-      .text("Min - 1K");
+      .attr("dominant-baseline", "middle")
+      .text(`~${minReqExample} reqs`);
 
     sizeLegend
       .append("circle")
-      .attr("cx", 100)
-      .attr("cy", 8)
-      .attr("r", 10)
-      .attr("fill", "#808080");
-
+      .attr("cx", maxSizeExample + 5)
+      .attr("cy", maxSizeExample * 2 + 15)
+      .attr("r", maxSizeExample)
+      .attr("fill", "#808080")
+      .attr("stroke", "#ccc")
+      .attr("stroke-width", 0.5);
     sizeLegend
       .append("text")
-      .attr("x", 120)
-      .attr("y", 12)
+      .attr("x", maxSizeExample * 2 + 15)
+      .attr("y", maxSizeExample * 2 + 20)
       .attr("fill", "white")
       .attr("font-size", "12px")
-      .text("Max - 10K");
+      .attr("dominant-baseline", "middle")
+      .text(`~${maxReqExample} reqs`);
 
-    // Add the percentage labels at the very end to ensure they appear on top
+    // --- Percentage Labels ---
     chart
       .append("g")
       .attr("class", "percentage-labels")
-      .raise() // Raise to the top of the display order
+      .raise()
       .selectAll(".percentage-label")
       .data(labelPositions)
       .enter()
@@ -344,8 +339,6 @@ const PolarChart: React.FC<PolarChartProps> = ({
       .attr("transform", (d) => `translate(0, ${-radius * d})`)
       .each(function (d, i) {
         const g = d3.select(this);
-
-        // Background for label
         g.append("rect")
           .attr("x", -20)
           .attr("y", -12)
@@ -353,14 +346,12 @@ const PolarChart: React.FC<PolarChartProps> = ({
           .attr("height", 24)
           .attr("fill", "#1A1B20")
           .attr("rx", 4)
-          .attr("opacity", 0.9); // Increased opacity for better visibility
-
-        // Text for label
+          .attr("opacity", 0.85);
         g.append("text")
           .attr("text-anchor", "middle")
           .attr("dominant-baseline", "middle")
           .attr("fill", "white")
-          .attr("font-size", "14px")
+          .attr("font-size", "12px")
           .text(percentageLabels[i]);
       });
   }, [services, domains, width, height, onServiceSelect]);
@@ -373,15 +364,13 @@ const PolarChart: React.FC<PolarChartProps> = ({
         height={height}
         className="bg-[#232429]"
       />
-
-      {/* Custom tooltip */}
       {tooltip.visible && (
         <div
-          className="absolute bg-gray-900 text-white p-2 rounded shadow-lg z-10 pointer-events-none"
+          className="absolute bg-gray-900 text-white p-2 rounded shadow-lg z-10 pointer-events-none text-xs"
           style={{
             left: `${tooltip.x + 10}px`,
             top: `${tooltip.y - 10}px`,
-            maxWidth: "200px",
+            maxWidth: "180px",
             whiteSpace: "pre-line",
           }}
         >
