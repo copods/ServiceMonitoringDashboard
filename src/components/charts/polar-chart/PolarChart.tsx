@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import * as d3 from 'd3';
 import { Service } from 'types/service';
 import { Domain } from 'types/domain';
-import { toRoman } from 'utils';
+import { mulberry32, toRoman } from 'utils';
 
 interface PolarChartProps {
   services: Service[];
@@ -96,26 +96,26 @@ const PolarChart: React.FC<PolarChartProps> = ({
         .attr("stroke-width", i === 0 ? 1.5 : 1);
     });
 
-    // Create a better random number generator with a seed
-    const mulberry32 = (seed: number) => {
-      return () => {
-        let t = (seed += 0x6d2b79f5);
-        t = Math.imul(t ^ (t >>> 15), t | 1);
-        t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-      };
-    };
-
-    // Group services by domain for better distribution
-    const servicesByDomain = domains.map((domain) => {
-      return services.filter((service) => service.domainId === domain.id);
+    // Create a domain lookup map for more efficient access
+    const domainMap = new Map();
+    domains.forEach((domain, index) => {
+      domainMap.set(domain.id, {
+        domain,
+        index,
+        pieData: pieData[index]
+      });
     });
 
-    // Plot services within their respective domain sections
-    servicesByDomain.forEach((domainServices, domainIndex) => {
-      const domainPie = pieData[domainIndex];
-      if (!domainPie) return;
-
+    // Plot each service in its respective domain section
+    services.forEach((service, serviceIndex) => {
+      // Get the domain data for this service
+      const domainInfo = domainMap.get(service.domainId);
+      
+      // Skip if we don't have domain information
+      if (!domainInfo) return;
+      
+      const { index: domainIndex, pieData: domainPie } = domainInfo;
+      
       // Calculate angles for this domain
       const domainStartAngle = domainPie.startAngle;
       const domainEndAngle = domainPie.endAngle;
@@ -127,99 +127,96 @@ const PolarChart: React.FC<PolarChartProps> = ({
       const adjustedEndAngle = domainEndAngle - paddingAngle;
       const adjustedAngleRange = adjustedEndAngle - adjustedStartAngle;
 
-      // Plot services in this domain
-      domainServices.forEach((service, i) => {
-        // Create a deterministic but well-distributed random generator for this service
-        const random = mulberry32(parseInt(service.id) * 1000 + i * 10);
+      // Create a deterministic but well-distributed random generator for this service
+      const random = mulberry32(parseInt(service.id) * 1000 + serviceIndex * 10);
 
-        // Direct mapping from importance to distance (higher importance = closer to center)
-        const importanceFactor = service.importance / 100; // 0 to 1
-        // Map importance directly to a position between inner circle (1/3) and outer edge
-        // Higher importance (closer to 1) = closer to center
-        const distanceFactor = (1 / 3) + ((1 - importanceFactor) * 2 / 3);
-        // Add slight random variation (±10%) to prevent overlap
-        const adjustedDistanceFactor = distanceFactor * (0.95 + random() * 0.1);
-        // Random angle within domain section
-        const randomAngle = adjustedStartAngle + random() * adjustedAngleRange;
-        // Calculate final position
-        const distance = radius * adjustedDistanceFactor;
-        const x = distance * Math.cos(randomAngle);
-        const y = distance * Math.sin(randomAngle);
+      // Direct mapping from importance to distance (higher importance = closer to center)
+      const importanceFactor = service.importance / 100; // 0 to 1
+      // Map importance directly to a position between inner circle (1/3) and outer edge
+      // Higher importance (closer to 1) = closer to center
+      const distanceFactor = (1 / 3) + ((1 - importanceFactor) * 2 / 3);
+      // Add slight random variation (±10%) to prevent overlap
+      const adjustedDistanceFactor = distanceFactor * (0.95 + random() * 0.1);
+      // Random angle within domain section
+      const randomAngle = adjustedStartAngle + random() * adjustedAngleRange;
+      // Calculate final position
+      const distance = radius * adjustedDistanceFactor;
+      const x = distance * Math.cos(randomAngle);
+      const y = distance * Math.sin(randomAngle);
 
-        // Bubble size based on total requests
-        const size = Math.max(
-          3,
-          Math.min(20, Math.sqrt(service.totalRequests) / 12)
-        );
+      // Bubble size based on total requests
+      const size = Math.max(
+        3,
+        Math.min(20, Math.sqrt(service.totalRequests) / 12)
+      );
 
-        // Bubble color based on status
-        const color =
-          service.status === "critical"
-            ? "#F30030" // Red for critical
-            : service.status === "warning"
-              ? "#FFCC00" // Yellow for warning
-              : "#4A4A52"; // Gray for normal
+      // Bubble color based on status
+      const color =
+        service.status === "critical"
+          ? "#F30030" // Red for critical
+          : service.status === "warning"
+            ? "#FFCC00" // Yellow for warning
+            : "#4A4A52"; // Gray for normal
 
-        // Create service bubble
-        const bubble = chart
-          .append("circle")
-          .attr("cx", x)
-          .attr("cy", y)
-          .attr("r", size)
-          .attr("fill", color)
-          .attr("opacity", 0.9)
-          .attr("stroke", "#333")
-          .attr("stroke-width", 1)
-          .style("cursor", "pointer");
+      // Create service bubble
+      const bubble = chart
+        .append("circle")
+        .attr("cx", x)
+        .attr("cy", y)
+        .attr("r", size)
+        .attr("fill", color)
+        .attr("opacity", 0.9)
+        .attr("stroke", "#333")
+        .attr("stroke-width", 1)
+        .style("cursor", "pointer");
 
-        // Custom tooltip handling
-        bubble
-          .on("mouseover", (event) => {
-            const tooltipContent = `${service.name}\nRequests: ${service.totalRequests.toLocaleString()}\nCriticality: ${service.criticalityPercentage}%`;
+      // Custom tooltip handling
+      bubble
+        .on("mouseover", (event) => {
+          const tooltipContent = `${service.name}\nRequests: ${service.totalRequests.toLocaleString()}\nCriticality: ${service.criticalityPercentage}%`;
 
-            // Calculate position relative to SVG
-            const svgRect = svgRef.current?.getBoundingClientRect();
-            if (!svgRect) return;
+          // Calculate position relative to SVG
+          const svgRect = svgRef.current?.getBoundingClientRect();
+          if (!svgRect) return;
 
-            // Get mouse position
-            const mouseX = event.clientX - svgRect.left;
-            const mouseY = event.clientY - svgRect.top;
+          // Get mouse position
+          const mouseX = event.clientX - svgRect.left;
+          const mouseY = event.clientY - svgRect.top;
 
-            setTooltip({
-              visible: true,
-              x: mouseX,
-              y: mouseY,
-              content: tooltipContent,
-            });
-          })
-          .on("mousemove", (event) => {
-            // Update tooltip position on mouse move
-            const svgRect = svgRef.current?.getBoundingClientRect();
-            if (!svgRect) return;
-
-            const mouseX = event.clientX - svgRect.left;
-            const mouseY = event.clientY - svgRect.top;
-
-            setTooltip((prev) => ({
-              ...prev,
-              x: mouseX,
-              y: mouseY,
-            }));
-          })
-          .on("mouseout", () => {
-            setTooltip((prev) => ({
-              ...prev,
-              visible: false,
-            }));
+          setTooltip({
+            visible: true,
+            x: mouseX,
+            y: mouseY,
+            content: tooltipContent,
           });
+        })
+        .on("mousemove", (event) => {
+          // Update tooltip position on mouse move
+          const svgRect = svgRef.current?.getBoundingClientRect();
+          if (!svgRect) return;
 
-        // Add click event
-        if (onServiceSelect) {
-          bubble.on("click", () => {
-            onServiceSelect(service.id);
-          });
-        }
-      });
+          const mouseX = event.clientX - svgRect.left;
+          const mouseY = event.clientY - svgRect.top;
+
+          setTooltip((prev) => ({
+            ...prev,
+            x: mouseX,
+            y: mouseY,
+          }));
+        })
+        .on("mouseout", () => {
+          setTooltip((prev) => ({
+            ...prev,
+            visible: false,
+          }));
+        });
+
+      // Add click event
+      if (onServiceSelect) {
+        bubble.on("click", () => {
+          onServiceSelect(service.id);
+        });
+      }
     });
 
     // Calculate domain icon positions to render them at the chart border

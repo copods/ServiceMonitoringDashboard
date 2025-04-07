@@ -8,13 +8,41 @@ const randomInt = (min, max) =>
 
 // Generate services for domains
 const generateServicesAndDomains = () => {
-  // Define domain base structure
+  // Define domain base structure with industry-specific names
   const domainBases = [
-    { name: "Domain Enterprise", shortCode: "ENT", colorCode: "#54D6FF" },
-    { name: "Domain name text", shortCode: "NET", colorCode: "#728E4F" },
-    { name: "Domain 3", shortCode: "D3", colorCode: "#9290F7" },
-    { name: "Domain 1", shortCode: "D1", colorCode: "#FF82FE" },
+    { name: "Infrastructure", shortCode: "INFRA", colorCode: "#54D6FF" },
+    { name: "Security Operations", shortCode: "SECOPS", colorCode: "#728E4F" },
+    { name: "Application Stack", shortCode: "APPSTK", colorCode: "#9290F7" },
+    { name: "Network Services", shortCode: "NETSVC", colorCode: "#FF82FE" },
   ];
+
+  // Service name components for generating realistic but shorter IT/Networking service names
+  const serviceNameComponents = {
+    INFRA: {
+      prefixes: ["comp", "stor", "vm", "ctr", "k8s", "db", "cache", "que", "load", "bak"],
+      criticalPrefixes: ["c-", "p-", "main-"],
+      warningPrefixes: ["s-", "r-", "f-"],
+      suffixes: ["cl", "nd", "pl", "fm", "ar", "bal", "vt", "eng", "px"]
+    },
+    SECOPS: {
+      prefixes: ["fw", "auth", "id", "acc", "tht", "vuln", "comp", "crypt", "cert", "key"],
+      criticalPrefixes: ["g-", "p-", "m-"],
+      warningPrefixes: ["b-", "i-", "z-"],
+      suffixes: ["ctl", "mgr", "det", "scn", "enf", "mon", "anl", "val", "svc"]
+    },
+    APPSTK: {
+      prefixes: ["api", "web", "mob", "pay", "bill", "usr", "cnt", "srch", "ntf", "anlt"],
+      criticalPrefixes: ["c-", "m-", "cntrl-"],
+      warningPrefixes: ["sup-", "aux-", "sec-"],
+      suffixes: ["svc", "gw", "eng", "proc", "mgr", "hdl", "plat", "sys", "ptl"]
+    },
+    NETSVC: {
+      prefixes: ["dns", "dhcp", "vpn", "wan", "lan", "rtr", "swt", "cdn", "prx", "trf"],
+      criticalPrefixes: ["m-", "c-", "bb-"],
+      warningPrefixes: ["e-", "b-", "r-"],
+      suffixes: ["ctl", "svc", "res", "cl", "opt", "gw", "acc", "mgr", "nd"]
+    }
+  };
 
   // Generate different service counts for each domain (50-100)
   const serviceCounts = domainBases.map(() => randomInt(50, 100));
@@ -86,35 +114,33 @@ const generateServicesAndDomains = () => {
             ? randomInt(30, 59)
             : randomInt(1, 29);
 
-      // --- MODIFIED SECTION ---
-      // Generate total requests (higher for more critical services) - Reduced Ranges
+      // Generate total requests (higher for more critical services)
       const baseRequests =
         status === "critical"
-          ? randomInt(5000, 20000) // Reduced from 50k-200k
+          ? randomInt(5000, 20000)
           : status === "warning"
-            ? randomInt(1000, 4999) // Reduced from 10k-50k
-            : randomInt(100, 999); // Reduced from 1k-10k
-      // --- END MODIFIED SECTION ---
+            ? randomInt(1000, 4999)
+            : randomInt(100, 999);
 
       const totalRequests = Math.floor(baseRequests);
 
-      // Calculate failed requests based on criticality (this will be lower due to lower totalRequests)
+      // Calculate failed requests based on criticality
       const failedRequests = Math.floor(
         totalRequests * (criticalityPercentage / 100),
       );
 
-      // Generate hourly data for 24 hours (hourly values will also be lower)
+      // Generate hourly data for 24 hours
       const hourlyData = [];
       for (let hour = 0; hour < 24; hour++) {
         const hourlyTotal = Math.floor(
           (totalRequests / 24) * (0.5 + Math.random()),
-        ); // Will be lower
+        );
         const hourlyFailed =
           status === "normal"
-            ? Math.floor(hourlyTotal * (randomInt(1, 5) / 100)) // Will be lower
+            ? Math.floor(hourlyTotal * (randomInt(1, 5) / 100))
             : status === "warning"
-              ? Math.floor(hourlyTotal * (randomInt(5, 30) / 100)) // Will be lower
-              : Math.floor(hourlyTotal * (randomInt(30, 95) / 100)); // Will be lower
+              ? Math.floor(hourlyTotal * (randomInt(5, 30) / 100))
+              : Math.floor(hourlyTotal * (randomInt(30, 95) / 100));
 
         hourlyData.push({
           hour,
@@ -145,21 +171,40 @@ const generateServicesAndDomains = () => {
             ? randomInt(1, Math.max(1, Math.floor(alerts * 0.3)))
             : randomInt(0, Math.min(2, alerts));
 
-      // Meaningful service name with domain code
+      // Generate a shorter, meaningful IT/Networking service name
+      const nameParts = serviceNameComponents[baseDomain.shortCode];
+      let serviceName;
+      
+      if (status === "critical") {
+        // For critical services, use critical prefixes with base only (no suffix)
+        const prefix = nameParts.criticalPrefixes[randomInt(0, nameParts.criticalPrefixes.length - 1)];
+        const base = nameParts.prefixes[randomInt(0, nameParts.prefixes.length - 1)];
+        serviceName = `${prefix}${base}`;
+      } else if (status === "warning") {
+        // For warning services, use just the base with a suffix
+        const base = nameParts.prefixes[randomInt(0, nameParts.prefixes.length - 1)];
+        serviceName = `${base}-${status.charAt(0)}`;
+      } else {
+        // For normal services, just use base
+        const base = nameParts.prefixes[randomInt(0, nameParts.prefixes.length - 1)];
+        serviceName = base;
+      }
+      
+      // Add short domain code and ID for uniqueness, but keep it compact
+      serviceName = `${baseDomain.shortCode.substring(0, 2)}${serviceName}${serviceId}`;
+
       services.push({
         id: serviceId.toString(),
-        name: `${baseDomain.shortCode}-${
-          status === "critical" ? "CRIT" : status === "warning" ? "WARN" : "SVC"
-        }-${serviceId}`,
+        name: serviceName,
         domainId: id,
         status,
         criticalityPercentage,
-        totalRequests, // Now lower
-        failedRequests, // Now lower
+        totalRequests,
+        failedRequests,
         alerts,
         criticalAlerts,
         importance,
-        hourlyData, // Now contains lower hourly values
+        hourlyData,
       });
 
       serviceId++;
