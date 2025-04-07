@@ -1,4 +1,3 @@
-// src/store/slices/networkSlice.ts
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Location, Route, BidirectionalRoute, MonthlyStatistic, ServiceDetails } from 'types/network';
 

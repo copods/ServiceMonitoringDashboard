@@ -1,4 +1,3 @@
-// src/services/api/networkApi.ts
 import axios from 'axios';
 import { Location, Route, MonthlyStatistic } from 'types/network';
 

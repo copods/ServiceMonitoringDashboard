@@ -31,8 +31,9 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "generate-network-data": "node mock-server/data/generateNetworkData.js",
+    "generate-dashboard-data": "node mock-server/data/generateDashboardData.js",
     "mock-server": "node mock-server/server.js",
-    "dev": "npm run generate-network-data && npm-run-all --parallel start mock-server"
+    "dev": "npm run generate-network-data && npm run generate-dashboard-data && npm-run-all --parallel start mock-server"
   },
   "eslintConfig": {
     "extends": [
