@@ -15,17 +15,16 @@ const getmonitorData = (dataPath) => {
     }
 };
 
-const getNetworkData = (dataPath) => {
+const getMOSData = (dataPath) => {
     try {
-        const rawData = fs.readFileSync(dataPath, 'utf8');
-        return JSON.parse(rawData);
+      const data = fs.readFileSync(dataPath, 'utf8');
+      return JSON.parse(data);
     } catch (error) {
-        console.error("Error reading network data file:", error);
-        return { locations: [], routes: [], statistics: {} };
+      console.error('Error reading MOS data:', error);
+      return {};
     }
-};
-
+  };
 module.exports = {
     getmonitorData,
-    getNetworkData
+    getMOSData
 };

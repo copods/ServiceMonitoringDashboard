@@ -1,24 +1,13 @@
 const express = require('express');
 const path = require('path');
-const fs = require('fs');
-
+const { getMOSData } = require('../utils');
 const router = express.Router();
 const dataPath = path.join(__dirname, '..', 'data/mos-data.json');
 
-// Helper function to get MOS data
-const getMOSData = () => {
-  try {
-    const data = fs.readFileSync(dataPath, 'utf8');
-    return JSON.parse(data);
-  } catch (error) {
-    console.error('Error reading MOS data:', error);
-    return {};
-  }
-};
 
 // Endpoint for MOS dashboard overview data
 router.get('/dashboard', (req, res) => {
-  const data = getMOSData();
+  const data = getMOSData(dataPath);
   
   // Return the essential data needed for dashboard overview
   res.json({
@@ -31,7 +20,7 @@ router.get('/dashboard', (req, res) => {
 
 // Endpoint for getting route details
 router.get('/route/:routeId', (req, res) => {
-  const data = getMOSData();
+  const data = getMOSData(dataPath);
   const routeId = req.params.routeId;
   
   if (data.routeDetails && data.routeDetails[routeId]) {
@@ -43,7 +32,7 @@ router.get('/route/:routeId', (req, res) => {
 
 // Endpoint for historical data
 router.get('/historical', (req, res) => {
-  const data = getMOSData();
+  const data = getMOSData(dataPath);
   
   if (data.historicalData) {
     res.json(data.historicalData);
