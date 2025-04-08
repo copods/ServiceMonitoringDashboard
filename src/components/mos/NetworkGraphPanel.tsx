@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import * as d3 from 'd3';
-import { Location, Route } from '../../types/mos';
+import { Location, Route } from 'types/mos';
 
 interface NetworkGraphPanelProps {
   locations: Location[];
@@ -55,7 +55,7 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
     const destinationLocations = locations.filter(loc => loc.id !== 'denver');
 
     // Create links/routes
-    const links = linksLayer.selectAll('line')
+    linksLayer.selectAll('line')
       .data(routes)
       .enter()
       .append('line')
@@ -152,7 +152,7 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
       .text(d => `${(d.streamCount / 1000).toFixed(0)}k streams`);
 
     // Create central (Denver) node
-    const denverNode = nodesLayer.append('circle')
+    nodesLayer.append('circle')
       .attr('cx', denverLocation.coordinates?.x || width / 2)
       .attr('cy', denverLocation.coordinates?.y || height / 2)
       .attr('r', 25)

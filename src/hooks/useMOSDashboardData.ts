@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { MosDashboardData, RouteDetails } from 'types/mos';
+import { MosDashboardData } from 'types/mos';
 import { fetchCompleteMOSDashboardData, fetchRouteDetails } from 'services/api/mosApi';
 
 interface UseMOSDashboardDataResult {

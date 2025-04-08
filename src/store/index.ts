@@ -3,14 +3,12 @@ import { useDispatch, useSelector, TypedUseSelectorHook } from 'react-redux';
 import domainsReducer from './slices/domainsSlice';
 import servicesReducer from './slices/servicesSlice';
 import uiReducer from './slices/uiSlice';
-import networkReducer from './slices/networkSlice';
 
 export const store = configureStore({
   reducer: {
     domains: domainsReducer,
     services: servicesReducer,
-    ui: uiReducer,
-    network: networkReducer
+    ui: uiReducer
   },
   middleware: (getDefaultMiddleware) => 
     getDefaultMiddleware({

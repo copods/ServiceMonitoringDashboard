@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useMOSDashboardData } from '../../hooks/useMOSDashboardData';
-import { Location } from '../../types/mos';
-import MOSDashboardHeader from './MOSDashboardHeader';
-import IssueDetailsBanner from './IssueDetailsBanner';
-import NetworkGraphPanel from './NetworkGraphPanel';
-import RouteDetailPanel from './RouteDetailPanel';
+import { useMOSDashboardData } from 'hooks/useMOSDashboardData';
+import { Location } from 'types/mos';
+import MOSDashboardHeader from 'components/mos/MOSDashboardHeader';
+import IssueDetailsBanner from 'components/mos/IssueDetailsBanner';
+import NetworkGraphPanel from 'components/mos/NetworkGraphPanel';
+import RouteDetailPanel from 'components/mos/RouteDetailPanel';
 
 const MOSDashboard: React.FC = () => {
   const { 
