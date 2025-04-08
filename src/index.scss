@@ -16,3 +16,127 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+/* Add these styles to your index.scss file */
+
+/* Base styles for the MOS Dashboard */
+.mos-dashboard {
+  --primary-color: #3b82f6;
+  --danger-color: #ef4444;
+  --warning-color: #f59e0b;
+  --background-color: #0c1e2e;
+  --text-color: #ffffff;
+  --border-color: #2d3748;
+}
+
+/* Network graph styles */
+.network-graph {
+  background-color: var(--background-color);
+}
+
+.network-graph-node {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.network-graph-node:hover {
+  filter: brightness(1.2);
+}
+
+.network-graph-link {
+  transition: all 0.2s ease;
+}
+
+.network-graph-link:hover {
+  stroke: var(--primary-color);
+  stroke-width: 3px;
+}
+
+.progress-circle {
+  transition: all 0.2s ease;
+}
+
+/* Route details styles */
+.route-detail-panel {
+  height: 100%;
+  overflow-y: auto;
+  background-color: white;
+  color: #1f2937;
+}
+
+.metrics-card {
+  background-color: white;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  margin-bottom: 1rem;
+}
+
+.progress-bar {
+  height: 8px;
+  border-radius: 4px;
+  background-color: #f3f4f6;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+.progress-bar-fill-danger {
+  background-color: var(--danger-color);
+}
+
+.progress-bar-fill-warning {
+  background-color: var(--warning-color);
+}
+
+.progress-bar-fill-primary {
+  background-color: var(--primary-color);
+}
+
+/* Chart styles */
+.chart-container {
+  height: 300px;
+  margin-top: 1rem;
+}
+
+/* Utility classes */
+.text-primary {
+  color: var(--primary-color);
+}
+
+.text-danger {
+  color: var(--danger-color);
+}
+
+.text-warning {
+  color: var(--warning-color);
+}
+
+.bg-dark {
+  background-color: var(--background-color);
+}
+
+.border-primary {
+  border-color: var(--primary-color);
+}
+
+.crosshair-icon {
+  stroke: #fff;
+  stroke-width: 2;
+}
+
+/* Responsive design tweaks */
+@media (max-width: 1024px) {
+  .mos-dashboard-grid {
+    display: block;
+  }
+  
+  // .network-graph-container,
+  // .route-detail-panel {
+  //   height: 500px;
+  // }
+}

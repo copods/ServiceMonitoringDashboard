@@ -1,153 +1,159 @@
-import React, { useRef, useEffect } from 'react';
-import * as d3 from 'd3';
-import { HistoricalData } from '../../types/mos';
+import React, { useRef, useEffect, useLayoutEffect } from "react";
+import * as d3 from "d3";
+import { HistoricalData } from "types/mos"; // Adjust path
 
 interface RouteHistoricalChartProps {
   data: HistoricalData[];
 }
 
-const RouteHistoricalChart: React.FC<RouteHistoricalChartProps> = ({ data }) => {
+const RouteHistoricalChart: React.FC<RouteHistoricalChartProps> = ({
+  data,
+}) => {
   const chartRef = useRef<SVGSVGElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null); // Ref for container div
 
-  useEffect(() => {
-    if (!chartRef.current || !data.length) return;
+  // Use useLayoutEffect for measurements before paint
+  useLayoutEffect(() => {
+    if (!chartRef.current || !containerRef.current || !data.length) return;
 
     // Clear previous chart
-    d3.select(chartRef.current).selectAll('*').remove();
+    d3.select(chartRef.current).selectAll("*").remove();
 
-    // Setup dimensions
-    const margin = { top: 20, right: 20, bottom: 40, left: 40 };
-    const width = chartRef.current.clientWidth - margin.left - margin.right;
-    const height = chartRef.current.clientHeight - margin.top - margin.bottom;
+    // Setup dimensions based on container
+    const margin = { top: 10, right: 10, bottom: 20, left: 30 }; // Adjusted margins
+    // Get dimensions from the container div
+    const containerWidth = containerRef.current.clientWidth;
+    const containerHeight = containerRef.current.clientHeight;
 
-    // Create the SVG container
-    const svg = d3.select(chartRef.current)
-      .append('g')
-      .attr('transform', `translate(${margin.left},${margin.top})`);
+    const width = containerWidth - margin.left - margin.right;
+    const height = containerHeight - margin.top - margin.bottom;
+
+    // Ensure dimensions are positive
+    if (width <= 0 || height <= 0) return;
+
+    // Create the SVG container within the chartRef SVG
+    const svg = d3
+      .select(chartRef.current)
+      .attr("viewBox", `0 0 ${containerWidth} ${containerHeight}`) // Make SVG responsive
+      .append("g")
+      .attr("transform", `translate(${margin.left},${margin.top})`);
 
     // Define scales
-    const xScale = d3.scaleBand()
-      .domain(data.map(d => d.month))
+    const xScale = d3
+      .scaleBand<string>() // Explicitly type scaleBand
+      .domain(data.map((d) => d.month))
       .range([0, width])
-      .padding(0.3);
+      .padding(0.6); // Adjust padding to make bars thinner
 
-    const yScale = d3.scaleLinear()
-      .domain([0, d3.max(data, d => Math.max(d.ingressValue, d.egressValue)) || 200])
-      .range([height, 0])
-      .nice();
+    const yScale = d3
+      .scaleLinear()
+      .domain([0, 200]) // Fixed scale [0, 200]
+      .range([height, 0]);
 
     // Define colors
-    const colors = {
-      ingress: '#3b82f6', // Blue
-      egress: '#8b5cf6'   // Purple
-    };
+    const barColor = "#3845a3"; // Dark blue for bars
+    const lineColor = "#000000"; // Black for line and dots
+    const gridColor = "#e5e7eb"; // Light gray for grid
+    const axisColor = "#6b7280"; // Gray for axis text/lines
+
+    // Add horizontal grid lines at specific values
+    const gridValues = [0, 25, 50, 150, 200];
+    svg
+      .selectAll(".grid-line")
+      .data(gridValues)
+      .enter()
+      .append("line")
+      .attr("class", "grid-line")
+      .attr("x1", 0)
+      .attr("x2", width)
+      .attr("y1", (d) => yScale(d))
+      .attr("y2", (d) => yScale(d))
+      .attr("stroke", gridColor)
+      .attr("stroke-width", 0.5); // Thinner grid lines
 
     // Add X axis
-    svg.append('g')
-      .attr('transform', `translate(0,${height})`)
-      .call(d3.axisBottom(xScale))
-      .selectAll('text')
-      .style('text-anchor', 'end')
-      .attr('dx', '-.8em')
-      .attr('dy', '.15em')
-      .attr('transform', 'rotate(-45)');
+    svg
+      .append("g")
+      .attr("transform", `translate(0,${height})`)
+      .call(
+        d3
+          .axisBottom(xScale)
+          .tickSize(0) // Remove tick marks
+          .tickPadding(8), // Padding between ticks and text
+      )
+      .attr("font-size", "9px") // Smaller font
+      .attr("color", axisColor)
+      .select(".domain") // Hide the axis line
+      .attr("stroke", "none");
 
     // Add Y axis
-    svg.append('g')
-      .call(d3.axisLeft(yScale));
-    
-    // Add Y axis label
-    svg.append('text')
-      .attr('transform', 'rotate(-90)')
-      .attr('y', 0 - margin.left)
-      .attr('x', 0 - (height / 2))
-      .attr('dy', '1em')
-      .style('text-anchor', 'middle')
-      .style('font-size', '12px')
-      .style('fill', '#6b7280')
-      .text('Value (0-200)');
+    svg
+      .append("g")
+      .call(
+        d3
+          .axisLeft(yScale)
+          .tickValues(gridValues) // Only show ticks for grid lines
+          .tickSize(0) // Remove tick marks
+          .tickPadding(8), // Padding between ticks and text
+      )
+      .attr("font-size", "9px") // Smaller font
+      .attr("color", axisColor)
+      .select(".domain") // Hide the axis line
+      .attr("stroke", "none");
 
-    // Create the bars for ingress data
-    svg.selectAll('.bar-ingress')
+    // Create the bars
+    svg
+      .selectAll(".bar")
       .data(data)
       .enter()
-      .append('rect')
-      .attr('class', 'bar-ingress')
-      .attr('x', d => xScale(d.month) || 0)
-      .attr('width', xScale.bandwidth() / 2)
-      .attr('y', d => yScale(d.ingressValue))
-      .attr('height', d => height - yScale(d.ingressValue))
-      .attr('fill', colors.ingress)
-      .attr('rx', 2);
+      .append("rect")
+      .attr("class", "bar")
+      .attr("x", (d) => xScale(d.month) ?? 0) // Use nullish coalescing
+      .attr("width", xScale.bandwidth())
+      .attr("y", (d) => yScale(d.ingressValue)) // Assuming ingressValue for bars
+      .attr("height", (d) => height - yScale(d.ingressValue))
+      .attr("fill", barColor);
 
-    // Create the bars for egress data
-    svg.selectAll('.bar-egress')
-      .data(data)
-      .enter()
-      .append('rect')
-      .attr('class', 'bar-egress')
-      .attr('x', d => (xScale(d.month) || 0) + xScale.bandwidth() / 2)
-      .attr('width', xScale.bandwidth() / 2)
-      .attr('y', d => yScale(d.egressValue))
-      .attr('height', d => height - yScale(d.egressValue))
-      .attr('fill', colors.egress)
-      .attr('rx', 2);
+    // Create a line generator for trend (using ingressValue for the line as well)
+    const lineGenerator = d3
+      .line<HistoricalData>()
+      .x((d) => (xScale(d.month) ?? 0) + xScale.bandwidth() / 2) // Center line on bar
+      .y((d) => yScale(d.ingressValue)) // Line follows ingressValue
+      .curve(d3.curveMonotoneX); // Smooth curve
 
-    // Create a line for ingress trend
-    const lineIngress = d3.line<HistoricalData>()
-      .x(d => (xScale(d.month) || 0) + xScale.bandwidth() / 2)
-      .y(d => yScale(d.ingressValue))
-      .curve(d3.curveMonotoneX);
-
-    svg.append('path')
+    // Add the line path
+    svg
+      .append("path")
       .datum(data)
-      .attr('fill', 'none')
-      .attr('stroke', '#f59e0b')  // Amber
-      .attr('stroke-width', 2)
-      .attr('d', lineIngress);
+      .attr("fill", "none")
+      .attr("stroke", lineColor)
+      .attr("stroke-width", 1.5) // Slightly thinner line
+      .attr("d", lineGenerator);
 
-    // Add legend
-    const legend = svg.append('g')
-      .attr('transform', `translate(${width - 100}, 0)`);
+    // Add dots on the line
+    svg
+      .selectAll(".dot")
+      .data(data)
+      .enter()
+      .append("circle")
+      .attr("class", "dot")
+      .attr("cx", (d) => (xScale(d.month) ?? 0) + xScale.bandwidth() / 2)
+      .attr("cy", (d) => yScale(d.ingressValue))
+      .attr("r", 3) // Smaller dots
+      .attr("fill", lineColor);
 
-    // Ingress legend item
-    legend.append('rect')
-      .attr('x', 0)
-      .attr('y', 0)
-      .attr('width', 12)
-      .attr('height', 12)
-      .attr('fill', colors.ingress);
-
-    legend.append('text')
-      .attr('x', 20)
-      .attr('y', 10)
-      .style('font-size', '12px')
-      .style('fill', '#6b7280')
-      .text('Ingress');
-
-    // Egress legend item
-    legend.append('rect')
-      .attr('x', 0)
-      .attr('y', 20)
-      .attr('width', 12)
-      .attr('height', 12)
-      .attr('fill', colors.egress);
-
-    legend.append('text')
-      .attr('x', 20)
-      .attr('y', 30)
-      .style('font-size', '12px')
-      .style('fill', '#6b7280')
-      .text('Egress');
-
-  }, [data]);
+    // Legend removed as per UI analysis
+  }, [data]); // Rerun effect if data changes
 
   return (
-    <svg
-      ref={chartRef}
-      className="w-full h-full overflow-visible"
-      preserveAspectRatio="xMidYMid meet"
-    ></svg>
+    // Container div to measure dimensions
+    <div ref={containerRef} className="w-full h-full">
+      <svg
+        ref={chartRef}
+        className="w-full h-full block" // Use block to prevent extra space below
+        preserveAspectRatio="xMidYMid meet"
+      ></svg>
+    </div>
   );
 };
 
