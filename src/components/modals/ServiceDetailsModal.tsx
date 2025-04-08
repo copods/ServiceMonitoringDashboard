@@ -168,5 +168,4 @@ const ServiceDetailsModal: React.FC<ServiceDetailsModalProps> = ({
   );
 };
 
-// Export a memoized version of the component to prevent unnecessary re-renders
 export default memo(ServiceDetailsModal);
