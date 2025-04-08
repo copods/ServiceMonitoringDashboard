@@ -3,11 +3,11 @@ import { useSelector } from 'react-redux';
 import { RootState } from 'store';
 import { format } from 'date-fns';
 
-interface DashboardLayoutProps {
+interface MonitoringDashboardLayoutProps {
   children: React.ReactNode;
 }
 
-const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
+const MonitoringDashboardLayout: React.FC<MonitoringDashboardLayoutProps> = ({ children }) => {
   const { location, currentTimestamp, timeRange } = useSelector((state: RootState) => state.ui);
 
   const timePart = format(new Date(currentTimestamp), 'HH:mm').toUpperCase();
@@ -39,4 +39,4 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   );
 };
 
-export default DashboardLayout;
+export default MonitoringDashboardLayout;

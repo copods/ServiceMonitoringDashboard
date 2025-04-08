@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { store } from 'store';
 import socketService from 'services/socket/socketService';
-import Dashboard from 'pages/Dashboard';
+import MonitoringDashboard from 'pages/MonitoringDashboard';
 import MOSDashboard from 'pages/MOSDashboard';
 
 const App: React.FC = () => {
@@ -17,7 +17,7 @@ const App: React.FC = () => {
     <Provider store={store}>
       <Router>
         <Routes>
-          <Route path="/" element={<Dashboard />} />
+          <Route path="/" element={<MonitoringDashboard />} />
           <Route path="/mos" element={<MOSDashboard />} />
         </Routes>
       </Router>

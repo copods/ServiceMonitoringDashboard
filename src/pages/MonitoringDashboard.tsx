@@ -3,11 +3,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from 'store';
 import { updateTimestamp } from 'store/slices/uiSlice';
 import { useDashboardData } from 'hooks/useDashboardData';
-import DashboardErrorState from 'components/common/DashboardErrorState';
-
-import DashboardLayout from 'components/layout/DashboardLayout';
-
 import { Service } from 'types/service';
+
+import DashboardErrorState from 'components/common/DashboardErrorState';
+import MonitoringDashboardLayout from 'components/layout/MonitoringDashboardLayout';
 
 const DomainOverview = lazy(() => import('components/domain-section/DomainOverview'));
 const PolarChart = lazy(() => import('components/charts/polar-chart/PolarChart'));
@@ -19,7 +18,7 @@ const TIMESTAMP_UPDATE_INTERVAL = 60000;
 
 const LoadingFallback: React.FC = () => <div className="p-4 text-center">Loading...</div>;
 
-const Dashboard: React.FC = () => {
+const MonitoringDashboard: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const domains = useSelector((state: RootState) => state.domains);
   const { items: services, topCritical } = useSelector((state: RootState) => state.services);
@@ -55,7 +54,7 @@ const Dashboard: React.FC = () => {
   }
 
   return (
-    <DashboardLayout>
+    <MonitoringDashboardLayout>
       {/* Domain Overview Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-1 mb-1">
         {domains.map((domain) => (
@@ -109,8 +108,8 @@ const Dashboard: React.FC = () => {
           />
         </Suspense>
       )}
-    </DashboardLayout>
+    </MonitoringDashboardLayout>
   );
 };
 
-export default Dashboard;
+export default MonitoringDashboard;

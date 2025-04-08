@@ -1,5 +1,5 @@
 import React from 'react';
-import DashboardLayout from 'components/layout/DashboardLayout';
+import MonitoringDashboardLayout from 'components/layout/MonitoringDashboardLayout';
 
 interface DashboardErrorStateProps {
   error: string;
@@ -8,7 +8,7 @@ interface DashboardErrorStateProps {
 
 const DashboardErrorState: React.FC<DashboardErrorStateProps> = ({ error, onRetry }) => {
   return (
-    <DashboardLayout>
+    <MonitoringDashboardLayout>
       <div className="flex flex-col items-center justify-center h-full">
         <div className="text-xl text-red-500 mb-4">Error loading data: {error}</div>
         <button
@@ -18,7 +18,7 @@ const DashboardErrorState: React.FC<DashboardErrorStateProps> = ({ error, onRetr
           Retry
         </button>
       </div>
-    </DashboardLayout>
+    </MonitoringDashboardLayout>
   );
 };
 
