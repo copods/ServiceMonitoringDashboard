@@ -90,7 +90,7 @@ const generateNetworkData = () => {
   }
   
   fs.writeFileSync(
-    path.join(outputDir, 'network-data.json'),
+    path.join(outputDir, 'data/network-data.json'),
     JSON.stringify(networkData, null, 2)
   );
   

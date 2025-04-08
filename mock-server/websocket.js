@@ -66,7 +66,7 @@ const generateImportanceUpdate = (services) => {
 // Create WebSocket server
 const startWebSocketServer = () => {
   // Load mock data
-  const mockDataPath = path.join(__dirname, 'db.json');
+  const mockDataPath = path.join(__dirname, 'data/monitor-data.json');
   let mockData;
   
   try {

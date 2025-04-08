@@ -1,6 +1,4 @@
 import axios from 'axios';
-import { Domain } from 'types/domain';
-import { Service } from 'types/service';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
 
@@ -11,22 +9,8 @@ const api = axios.create({
   }
 });
 
-export const fetchDomains = async (): Promise<Domain[]> => {
-  const response = await api.get('/domains');
-  return response.data;
-};
+export * from './monitorApi';
 
-export const fetchServices = async (): Promise<Service[]> => {
-  const response = await api.get('/services');
-  return response.data;
-};
-
-export const fetchServiceDetails = async (serviceId: string): Promise<Service> => {
-  const response = await api.get(`/services/${serviceId}`);
-  return response.data;
-};
-
-// Export network API functions as well
 export * from './networkApi';
 
 // Error handling interceptor

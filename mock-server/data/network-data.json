@@ -54,433 +54,433 @@
       "id": "denver-pune",
       "sourceId": "denver",
       "destinationId": "pune",
-      "totalStreams": 84000,
-      "impactedPercentage": 75,
-      "mosScore": 35,
-      "packetLoss": 60,
-      "degradationPercentage": 65
+      "totalStreams": 55000,
+      "impactedPercentage": 82,
+      "mosScore": 85,
+      "packetLoss": 53,
+      "degradationPercentage": 54
     },
     {
       "id": "pune-denver",
       "sourceId": "pune",
       "destinationId": "denver",
-      "totalStreams": 16800,
-      "impactedPercentage": 53,
-      "mosScore": 42,
-      "packetLoss": 23,
+      "totalStreams": 11000,
+      "impactedPercentage": 41,
+      "mosScore": 34,
+      "packetLoss": 19,
       "degradationPercentage": 18
     },
     {
       "id": "denver-berlin",
       "sourceId": "denver",
       "destinationId": "berlin",
-      "totalStreams": 88000,
-      "impactedPercentage": 50,
-      "mosScore": 44,
-      "packetLoss": 41,
-      "degradationPercentage": 70
+      "totalStreams": 51000,
+      "impactedPercentage": 44,
+      "mosScore": 52,
+      "packetLoss": 55,
+      "degradationPercentage": 62
     },
     {
       "id": "berlin-denver",
       "sourceId": "berlin",
       "destinationId": "denver",
-      "totalStreams": 17600,
-      "impactedPercentage": 47,
-      "mosScore": 36,
-      "packetLoss": 35,
-      "degradationPercentage": 53
+      "totalStreams": 10200,
+      "impactedPercentage": 49,
+      "mosScore": 32,
+      "packetLoss": 24,
+      "degradationPercentage": 59
     },
     {
       "id": "denver-newyork",
       "sourceId": "denver",
       "destinationId": "newyork",
-      "totalStreams": 59000,
-      "impactedPercentage": 58,
-      "mosScore": 22,
-      "packetLoss": 65,
-      "degradationPercentage": 68
+      "totalStreams": 45000,
+      "impactedPercentage": 48,
+      "mosScore": 61,
+      "packetLoss": 51,
+      "degradationPercentage": 58
     },
     {
       "id": "newyork-denver",
       "sourceId": "newyork",
       "destinationId": "denver",
-      "totalStreams": 11800,
-      "impactedPercentage": 60,
-      "mosScore": 66,
-      "packetLoss": 34,
-      "degradationPercentage": 19
+      "totalStreams": 9000,
+      "impactedPercentage": 52,
+      "mosScore": 55,
+      "packetLoss": 37,
+      "degradationPercentage": 32
     },
     {
       "id": "denver-bangalore",
       "sourceId": "denver",
       "destinationId": "bangalore",
-      "totalStreams": 24000,
-      "impactedPercentage": 54,
-      "mosScore": 38,
-      "packetLoss": 53,
-      "degradationPercentage": 48
+      "totalStreams": 59000,
+      "impactedPercentage": 96,
+      "mosScore": 43,
+      "packetLoss": 41,
+      "degradationPercentage": 40
     },
     {
       "id": "bangalore-denver",
       "sourceId": "bangalore",
       "destinationId": "denver",
-      "totalStreams": 4800,
-      "impactedPercentage": 46,
-      "mosScore": 54,
-      "packetLoss": 38,
-      "degradationPercentage": 23
+      "totalStreams": 11800,
+      "impactedPercentage": 50,
+      "mosScore": 33,
+      "packetLoss": 16,
+      "degradationPercentage": 11
     },
     {
       "id": "denver-california",
       "sourceId": "denver",
       "destinationId": "california",
-      "totalStreams": 71000,
-      "impactedPercentage": 61,
-      "mosScore": 71,
-      "packetLoss": 48,
-      "degradationPercentage": 36
+      "totalStreams": 80000,
+      "impactedPercentage": 96,
+      "mosScore": 88,
+      "packetLoss": 35,
+      "degradationPercentage": 43
     },
     {
       "id": "california-denver",
       "sourceId": "california",
       "destinationId": "denver",
-      "totalStreams": 14200,
-      "impactedPercentage": 47,
-      "mosScore": 38,
+      "totalStreams": 16000,
+      "impactedPercentage": 33,
+      "mosScore": 36,
       "packetLoss": 11,
-      "degradationPercentage": 36
+      "degradationPercentage": 20
     },
     {
       "id": "denver-seattle",
       "sourceId": "denver",
       "destinationId": "seattle",
-      "totalStreams": 59000,
+      "totalStreams": 61000,
       "impactedPercentage": 15,
-      "mosScore": 48,
-      "packetLoss": 61,
-      "degradationPercentage": 48
+      "mosScore": 88,
+      "packetLoss": 24,
+      "degradationPercentage": 30
     },
     {
       "id": "seattle-denver",
       "sourceId": "seattle",
       "destinationId": "denver",
-      "totalStreams": 11800,
-      "impactedPercentage": 41,
-      "mosScore": 33,
-      "packetLoss": 31,
+      "totalStreams": 12200,
+      "impactedPercentage": 45,
+      "mosScore": 52,
+      "packetLoss": 16,
       "degradationPercentage": 44
     },
     {
       "id": "denver-mumbai",
       "sourceId": "denver",
       "destinationId": "mumbai",
-      "totalStreams": 48000,
-      "impactedPercentage": 55,
+      "totalStreams": 29000,
+      "impactedPercentage": 92,
       "mosScore": 77,
-      "packetLoss": 48,
-      "degradationPercentage": 66
+      "packetLoss": 27,
+      "degradationPercentage": 88
     },
     {
       "id": "mumbai-denver",
       "sourceId": "mumbai",
       "destinationId": "denver",
-      "totalStreams": 9600,
-      "impactedPercentage": 49,
-      "mosScore": 69,
-      "packetLoss": 31,
-      "degradationPercentage": 44
+      "totalStreams": 5800,
+      "impactedPercentage": 65,
+      "mosScore": 40,
+      "packetLoss": 22,
+      "degradationPercentage": 58
     }
   ],
   "statistics": {
     "denver-pune": [
       {
         "month": "April",
-        "value": 94,
+        "value": 96,
         "date": "2014-05-01"
       },
       {
         "month": "May",
-        "value": 73,
+        "value": 91,
         "date": "2014-06-01"
       },
       {
         "month": "June",
-        "value": 87,
+        "value": 75,
         "date": "2014-07-01"
       },
       {
         "month": "July",
-        "value": 62,
+        "value": 99,
         "date": "2014-08-01"
       },
       {
         "month": "Aug",
-        "value": 58,
+        "value": 63,
         "date": "2014-09-01"
       },
       {
         "month": "Sep",
-        "value": 82,
+        "value": 74,
         "date": "2014-10-01"
       },
       {
         "month": "Oct",
-        "value": 92,
+        "value": 64,
         "date": "2014-11-01"
       },
       {
         "month": "Nov",
-        "value": 53,
+        "value": 66,
         "date": "2014-12-01"
       },
       {
         "month": "Dec",
-        "value": 51,
+        "value": 59,
         "date": "2014-01-01"
       },
       {
         "month": "Jan",
-        "value": 33,
+        "value": 34,
         "date": "2014-02-01"
       }
     ],
     "pune-denver": [
       {
         "month": "April",
-        "value": 98,
+        "value": 73,
         "date": "2014-05-01"
       },
       {
         "month": "May",
-        "value": 66,
+        "value": 85,
         "date": "2014-06-01"
       },
       {
         "month": "June",
-        "value": 70,
+        "value": 89,
         "date": "2014-07-01"
       },
       {
         "month": "July",
-        "value": 84,
+        "value": 66,
         "date": "2014-08-01"
       },
       {
         "month": "Aug",
-        "value": 50,
+        "value": 68,
         "date": "2014-09-01"
       },
       {
         "month": "Sep",
-        "value": 79,
+        "value": 90,
         "date": "2014-10-01"
       },
       {
         "month": "Oct",
-        "value": 63,
+        "value": 94,
         "date": "2014-11-01"
       },
       {
         "month": "Nov",
-        "value": 66,
+        "value": 75,
         "date": "2014-12-01"
       },
       {
         "month": "Dec",
-        "value": 81,
+        "value": 65,
         "date": "2014-01-01"
       },
       {
         "month": "Jan",
-        "value": 75,
+        "value": 56,
         "date": "2014-02-01"
       }
     ],
     "denver-berlin": [
       {
         "month": "April",
-        "value": 94,
+        "value": 55,
         "date": "2014-05-01"
       },
       {
         "month": "May",
-        "value": 93,
+        "value": 74,
         "date": "2014-06-01"
       },
       {
         "month": "June",
-        "value": 60,
+        "value": 90,
         "date": "2014-07-01"
       },
       {
         "month": "July",
-        "value": 72,
+        "value": 85,
         "date": "2014-08-01"
       },
       {
         "month": "Aug",
-        "value": 80,
+        "value": 60,
         "date": "2014-09-01"
       },
       {
         "month": "Sep",
-        "value": 51,
+        "value": 74,
         "date": "2014-10-01"
       },
       {
         "month": "Oct",
-        "value": 65,
+        "value": 75,
         "date": "2014-11-01"
       },
       {
         "month": "Nov",
-        "value": 55,
+        "value": 66,
         "date": "2014-12-01"
       },
       {
         "month": "Dec",
-        "value": 79,
+        "value": 91,
         "date": "2014-01-01"
       },
       {
         "month": "Jan",
-        "value": 92,
+        "value": 67,
         "date": "2014-02-01"
       }
     ],
     "berlin-denver": [
       {
         "month": "April",
-        "value": 84,
+        "value": 79,
         "date": "2014-05-01"
       },
       {
         "month": "May",
-        "value": 66,
+        "value": 99,
         "date": "2014-06-01"
       },
       {
         "month": "June",
-        "value": 59,
+        "value": 76,
         "date": "2014-07-01"
       },
       {
         "month": "July",
-        "value": 72,
+        "value": 89,
         "date": "2014-08-01"
       },
       {
         "month": "Aug",
-        "value": 84,
+        "value": 57,
         "date": "2014-09-01"
       },
       {
         "month": "Sep",
-        "value": 60,
+        "value": 52,
         "date": "2014-10-01"
       },
       {
         "month": "Oct",
-        "value": 64,
+        "value": 100,
         "date": "2014-11-01"
       },
       {
         "month": "Nov",
-        "value": 94,
+        "value": 61,
         "date": "2014-12-01"
       },
       {
         "month": "Dec",
-        "value": 51,
+        "value": 56,
         "date": "2014-01-01"
       },
       {
         "month": "Jan",
-        "value": 94,
+        "value": 59,
         "date": "2014-02-01"
       }
     ],
     "denver-newyork": [
       {
         "month": "April",
-        "value": 94,
+        "value": 83,
         "date": "2014-05-01"
       },
       {
         "month": "May",
-        "value": 73,
+        "value": 78,
         "date": "2014-06-01"
       },
       {
         "month": "June",
-        "value": 72,
+        "value": 85,
         "date": "2014-07-01"
       },
       {
         "month": "July",
-        "value": 66,
+        "value": 56,
         "date": "2014-08-01"
       },
       {
         "month": "Aug",
-        "value": 70,
+        "value": 56,
         "date": "2014-09-01"
       },
       {
         "month": "Sep",
-        "value": 58,
+        "value": 55,
         "date": "2014-10-01"
       },
       {
         "month": "Oct",
-        "value": 59,
+        "value": 62,
         "date": "2014-11-01"
       },
       {
         "month": "Nov",
-        "value": 54,
+        "value": 83,
         "date": "2014-12-01"
       },
       {
         "month": "Dec",
-        "value": 58,
+        "value": 83,
         "date": "2014-01-01"
       },
       {
         "month": "Jan",
-        "value": 94,
+        "value": 65,
         "date": "2014-02-01"
       }
     ],
     "newyork-denver": [
       {
         "month": "April",
-        "value": 64,
+        "value": 75,
         "date": "2014-05-01"
       },
       {
         "month": "May",
-        "value": 70,
+        "value": 61,
         "date": "2014-06-01"
       },
       {
         "month": "June",
-        "value": 95,
+        "value": 76,
         "date": "2014-07-01"
       },
       {
         "month": "July",
-        "value": 67,
+        "value": 63,
         "date": "2014-08-01"
       },
       {
         "month": "Aug",
-        "value": 72,
+        "value": 78,
         "date": "2014-09-01"
       },
       {
         "month": "Sep",
-        "value": 75,
+        "value": 62,
         "date": "2014-10-01"
       },
       {
@@ -495,59 +495,111 @@
       },
       {
         "month": "Dec",
-        "value": 54,
+        "value": 66,
         "date": "2014-01-01"
       },
       {
         "month": "Jan",
-        "value": 82,
+        "value": 79,
         "date": "2014-02-01"
       }
     ],
     "denver-bangalore": [
       {
         "month": "April",
-        "value": 56,
+        "value": 79,
         "date": "2014-05-01"
       },
       {
         "month": "May",
-        "value": 69,
+        "value": 70,
         "date": "2014-06-01"
       },
       {
         "month": "June",
-        "value": 100,
+        "value": 70,
         "date": "2014-07-01"
       },
       {
         "month": "July",
-        "value": 86,
+        "value": 73,
         "date": "2014-08-01"
       },
       {
         "month": "Aug",
-        "value": 90,
+        "value": 59,
         "date": "2014-09-01"
       },
       {
         "month": "Sep",
-        "value": 97,
+        "value": 59,
         "date": "2014-10-01"
       },
       {
         "month": "Oct",
-        "value": 65,
+        "value": 81,
         "date": "2014-11-01"
       },
       {
         "month": "Nov",
-        "value": 96,
+        "value": 90,
         "date": "2014-12-01"
       },
       {
         "month": "Dec",
-        "value": 65,
+        "value": 80,
+        "date": "2014-01-01"
+      },
+      {
+        "month": "Jan",
+        "value": 91,
+        "date": "2014-02-01"
+      }
+    ],
+    "bangalore-denver": [
+      {
+        "month": "April",
+        "value": 81,
+        "date": "2014-05-01"
+      },
+      {
+        "month": "May",
+        "value": 50,
+        "date": "2014-06-01"
+      },
+      {
+        "month": "June",
+        "value": 81,
+        "date": "2014-07-01"
+      },
+      {
+        "month": "July",
+        "value": 90,
+        "date": "2014-08-01"
+      },
+      {
+        "month": "Aug",
+        "value": 98,
+        "date": "2014-09-01"
+      },
+      {
+        "month": "Sep",
+        "value": 76,
+        "date": "2014-10-01"
+      },
+      {
+        "month": "Oct",
+        "value": 74,
+        "date": "2014-11-01"
+      },
+      {
+        "month": "Nov",
+        "value": 100,
+        "date": "2014-12-01"
+      },
+      {
+        "month": "Dec",
+        "value": 88,
         "date": "2014-01-01"
       },
       {
@@ -556,62 +608,62 @@
         "date": "2014-02-01"
       }
     ],
-    "bangalore-denver": [
+    "denver-california": [
       {
         "month": "April",
-        "value": 96,
+        "value": 50,
         "date": "2014-05-01"
       },
       {
         "month": "May",
-        "value": 80,
+        "value": 95,
         "date": "2014-06-01"
       },
       {
         "month": "June",
-        "value": 96,
+        "value": 77,
         "date": "2014-07-01"
       },
       {
         "month": "July",
-        "value": 70,
+        "value": 87,
         "date": "2014-08-01"
       },
       {
         "month": "Aug",
-        "value": 91,
+        "value": 54,
         "date": "2014-09-01"
       },
       {
         "month": "Sep",
-        "value": 80,
+        "value": 92,
         "date": "2014-10-01"
       },
       {
         "month": "Oct",
-        "value": 99,
+        "value": 59,
         "date": "2014-11-01"
       },
       {
         "month": "Nov",
-        "value": 56,
+        "value": 90,
         "date": "2014-12-01"
       },
       {
         "month": "Dec",
-        "value": 84,
+        "value": 91,
         "date": "2014-01-01"
       },
       {
         "month": "Jan",
-        "value": 81,
+        "value": 98,
         "date": "2014-02-01"
       }
     ],
-    "denver-california": [
+    "california-denver": [
       {
         "month": "April",
-        "value": 53,
+        "value": 74,
         "date": "2014-05-01"
       },
       {
@@ -621,141 +673,37 @@
       },
       {
         "month": "June",
-        "value": 86,
+        "value": 96,
         "date": "2014-07-01"
       },
       {
         "month": "July",
-        "value": 87,
+        "value": 76,
         "date": "2014-08-01"
       },
       {
         "month": "Aug",
-        "value": 90,
+        "value": 70,
         "date": "2014-09-01"
       },
       {
         "month": "Sep",
-        "value": 98,
+        "value": 76,
         "date": "2014-10-01"
       },
       {
         "month": "Oct",
-        "value": 87,
+        "value": 77,
         "date": "2014-11-01"
       },
       {
         "month": "Nov",
-        "value": 66,
+        "value": 91,
         "date": "2014-12-01"
       },
       {
         "month": "Dec",
-        "value": 100,
-        "date": "2014-01-01"
-      },
-      {
-        "month": "Jan",
-        "value": 65,
-        "date": "2014-02-01"
-      }
-    ],
-    "california-denver": [
-      {
-        "month": "April",
-        "value": 72,
-        "date": "2014-05-01"
-      },
-      {
-        "month": "May",
-        "value": 82,
-        "date": "2014-06-01"
-      },
-      {
-        "month": "June",
-        "value": 90,
-        "date": "2014-07-01"
-      },
-      {
-        "month": "July",
-        "value": 65,
-        "date": "2014-08-01"
-      },
-      {
-        "month": "Aug",
-        "value": 81,
-        "date": "2014-09-01"
-      },
-      {
-        "month": "Sep",
-        "value": 86,
-        "date": "2014-10-01"
-      },
-      {
-        "month": "Oct",
-        "value": 84,
-        "date": "2014-11-01"
-      },
-      {
-        "month": "Nov",
-        "value": 98,
-        "date": "2014-12-01"
-      },
-      {
-        "month": "Dec",
-        "value": 79,
-        "date": "2014-01-01"
-      },
-      {
-        "month": "Jan",
-        "value": 89,
-        "date": "2014-02-01"
-      }
-    ],
-    "denver-seattle": [
-      {
-        "month": "April",
-        "value": 63,
-        "date": "2014-05-01"
-      },
-      {
-        "month": "May",
-        "value": 82,
-        "date": "2014-06-01"
-      },
-      {
-        "month": "June",
-        "value": 83,
-        "date": "2014-07-01"
-      },
-      {
-        "month": "July",
-        "value": 82,
-        "date": "2014-08-01"
-      },
-      {
-        "month": "Aug",
-        "value": 52,
-        "date": "2014-09-01"
-      },
-      {
-        "month": "Sep",
-        "value": 64,
-        "date": "2014-10-01"
-      },
-      {
-        "month": "Oct",
-        "value": 99,
-        "date": "2014-11-01"
-      },
-      {
-        "month": "Nov",
-        "value": 51,
-        "date": "2014-12-01"
-      },
-      {
-        "month": "Dec",
-        "value": 55,
+        "value": 96,
         "date": "2014-01-01"
       },
       {
@@ -764,20 +712,72 @@
         "date": "2014-02-01"
       }
     ],
-    "seattle-denver": [
+    "denver-seattle": [
       {
         "month": "April",
-        "value": 61,
+        "value": 65,
         "date": "2014-05-01"
       },
       {
         "month": "May",
-        "value": 55,
+        "value": 66,
         "date": "2014-06-01"
       },
       {
         "month": "June",
-        "value": 67,
+        "value": 64,
+        "date": "2014-07-01"
+      },
+      {
+        "month": "July",
+        "value": 58,
+        "date": "2014-08-01"
+      },
+      {
+        "month": "Aug",
+        "value": 62,
+        "date": "2014-09-01"
+      },
+      {
+        "month": "Sep",
+        "value": 83,
+        "date": "2014-10-01"
+      },
+      {
+        "month": "Oct",
+        "value": 50,
+        "date": "2014-11-01"
+      },
+      {
+        "month": "Nov",
+        "value": 65,
+        "date": "2014-12-01"
+      },
+      {
+        "month": "Dec",
+        "value": 93,
+        "date": "2014-01-01"
+      },
+      {
+        "month": "Jan",
+        "value": 79,
+        "date": "2014-02-01"
+      }
+    ],
+    "seattle-denver": [
+      {
+        "month": "April",
+        "value": 98,
+        "date": "2014-05-01"
+      },
+      {
+        "month": "May",
+        "value": 92,
+        "date": "2014-06-01"
+      },
+      {
+        "month": "June",
+        "value": 76,
         "date": "2014-07-01"
       },
       {
@@ -787,136 +787,136 @@
       },
       {
         "month": "Aug",
-        "value": 87,
+        "value": 71,
         "date": "2014-09-01"
       },
       {
         "month": "Sep",
-        "value": 85,
+        "value": 76,
         "date": "2014-10-01"
       },
       {
         "month": "Oct",
-        "value": 72,
+        "value": 86,
         "date": "2014-11-01"
       },
       {
         "month": "Nov",
-        "value": 73,
+        "value": 98,
         "date": "2014-12-01"
       },
       {
         "month": "Dec",
-        "value": 78,
+        "value": 72,
         "date": "2014-01-01"
       },
       {
         "month": "Jan",
-        "value": 71,
+        "value": 88,
         "date": "2014-02-01"
       }
     ],
     "denver-mumbai": [
       {
         "month": "April",
-        "value": 82,
+        "value": 89,
         "date": "2014-05-01"
       },
       {
         "month": "May",
-        "value": 73,
+        "value": 53,
         "date": "2014-06-01"
       },
       {
         "month": "June",
-        "value": 92,
+        "value": 68,
         "date": "2014-07-01"
       },
       {
         "month": "July",
-        "value": 84,
+        "value": 72,
         "date": "2014-08-01"
       },
       {
         "month": "Aug",
-        "value": 76,
+        "value": 62,
         "date": "2014-09-01"
       },
       {
         "month": "Sep",
-        "value": 74,
+        "value": 70,
         "date": "2014-10-01"
       },
       {
         "month": "Oct",
-        "value": 62,
+        "value": 99,
         "date": "2014-11-01"
       },
       {
         "month": "Nov",
-        "value": 50,
+        "value": 89,
         "date": "2014-12-01"
       },
       {
         "month": "Dec",
-        "value": 70,
+        "value": 91,
         "date": "2014-01-01"
       },
       {
         "month": "Jan",
-        "value": 61,
+        "value": 81,
         "date": "2014-02-01"
       }
     ],
     "mumbai-denver": [
       {
         "month": "April",
-        "value": 76,
+        "value": 84,
         "date": "2014-05-01"
       },
       {
         "month": "May",
-        "value": 75,
+        "value": 84,
         "date": "2014-06-01"
       },
       {
         "month": "June",
-        "value": 85,
+        "value": 74,
         "date": "2014-07-01"
       },
       {
         "month": "July",
-        "value": 74,
+        "value": 83,
         "date": "2014-08-01"
       },
       {
         "month": "Aug",
-        "value": 95,
+        "value": 100,
         "date": "2014-09-01"
       },
       {
         "month": "Sep",
-        "value": 70,
+        "value": 52,
         "date": "2014-10-01"
       },
       {
         "month": "Oct",
-        "value": 91,
+        "value": 61,
         "date": "2014-11-01"
       },
       {
         "month": "Nov",
-        "value": 77,
+        "value": 74,
         "date": "2014-12-01"
       },
       {
         "month": "Dec",
-        "value": 91,
+        "value": 66,
         "date": "2014-01-01"
       },
       {
         "month": "Jan",
-        "value": 75,
+        "value": 98,
         "date": "2014-02-01"
       }
     ]

@@ -241,7 +241,7 @@ const generateMockData = () => {
   }
 
   fs.writeFileSync(
-    path.join(__dirname, "..", "db.json"),
+    path.join(__dirname, "..", "data/monitor-data.json"),
     JSON.stringify(mockData, null, 2),
   );
 
