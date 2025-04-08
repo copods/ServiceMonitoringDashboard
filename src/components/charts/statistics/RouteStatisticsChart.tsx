@@ -1,7 +1,13 @@
 // src/components/charts/statistics/RouteStatisticsChart.tsx
 import React, { useRef, useEffect } from 'react';
 import * as d3 from 'd3';
-import { Location, MonthlyStatistic } from 'types/network';
+import { Location } from 'types/mos';
+
+interface MonthlyStatistic {
+  month: string;
+  ingressValue: number;
+  egressValue: number;
+}
 
 interface RouteStatisticsChartProps {
   sourceLocation: Location;

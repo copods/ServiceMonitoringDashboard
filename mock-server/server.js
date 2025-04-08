@@ -1,9 +1,8 @@
 // mock-server/server.js
 const express = require('express');
 const cors = require('cors');
-const networkRoutes = require('./routes/network');
 const monitorRoutes = require('./routes/monitor'); // Added monitor routes
-
+const mosRoutes = require('./routes/mos');
 // Create Express app
 const app = express();
 const port = 3001;
@@ -12,11 +11,12 @@ const port = 3001;
 app.use(cors());
 app.use(express.json());
 
-// Network routes for MOS Dashboard
-app.use('/api/network', networkRoutes);
 
 // monitor routes (includes services and domains)
 app.use('/api/monitor', monitorRoutes);
+
+// MOS dashboard routes
+app.use('/api/mos', mosRoutes);
 
 // Handle WebSocket server conditionally
 let websocketServer;

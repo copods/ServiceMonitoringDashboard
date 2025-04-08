@@ -11,7 +11,7 @@ const api = axios.create({
 
 export * from './monitorApi';
 
-export * from './networkApi';
+export * from './mosApi';
 
 // Error handling interceptor
 api.interceptors.response.use(
