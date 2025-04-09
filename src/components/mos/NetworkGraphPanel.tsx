@@ -428,7 +428,7 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
             </g>
         </g>
     );
-}, [layoutPositions.svgHeight]); // Re-calculate if svgHeight changes
+}, [layoutPositions.svgHeight]);
 
 
 
