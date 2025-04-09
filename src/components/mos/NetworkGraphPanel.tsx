@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useCallback } from "react";
 import * as d3 from "d3";
 import { Location, Route } from "types/mos"; // Adjust path if needed
 
@@ -13,7 +13,7 @@ interface NetworkGraphPanelProps {
 
 // --- Constants for Layout and Styling ---
 const SVG_WIDTH = "100%"; // Use relative width
-const SVG_HEIGHT = 450; // Keep fixed height or adjust as needed
+const SVG_HEIGHT = 550; // Keep fixed height or adjust as needed
 const NODE_RADIUS = 28; // Slightly smaller
 const PROGRESS_RADIUS = 18; // Slightly smaller
 const PADDING_Y = 55; // Adjust vertical spacing
@@ -141,36 +141,158 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
   selectedRouteId,
   mainDegradationPercentage, // Use the prop
 }) => {
+  // Optimize computation of sourceLocation
   const sourceLocation = useMemo(() => {
     if (!routes || routes.length === 0 || !locations) return null;
     const sourceId = routes[0].sourceId;
     return locations.find((loc) => loc.id === sourceId);
   }, [locations, routes]);
+  
+  // Create a function that returns a click handler for a specific route
+  const createRouteClickHandler = useCallback((routeId: string) => {
+    return (e: React.MouseEvent) => {
+      e.stopPropagation(); // Prevent bubbling
+      e.preventDefault(); // Prevent default
+      // Use a setTimeout to ensure the DOM has time to update before the next render
+      setTimeout(() => onRouteSelected(routeId), 0);
+    };
+  }, [onRouteSelected]);
 
-  const totalDestinations = routes.length;
-  // Adjust startY calculation if SVG height changes
-  const startY = (SVG_HEIGHT - (totalDestinations - 1) * PADDING_Y) / 2;
+  // Memoize route rendering logic to prevent recalculations on every render
+  const routeElements = useMemo(() => {
+    if (!routes || routes.length === 0 || !sourceLocation) return [];
+    
+    const totalDestinations = routes.length;
+    const startY = (SVG_HEIGHT - (totalDestinations - 1) * PADDING_Y) / 2;
+    
+    return routes.map((route, index) => {
+      const destinationLocation = locations.find(
+        (loc) => loc.id === route.destinationId,
+      );
+      if (!destinationLocation) return null;
 
-  if (!sourceLocation || routes.length === 0) {
+      const isSelected = route.id === selectedRouteId;
+      const destY = startY + index * PADDING_Y;
+      const progressY = destY;
+
+      const lineColor = isSelected ? SELECTED_LINE_COLOR : DEFAULT_LINE_COLOR;
+      const nodeStrokeColor = isSelected
+        ? SELECTED_NODE_STROKE_COLOR
+        : NODE_STROKE_COLOR;
+      const nodeStrokeWidth = isSelected ? "1.5" : "1";
+      const progressPercent = route.impactPercentage;
+      const progressColor =
+        progressPercent >= 50 ? PROGRESS_HIGH_COLOR : PROGRESS_LOW_COLOR;
+
+      const endAngle = (progressPercent / 100) * 2 * Math.PI;
+      const progressArcPath = arcGenerator({ endAngle } as any) ?? "";
+      const backgroundArcPath = backgroundArcGenerator({} as any) ?? "";
+
+      const linePathToProgress = getCurvePath(
+        CENTRAL_NODE_X + NODE_RADIUS * 0.7,
+        CENTRAL_NODE_Y,
+        PROGRESS_X - PROGRESS_RADIUS,
+        progressY,
+      );
+      const linePathToDest = getCurvePath(
+        PROGRESS_X + PROGRESS_RADIUS,
+        progressY,
+        DEST_NODE_X - NODE_RADIUS,
+        destY,
+      );
+
+      return (
+        <g
+          key={route.id}
+          onClick={createRouteClickHandler(route.id)}
+          style={{ cursor: "pointer" }}
+          aria-label={`Route from ${sourceLocation.name} to ${destinationLocation.name}`}
+        >
+          {/* Connecting Lines */}
+          <path
+            d={linePathToProgress}
+            stroke={lineColor}
+            strokeWidth="1"
+            fill="none"
+          />
+          <path
+            d={linePathToDest}
+            stroke={DEFAULT_LINE_COLOR}
+            strokeWidth="1"
+            fill="none"
+          />
+
+          {/* Progress Indicator */}
+          <g transform={`translate(${PROGRESS_X}, ${progressY})`}>
+            <path d={backgroundArcPath} fill={PROGRESS_BG_COLOR} />
+            <path d={progressArcPath} fill={progressColor} />
+            <text
+              textAnchor="middle"
+              dominantBaseline="middle"
+              fontSize="9"
+              fontWeight="600"
+              fill={TEXT_COLOR}
+            >
+              {progressPercent}%
+            </text>
+          </g>
+          <text
+            x={PROGRESS_X + PROGRESS_RADIUS + TEXT_OFFSET_X / 2}
+            y={progressY}
+            dominantBaseline="middle"
+            fontSize="10"
+            fill={TEXT_COLOR}
+          >
+            {Math.round(route.streamCount / 1000)}k streams
+          </text>
+
+          {/* Destination Node */}
+          <g>
+            <circle
+              cx={DEST_NODE_X}
+              cy={destY}
+              r={NODE_RADIUS}
+              fill="white"
+              stroke={nodeStrokeColor}
+              strokeWidth={nodeStrokeWidth}
+            />
+            {getIconPath(
+              DEST_NODE_X,
+              destY,
+              NODE_RADIUS * 0.9,
+              false,
+              isSelected,
+            )}
+            <text
+              x={DEST_NODE_X + NODE_RADIUS + TEXT_OFFSET_X}
+              y={destY - 4}
+              dominantBaseline="middle"
+              fontWeight="600"
+              fontSize="11"
+              fill={TEXT_COLOR}
+            >
+              {destinationLocation.name}
+            </text>
+            <text
+              x={DEST_NODE_X + NODE_RADIUS + TEXT_OFFSET_X}
+              y={destY + 8}
+              dominantBaseline="middle"
+              fontSize="10"
+              fill={TEXT_COLOR}
+            >
+              {route.mosPercentage}% Deg
+            </text>
+          </g>
+        </g>
+      );
+    });
+  }, [locations, routes, selectedRouteId, sourceLocation, createRouteClickHandler]); // Removed redundant onRouteSelected dependency
+
+  // Memoize the central node to prevent recreation on every render
+  const centralNode = useMemo(() => {
+    if (!sourceLocation) return null;
+    
     return (
-      <div
-        style={{ width: SVG_WIDTH, height: SVG_HEIGHT }}
-        className="flex items-center justify-center text-gray-500"
-      >
-        No network data to display.
-      </div>
-    );
-  }
-
-  return (
-    <svg
-      width={SVG_WIDTH}
-      height={SVG_HEIGHT}
-      viewBox={`0 0 ${500} ${SVG_HEIGHT}`} // Adjust viewBox width if needed
-      preserveAspectRatio="xMidYMid meet"
-      style={{ fontFamily: "Arial, sans-serif", maxWidth: "500px" }} // Max width to prevent excessive stretching
-    >
-      {/* Central Node */}
       <g>
         <circle
           cx={CENTRAL_NODE_X}
@@ -204,137 +326,25 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
           fontSize="10" // Even smaller font
           fill={TEXT_COLOR}
         >
-          {/* Display main degradation percentage */}
           {mainDegradationPercentage}% MoS
         </text>
       </g>
+    );
+  }, [sourceLocation, mainDegradationPercentage]);
 
-      {/* Destination Nodes and Connections */}
-      {routes.map((route, index) => {
-        const destinationLocation = locations.find(
-          (loc) => loc.id === route.destinationId,
-        );
-        if (!destinationLocation) return null;
+  return (
+    <svg
+      width={SVG_WIDTH}
+      height={SVG_HEIGHT}
+      viewBox={`0 0 ${500} ${SVG_HEIGHT}`}
+      preserveAspectRatio="xMidYMid meet"
+      style={{ fontFamily: "Arial, sans-serif", maxWidth: "500px" }}
+    >
+      {/* Central Node */}
+      {centralNode}
 
-        const isSelected = route.id === selectedRouteId;
-        const destY = startY + index * PADDING_Y;
-        const progressY = destY;
-
-        const lineColor = isSelected ? SELECTED_LINE_COLOR : DEFAULT_LINE_COLOR;
-        const nodeStrokeColor = isSelected
-          ? SELECTED_NODE_STROKE_COLOR
-          : NODE_STROKE_COLOR;
-        const nodeStrokeWidth = isSelected ? "1.5" : "1";
-        // Use impactPercentage for the red/gray arc
-        const progressPercent = route.impactPercentage;
-        const progressColor =
-          progressPercent >= 50 ? PROGRESS_HIGH_COLOR : PROGRESS_LOW_COLOR;
-
-        // Calculate end angle (0 to 2*PI)
-        const endAngle = (progressPercent / 100) * 2 * Math.PI;
-        // Use 'as any' to bypass strict D3 type checks if needed
-        const progressArcPath = arcGenerator({ endAngle } as any) ?? "";
-        const backgroundArcPath = backgroundArcGenerator({} as any) ?? "";
-
-        const linePathToProgress = getCurvePath(
-          CENTRAL_NODE_X + NODE_RADIUS * 0.7, // Start from edge of icon area
-          CENTRAL_NODE_Y,
-          PROGRESS_X - PROGRESS_RADIUS,
-          progressY,
-        );
-        const linePathToDest = getCurvePath(
-          PROGRESS_X + PROGRESS_RADIUS,
-          progressY,
-          DEST_NODE_X - NODE_RADIUS,
-          destY,
-        );
-
-        return (
-          <g
-            key={route.id}
-            onClick={() => onRouteSelected(route.id)}
-            style={{ cursor: "pointer" }}
-            aria-label={`Route from ${sourceLocation.name} to ${destinationLocation.name}`}
-          >
-            {/* Connecting Lines */}
-            <path
-              d={linePathToProgress}
-              stroke={lineColor} // First segment color depends on selection
-              strokeWidth="1" // Thinner lines
-              fill="none"
-            />
-            <path
-              d={linePathToDest}
-              stroke={DEFAULT_LINE_COLOR} // Second segment always default color
-              strokeWidth="1" // Thinner lines
-              fill="none"
-            />
-
-            {/* Progress Indicator */}
-            <g transform={`translate(${PROGRESS_X}, ${progressY})`}>
-              <path d={backgroundArcPath} fill={PROGRESS_BG_COLOR} />
-              <path d={progressArcPath} fill={progressColor} />
-              <text
-                textAnchor="middle"
-                dominantBaseline="middle"
-                fontSize="9" // Smaller text inside arc
-                fontWeight="600"
-                fill={TEXT_COLOR}
-              >
-                {progressPercent}%
-              </text>
-            </g>
-            <text
-              x={PROGRESS_X + PROGRESS_RADIUS + TEXT_OFFSET_X / 2} // Position text next to progress
-              y={progressY}
-              dominantBaseline="middle"
-              fontSize="10" // Small text
-              fill={TEXT_COLOR}
-            >
-              {Math.round(route.streamCount / 1000)}k streams
-            </text>
-
-            {/* Destination Node */}
-            <g>
-              <circle
-                cx={DEST_NODE_X}
-                cy={destY}
-                r={NODE_RADIUS}
-                fill="white"
-                stroke={nodeStrokeColor}
-                strokeWidth={nodeStrokeWidth}
-              />
-              {getIconPath(
-                DEST_NODE_X,
-                destY,
-                NODE_RADIUS * 0.9, // Icon size
-                false,
-                isSelected,
-              )}
-              <text
-                x={DEST_NODE_X + NODE_RADIUS + TEXT_OFFSET_X} // Position text next to node
-                y={destY - 4} // Position name slightly above center
-                dominantBaseline="middle"
-                fontWeight="600" // Semibold
-                fontSize="11" // Small font
-                fill={TEXT_COLOR}
-              >
-                {destinationLocation.name}
-              </text>
-              <text
-                x={DEST_NODE_X + NODE_RADIUS + TEXT_OFFSET_X} // Position text next to node
-                y={destY + 8} // Position deg below name
-                dominantBaseline="middle"
-                fontSize="10" // Smaller font
-                fill={TEXT_COLOR}
-              >
-                {/* Use mosPercentage for the "Deg" value */}
-                {route.mosPercentage}% Deg
-              </text>
-            </g>
-          </g>
-        );
-      })}
+      {/* Destination Nodes and Connections - use the memoized elements */}
+      {routeElements}
     </svg>
   );
 };

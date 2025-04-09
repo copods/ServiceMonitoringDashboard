@@ -1,4 +1,5 @@
 import React from "react";
+import SvgIcon from "components/common/SvgIcon"; // Import SvgIcon
 
 interface IssueDetailsBannerProps {
   mainNode: string;
@@ -8,41 +9,7 @@ interface IssueDetailsBannerProps {
   codec: string;
 }
 
-// Icons for Sort Controls
-const SortAscIcon = () => (
-  <svg
-    width="16"
-    height="16"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <line x1="12" y1="19" x2="12" y2="5"></line>
-    <polyline points="5 12 12 5 19 12"></polyline>
-  </svg>
-);
-const ListIcon = () => (
-  <svg
-    width="16"
-    height="16"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <line x1="8" y1="6" x2="21" y2="6"></line>
-    <line x1="8" y1="12" x2="21" y2="12"></line>
-    <line x1="8" y1="18" x2="21" y2="18"></line>
-    <line x1="3" y1="6" x2="3.01" y2="6"></line>
-    <line x1="3" y1="12" x2="3.01" y2="12"></line>
-    <line x1="3" y1="18" x2="3.01" y2="18"></line>
-  </svg>
-);
+// Removed local icon definitions
 
 const IssueDetailsBanner: React.FC<IssueDetailsBannerProps> = ({
   mainNode,
@@ -69,13 +36,13 @@ const IssueDetailsBanner: React.FC<IssueDetailsBannerProps> = ({
           </div>
         </div>
 
-        {/* Right Side: Sort Controls */}
+        {/* Right Side: Sort Controls using SvgIcon */}
         <div className="flex items-center space-x-3 text-gray-600">
           <button className="hover:text-black">
-            <SortAscIcon />
+            <SvgIcon name="sort-asc" size={16} />
           </button>
           <button className="hover:text-black">
-            <ListIcon />
+            <SvgIcon name="list" size={16} />
           </button>
           <div className="text-xs font-medium text-gray-700">
             Sort By: Impact from Denver &#9662; {/* Arrow down */}

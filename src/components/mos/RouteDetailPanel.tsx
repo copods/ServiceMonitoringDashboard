@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useMemo, useCallback } from "react"; // Import useCallback
 import { RouteDetails, HistoricalData } from "types/mos"; // Adjust path
 import RouteHistoricalChart from "./RouteHistoricalChart"; // Adjust path
+import SvgIcon from "components/common/SvgIcon"; // Import SvgIcon
 
 interface RouteDetailPanelProps {
   routeDetails: RouteDetails;
@@ -23,55 +24,7 @@ const NodeIcon = () => (
   </div>
 );
 
-// Arrow Icons
-const RightArrowIcon = () => (
-  <svg
-    width="20"
-    height="20"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="#9ca3af"
-    strokeWidth="1.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <line x1="5" y1="12" x2="19" y2="12"></line>
-    <polyline points="12 5 19 12 12 19"></polyline>
-  </svg>
-);
-const LeftArrowIcon = () => (
-  <svg
-    width="20"
-    height="20"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="#9ca3af"
-    strokeWidth="1.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <line x1="19" y1="12" x2="5" y2="12"></line>
-    <polyline points="12 19 5 12 12 5"></polyline>
-  </svg>
-);
-
-// Download Icon
-const DownloadIcon = () => (
-  <svg
-    width="16"
-    height="16"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-    <polyline points="7 10 12 15 17 10"></polyline>
-    <line x1="12" y1="15" x2="12" y2="3"></line>
-  </svg>
-);
+// Removed local Arrow and Download Icon definitions
 
 const RouteDetailPanel: React.FC<RouteDetailPanelProps> = ({
   routeDetails,
@@ -81,22 +34,150 @@ const RouteDetailPanel: React.FC<RouteDetailPanelProps> = ({
 }) => {
   const { forwardPath, returnPath, analysis, additionalStats } = routeDetails;
 
-  // Helper to determine MOS color (example thresholds)
-  const getMosColor = (mos: number): string => {
+  // Helper to determine MOS color (example thresholds) - wrapped in useCallback
+  const getMosColor = useCallback((mos: number): string => {
     if (mos < 40) return "text-red-600";
     if (mos < 70) return "text-yellow-600";
     return "text-green-600"; // Or blue like the original? Let's use green for good MOS
-  };
-  const getPlColor = (pl: number): string => {
+  }, []); // Empty dependency array as it doesn't depend on props/state
+
+  // Helper to determine Packet Loss color - wrapped in useCallback
+  const getPlColor = useCallback((pl: number): string => {
     if (pl > 10) return "text-red-600";
     if (pl > 2) return "text-yellow-600";
     return "text-gray-700"; // Low PL is good, less emphasis
-  };
+  }, []); // Empty dependency array
 
-  // Impact color based on percentage
-  const getImpactColor = (impact: number): string => {
+  // Impact color based on percentage - wrapped in useCallback
+  const getImpactColor = useCallback((impact: number): string => {
     return impact > 50 ? "bg-red-500" : "bg-yellow-400"; // Red for high impact, yellow for lower
-  };
+  }, []); // Empty dependency array
+
+  // Memoize sections to prevent re-rendering on parent re-renders
+  // Use the memoized functions (getMosColor, getPlColor, getImpactColor) in dependencies
+  const forwardPathSection = useMemo(() => (
+    <div className="flex items-center justify-between space-x-2">
+      {/* Source Stats */}
+      <div className="flex items-center space-x-2 flex-none w-1/4">
+        <NodeIcon />
+        <div className="text-xs leading-tight">
+          <div className={getMosColor(forwardPath.mosPercentage)}>
+            {forwardPath.mosPercentage}% MOS
+          </div>
+          <div className={getPlColor(forwardPath.packetLossPercentage)}>
+            {forwardPath.packetLossPercentage.toFixed(1)}% PL
+          </div>
+        </div>
+      </div>
+
+      {/* Connection Details */}
+      <div className="flex flex-col items-center flex-grow mx-2">
+        <div className="text-xs text-gray-500 mb-1">
+          {Math.round(forwardPath.streamCount / 1000)}k streams
+        </div>
+        {/* Dashed Line */}
+        <div className="w-full border-t border-dashed border-gray-400 relative">
+          <div className="absolute -top-2.5 left-1/2 transform -translate-x-1/2">
+            <SvgIcon name="arrow-right" size={20} stroke="#9ca3af" strokeWidth={1.5} />
+          </div>
+        </div>
+        {/* Impact Arc/Circle (Simplified as text for now) */}
+        <div className="mt-1 text-xs font-semibold text-red-600">
+          {forwardPath.impactPercentage}% Impacted
+        </div>
+        {/* Progress Circle (visual representation) */}
+        <div className="mt-1 w-5 h-5 rounded-full border border-gray-300 bg-gray-100 relative overflow-hidden">
+           <div
+             className={`absolute top-0 left-0 h-full ${getImpactColor(forwardPath.impactPercentage)}`}
+             style={{ width: `${forwardPath.impactPercentage}%` }} // Simple bar inside circle
+           ></div>
+        </div>
+      </div>
+
+      {/* Destination Stats */}
+      <div className="flex items-center justify-end space-x-2 flex-none w-1/4 text-right">
+        <div className="text-xs leading-tight">
+          {/* Destination MOS/PL from additionalStats */}
+          <div className={getMosColor(additionalStats.destinationMOS)}>
+            {additionalStats.destinationMOS}% MOS
+          </div>
+          <div className={getPlColor(additionalStats.destinationPacketLoss)}>
+            {additionalStats.destinationPacketLoss.toFixed(1)}% PL
+          </div>
+        </div>
+        <NodeIcon />
+      </div>
+    </div>
+  ), [forwardPath, additionalStats, getMosColor, getPlColor, getImpactColor]); // Dependencies now include stable function references
+
+  const returnPathSection = useMemo(() => (
+    <div className="flex items-center justify-between space-x-2">
+      {/* Destination Stats (Now acting as source for return) */}
+       <div className="flex items-center space-x-2 flex-none w-1/4">
+         <NodeIcon />
+         <div className="text-xs leading-tight">
+           <div className={getMosColor(additionalStats.destinationMOS)}>
+             {additionalStats.destinationMOS}% MOS
+           </div>
+           <div className={getPlColor(additionalStats.destinationPacketLoss)}>
+             {additionalStats.destinationPacketLoss.toFixed(1)}% PL
+           </div>
+         </div>
+       </div>
+
+      {/* Connection Details (Return) */}
+      <div className="flex flex-col items-center flex-grow mx-2">
+        <div className="text-xs text-gray-500 mb-1">
+          {Math.round(returnPath.streamCount / 1000)}k streams
+        </div>
+        {/* Dashed Line */}
+        <div className="w-full border-t border-dashed border-gray-400 relative">
+          <div className="absolute -top-2.5 left-1/2 transform -translate-x-1/2">
+            <SvgIcon name="arrow-left" size={20} stroke="#9ca3af" strokeWidth={1.5} />
+          </div>
+        </div>
+        {/* Impact Arc/Circle (Simplified as text for now) */}
+        <div className="mt-1 text-xs font-semibold text-yellow-600">
+          {returnPath.impactPercentage}% Impacted
+        </div>
+         {/* Progress Circle (visual representation) */}
+         <div className="mt-1 w-5 h-5 rounded-full border border-gray-300 bg-gray-100 relative overflow-hidden">
+            <div
+              className={`absolute top-0 left-0 h-full ${getImpactColor(returnPath.impactPercentage)}`}
+              style={{ width: `${returnPath.impactPercentage}%` }} // Simple bar inside circle
+            ></div>
+         </div>
+      </div>
+
+      {/* Source Stats (Now acting as destination for return) */}
+      <div className="flex items-center justify-end space-x-2 flex-none w-1/4 text-right">
+        <div className="text-xs leading-tight">
+          <div className={getMosColor(additionalStats.sourceMOS)}>
+            {additionalStats.sourceMOS}% MOS
+          </div>
+          <div className={getPlColor(additionalStats.sourcePacketLoss)}>
+            {additionalStats.sourcePacketLoss.toFixed(1)}% PL
+          </div>
+        </div>
+        <NodeIcon />
+      </div>
+    </div>
+  ), [returnPath, additionalStats, getMosColor, getPlColor, getImpactColor]); // Dependencies now include stable function references
+
+  const analysisSection = useMemo(() => (
+    <div className="border-t border-gray-200 pt-3">
+      {/* Title omitted as per screenshot */}
+      <div className="text-xs text-gray-600 space-y-1">
+        <p>
+          {analysis.impactedStreamsPercentage}% of streams reaching{" "}
+          {destinationLocationName} are impacted. Out of all the streams that
+          reach {destinationLocationName},{" "}
+          {analysis.sourceToDestPercentage}% come from {sourceLocationName}.
+        </p>
+        <p>{analysis.overlapAnalysis}</p>
+      </div>
+    </div>
+  ), [analysis, sourceLocationName, destinationLocationName]);
 
   return (
     // White background, black text, full height, padding
@@ -110,127 +191,13 @@ const RouteDetailPanel: React.FC<RouteDetailPanelProps> = ({
 
       {/* Forward/Return Path Section */}
       <div className="space-y-5">
-        {/* Forward Path */}
-        <div className="flex items-center justify-between space-x-2">
-          {/* Source Stats */}
-          <div className="flex items-center space-x-2 flex-none w-1/4">
-            <NodeIcon />
-            <div className="text-xs leading-tight">
-              <div className={getMosColor(forwardPath.mosPercentage)}>
-                {forwardPath.mosPercentage}% MOS
-              </div>
-              <div className={getPlColor(forwardPath.packetLossPercentage)}>
-                {forwardPath.packetLossPercentage.toFixed(1)}% PL
-              </div>
-            </div>
-          </div>
-
-          {/* Connection Details */}
-          <div className="flex flex-col items-center flex-grow mx-2">
-            <div className="text-xs text-gray-500 mb-1">
-              {Math.round(forwardPath.streamCount / 1000)}k streams
-            </div>
-            {/* Dashed Line */}
-            <div className="w-full border-t border-dashed border-gray-400 relative">
-              <div className="absolute -top-2.5 left-1/2 transform -translate-x-1/2">
-                <RightArrowIcon />
-              </div>
-            </div>
-            {/* Impact Arc/Circle (Simplified as text for now) */}
-            <div className="mt-1 text-xs font-semibold text-red-600">
-              {forwardPath.impactPercentage}% Impacted
-            </div>
-            {/* Progress Circle (visual representation) */}
-            <div className="mt-1 w-5 h-5 rounded-full border border-gray-300 bg-gray-100 relative overflow-hidden">
-               <div
-                 className={`absolute top-0 left-0 h-full ${getImpactColor(forwardPath.impactPercentage)}`}
-                 style={{ width: `${forwardPath.impactPercentage}%` }} // Simple bar inside circle
-               ></div>
-            </div>
-          </div>
-
-          {/* Destination Stats */}
-          <div className="flex items-center justify-end space-x-2 flex-none w-1/4 text-right">
-            <div className="text-xs leading-tight">
-              {/* Destination MOS/PL from additionalStats */}
-              <div className={getMosColor(additionalStats.destinationMOS)}>
-                {additionalStats.destinationMOS}% MOS
-              </div>
-              <div className={getPlColor(additionalStats.destinationPacketLoss)}>
-                {additionalStats.destinationPacketLoss.toFixed(1)}% PL
-              </div>
-            </div>
-            <NodeIcon />
-          </div>
-        </div>
-
-        {/* Return Path */}
-        <div className="flex items-center justify-between space-x-2">
-          {/* Destination Stats (Now acting as source for return) */}
-           <div className="flex items-center space-x-2 flex-none w-1/4">
-             <NodeIcon />
-             <div className="text-xs leading-tight">
-               <div className={getMosColor(additionalStats.destinationMOS)}>
-                 {additionalStats.destinationMOS}% MOS
-               </div>
-               <div className={getPlColor(additionalStats.destinationPacketLoss)}>
-                 {additionalStats.destinationPacketLoss.toFixed(1)}% PL
-               </div>
-             </div>
-           </div>
-
-          {/* Connection Details (Return) */}
-          <div className="flex flex-col items-center flex-grow mx-2">
-            <div className="text-xs text-gray-500 mb-1">
-              {Math.round(returnPath.streamCount / 1000)}k streams
-            </div>
-            {/* Dashed Line */}
-            <div className="w-full border-t border-dashed border-gray-400 relative">
-              <div className="absolute -top-2.5 left-1/2 transform -translate-x-1/2">
-                <LeftArrowIcon />
-              </div>
-            </div>
-            {/* Impact Arc/Circle (Simplified as text for now) */}
-            <div className="mt-1 text-xs font-semibold text-yellow-600">
-              {returnPath.impactPercentage}% Impacted
-            </div>
-             {/* Progress Circle (visual representation) */}
-             <div className="mt-1 w-5 h-5 rounded-full border border-gray-300 bg-gray-100 relative overflow-hidden">
-                <div
-                  className={`absolute top-0 left-0 h-full ${getImpactColor(returnPath.impactPercentage)}`}
-                  style={{ width: `${returnPath.impactPercentage}%` }} // Simple bar inside circle
-                ></div>
-             </div>
-          </div>
-
-          {/* Source Stats (Now acting as destination for return) */}
-          <div className="flex items-center justify-end space-x-2 flex-none w-1/4 text-right">
-            <div className="text-xs leading-tight">
-              <div className={getMosColor(additionalStats.sourceMOS)}>
-                {additionalStats.sourceMOS}% MOS
-              </div>
-              <div className={getPlColor(additionalStats.sourcePacketLoss)}>
-                {additionalStats.sourcePacketLoss.toFixed(1)}% PL
-              </div>
-            </div>
-            <NodeIcon />
-          </div>
-        </div>
+        {/* Use memoized sections instead of repeated JSX */}
+        {forwardPathSection}
+        {returnPathSection}
       </div>
 
       {/* Analysis Section */}
-      <div className="border-t border-gray-200 pt-3">
-        {/* Title omitted as per screenshot */}
-        <div className="text-xs text-gray-600 space-y-1">
-          <p>
-            {analysis.impactedStreamsPercentage}% of streams reaching{" "}
-            {destinationLocationName} are impacted. Out of all the streams that
-            reach {destinationLocationName},{" "}
-            {analysis.sourceToDestPercentage}% come from {sourceLocationName}.
-          </p>
-          <p>{analysis.overlapAnalysis}</p>
-        </div>
-      </div>
+      {analysisSection}
 
       {/* Additional Statistics Section */}
       <div className="border-t border-gray-200 pt-3 space-y-3">
@@ -254,7 +221,7 @@ const RouteDetailPanel: React.FC<RouteDetailPanelProps> = ({
               {sourceLocationName} &gt; {destinationLocationName}
             </h4>
             <button className="text-gray-500 hover:text-black">
-              <DownloadIcon />
+              <SvgIcon name="download" size={16} />
             </button>
           </div>
           {/* Fixed height container for the chart */}

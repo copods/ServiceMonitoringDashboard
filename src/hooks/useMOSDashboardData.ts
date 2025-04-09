@@ -1,121 +1,88 @@
-import { useState, useEffect } from "react";
-import { MosDashboardData, RouteDetails } from "../types/mos"; // Adjust path
+import { useEffect, useCallback } from "react";
+import { useAppDispatch, useAppSelector } from "store"; // Assuming store index exports these
 import {
-  fetchCompleteMOSDashboardData,
-  fetchRouteDetails,
-} from "../services/api/mosApi"; // Adjust path
+  fetchInitialMOSData,
+  fetchRouteDetailsById,
+  selectMOSData,
+  selectMOSLocationsMap,
+  selectMOSIsLoading,
+  selectMOSIsRouteLoading,
+  selectMOSError,
+  selectSelectedRouteId,
+  // setSelectedRouteIdAction // Potentially needed if we want instant UI feedback before fetch
+} from "store/slices/mosSlice";
+import { MosDashboardData, Location } from "types/mos"; // Keep type imports
 
+// Interface remains the same as it defines the hook's return contract
 interface UseMOSDashboardDataResult {
   dashboardData: MosDashboardData | null;
-  isLoading: boolean;
-  error: string | null;
-  selectedRouteId: string | null;
-  selectRoute: (routeId: string) => void;
+  locationsMap: Record<string, Location>;
+  isLoading: boolean; // Reflects initial data loading state from Redux
+  isRouteLoading: boolean; // Reflects route detail loading state from Redux
+  error: string | null; // Reflects error state from Redux
+  selectedRouteId: string | null; // Reflects selected route ID from Redux
+  selectRoute: (routeId: string) => void; // Function to trigger route selection/fetch
+  retryFetch: () => void; // Function to retry initial data fetch
 }
 
 export const useMOSDashboardData = (): UseMOSDashboardDataResult => {
-  const [dashboardData, setDashboardData] =
-    useState<MosDashboardData | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  // Default selection matches screenshot's initial state
-  const [selectedRouteId, setSelectedRouteId] = useState<string | null>(
-    "denver-pune",
-  );
+  const dispatch = useAppDispatch();
 
-  // Fetch initial dashboard data and pre-select route
+  // Select state from Redux store
+  const dashboardData = useAppSelector(selectMOSData);
+  const locationsMap = useAppSelector(selectMOSLocationsMap);
+  const isLoading = useAppSelector(selectMOSIsLoading);
+  const isRouteLoading = useAppSelector(selectMOSIsRouteLoading);
+  const error = useAppSelector(selectMOSError);
+  const selectedRouteId = useAppSelector(selectSelectedRouteId); // Get initial/current ID from store
+
+  // Fetch initial data on mount using the initial selectedRouteId from the store
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setIsLoading(true);
-        setError(null); // Clear previous errors
-        const data = await fetchCompleteMOSDashboardData();
-
-        // Auto-select the default route initially if data is loaded
-        if (data && selectedRouteId) {
-          try {
-            const routeDetails = await fetchRouteDetails(selectedRouteId);
-            data.selectedRoute = routeDetails;
-          } catch (routeError) {
-            console.error(
-              "Failed to load initial route details:",
-              routeError,
-            );
-            // Don't set main error, maybe just log or clear selection
-            data.selectedRoute = null;
-            setSelectedRouteId(null);
-          }
-        } else if (data) {
-          // If no default route ID or it failed, ensure selectedRoute is null
-          data.selectedRoute = null;
-        }
-
-        setDashboardData(data);
-      } catch (err) {
-        console.error("Error fetching MOS dashboard data:", err);
-        setError(
-          "Failed to fetch MOS dashboard data. Please try again later.",
-        );
-        setDashboardData(null); // Clear data on error
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-    // Rerun only if the default selectedRouteId changes (it doesn't here, but good practice)
-  }, [selectedRouteId]); // Dependency array includes selectedRouteId for initial load logic
-
-  // Fetch route details when a route is selected by user interaction
-  const selectRoute = async (routeId: string) => {
-    // Prevent selection if data isn't loaded or same route is clicked
-    if (!routeId || !dashboardData || selectedRouteId === routeId) return;
-
-    // Store previous details in case fetch fails
-    const previousSelectedRoute = dashboardData.selectedRoute;
-    const previousSelectedId = selectedRouteId;
-
-    // Optimistically update UI
-    setSelectedRouteId(routeId);
-    setDashboardData((prev) =>
-      prev ? { ...prev, selectedRoute: null } : null,
-    ); // Show loading/clear details
-    // Consider setting a specific loading state for the detail panel
-
-    try {
-      // No need for setIsLoading(true) here if handled within components or optimistically
-      const routeDetails = await fetchRouteDetails(routeId);
-
-      setDashboardData((prev) => {
-        if (!prev) return null;
-        return {
-          ...prev,
-          selectedRoute: routeDetails,
-        };
-      });
-      setError(null); // Clear error on success
-    } catch (err) {
-      console.error(`Error fetching details for route ${routeId}:`, err);
-      setError(
-        `Failed to fetch details for the selected route. Please try again later.`,
-      );
-      // Revert to previous state on error
-      setSelectedRouteId(previousSelectedId);
-      setDashboardData((prev) =>
-        prev ? { ...prev, selectedRoute: previousSelectedRoute } : null,
-      );
-    } finally {
-      // No need for setIsLoading(false) here if handled within components
+    // Only fetch if data isn't already loaded or loading
+    // This prevents re-fetching on component re-renders if data is present
+    if (!dashboardData && !isLoading) {
+       dispatch(fetchInitialMOSData(selectedRouteId ?? undefined)); // Pass current selected ID or undefined
     }
-  };
+  }, [dispatch, dashboardData, isLoading, selectedRouteId]); // Add dependencies
 
+  // Function to select a route and fetch its details
+  const selectRoute = useCallback((routeId: string) => {
+    // Prevent selection if same route is clicked or route loading is in progress
+    if (!routeId || selectedRouteId === routeId || isRouteLoading) {
+       console.log("Selection prevented:", { routeId, selectedRouteId, isRouteLoading });
+       return;
+    }
+
+    // Dispatch the thunk to fetch route details.
+    // The thunk's pending action will update selectedRouteId and isRouteLoading state.
+    console.log("Dispatching fetchRouteDetailsById for:", routeId);
+    dispatch(fetchRouteDetailsById(routeId));
+
+    // Optional: Dispatch an action immediately to update selectedRouteId in UI
+    // if you need instant feedback before the async operation starts/completes.
+    // The thunk already handles this in its pending state, so this might be redundant.
+    // dispatch(setSelectedRouteIdAction(routeId));
+
+  }, [dispatch, selectedRouteId, isRouteLoading]); // Add dependencies
+
+  // Function to retry fetching initial data
+  const retryFetch = useCallback(() => {
+    // Dispatch the initial fetch thunk again, passing the current selected ID from store
+    dispatch(fetchInitialMOSData(selectedRouteId ?? undefined));
+  }, [dispatch, selectedRouteId]); // Add dependency
+
+  // Return the state selected from Redux and the action dispatching functions
   return {
     dashboardData,
-    isLoading, // This reflects initial load mainly
+    locationsMap,
+    isLoading,
+    isRouteLoading,
     error,
     selectedRouteId,
     selectRoute,
+    retryFetch,
   };
 };
 
-export default useMOSDashboardData;
+// No need for default export if named export is used consistently
+// export default useMOSDashboardData;

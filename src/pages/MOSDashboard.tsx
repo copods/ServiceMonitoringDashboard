@@ -1,34 +1,72 @@
-import React, { useState, useEffect } from "react";
+import React, { useMemo } from "react"; // Added useMemo
 import { useMOSDashboardData } from "hooks/useMOSDashboardData";
-import { Location } from "types/mos";
 import MOSDashboardHeader from "components/mos/MOSDashboardHeader";
 import IssueDetailsBanner from "components/mos/IssueDetailsBanner";
 import NetworkGraphPanel from "components/mos/NetworkGraphPanel";
 import RouteDetailPanel from "components/mos/RouteDetailPanel";
+import DashboardErrorState from "components/common/DashboardErrorState";
+
+const MemoizedHeader = React.memo(MOSDashboardHeader);
+const MemoizedIssueBanner = React.memo(IssueDetailsBanner);
+const MemoizedNetworkGraph = React.memo(NetworkGraphPanel);
+const MemoizedRouteDetailPanel = React.memo(RouteDetailPanel);
 
 const MOSDashboard: React.FC = () => {
   const {
     dashboardData,
     isLoading,
+    isRouteLoading,
     error,
     selectedRouteId,
     selectRoute,
+    locationsMap,
+    retryFetch,
   } = useMOSDashboardData();
+  
+  // Memoize all props before any conditional returns
+  // 1. Network Graph props
+  const networkGraphProps = useMemo(() => {
+    if (!dashboardData) return null;
+    return {
+      locations: dashboardData.locations,
+      routes: dashboardData.routes,
+      onRouteSelected: selectRoute,
+      selectedRouteId,
+      mainDegradationPercentage: dashboardData.issueDetails?.degradationPercentage || 0
+    };
+  }, [dashboardData, selectedRouteId, selectRoute]);
+  
+  // 2. Route Detail props
+  const routeDetailProps = useMemo(() => {
+    if (!dashboardData?.selectedRoute) return null;
+    return {
+      routeDetails: dashboardData.selectedRoute,
+      historicalData: dashboardData.historicalData || [],
+      sourceLocationName: locationsMap[dashboardData.selectedRoute.sourceId]?.name || dashboardData.selectedRoute.sourceId,
+      destinationLocationName: locationsMap[dashboardData.selectedRoute.destinationId]?.name || dashboardData.selectedRoute.destinationId,
+    };
+  }, [dashboardData?.selectedRoute, dashboardData?.historicalData, locationsMap]);
 
-  const [locationsMap, setLocationsMap] = useState<Record<string, Location>>(
-    {},
-  );
+  // 3. Header props
+  const headerProps = useMemo(() => {
+    return {
+      serviceName: dashboardData?.serviceInfo?.name || ''
+    };
+  }, [dashboardData?.serviceInfo?.name]);
 
-  useEffect(() => {
-    if (dashboardData?.locations) {
-      const map: Record<string, Location> = {};
-      dashboardData.locations.forEach((location) => {
-        map[location.id] = location;
-      });
-      setLocationsMap(map);
-    }
-  }, [dashboardData?.locations]);
+  // 4. Issue Banner props
+  const issueBannerProps = useMemo(() => {
+    if (!dashboardData?.issueDetails) return null;
+    return {
+      mainNode: dashboardData.issueDetails.mainNode,
+      degradationPercentage: dashboardData.issueDetails.degradationPercentage,
+      application: dashboardData.issueDetails.application,
+      vlan: dashboardData.issueDetails.vlan,
+      codec: dashboardData.issueDetails.codec
+    };
+  }, [dashboardData?.issueDetails]);
 
+  // Loading state handling
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-screen bg-white">
@@ -37,15 +75,17 @@ const MOSDashboard: React.FC = () => {
     );
   }
 
-  if (error || !dashboardData) {
+  // Error handling
+  if (error) {
+    const errorMessage = error || "An unknown error occurred.";
+    return <DashboardErrorState error={errorMessage} onRetry={retryFetch} />;
+  }
+
+  // No data handling
+  if (!dashboardData) {
     return (
       <div className="p-8 text-center bg-white text-black">
-        <div className="text-red-500 text-xl mb-4">
-          Error loading dashboard data
-        </div>
-        <div className="text-gray-700">
-          {error || "Unknown error occurred"}
-        </div>
+        No data available.
       </div>
     );
   }
@@ -53,61 +93,29 @@ const MOSDashboard: React.FC = () => {
   return (
     // Main container uses white background, black text
     <div className="min-h-screen bg-white text-black mos-dashboard flex flex-col">
-      {/* Header takes full width */}
-      <MOSDashboardHeader
-        serviceName={dashboardData.serviceInfo.name}
-        currentTime={dashboardData.serviceInfo.currentTime} // These times aren't used in the static header example
-        startTime={dashboardData.serviceInfo.startTime} // but kept for potential future use
-      />
+      {/* Use memoized header component with memoized props */}
+      <MemoizedHeader {...headerProps} />
 
       {/* Main Content Area below header */}
       <div className="flex-grow flex flex-col">
-        {/* Issue Banner takes full width */}
-        <IssueDetailsBanner
-          mainNode={dashboardData.issueDetails.mainNode}
-          degradationPercentage={
-            dashboardData.issueDetails.degradationPercentage
-          }
-          application={dashboardData.issueDetails.application}
-          vlan={dashboardData.issueDetails.vlan}
-          codec={dashboardData.issueDetails.codec}
-        />
+        {/* Use memoized issue banner with memoized props */}
+        {issueBannerProps && <MemoizedIssueBanner {...issueBannerProps} />}
 
         {/* Two Panel Layout takes remaining height */}
         <div className="flex-grow grid grid-cols-1 lg:grid-cols-2 gap-0 mos-dashboard-grid">
-          {/* Left Panel - Network Graph */}
-          {/* Added border-r for visual separation */}
+          {/* Left Panel - Network Graph - use memoized component */}
           <div className="network-graph-container border-r border-gray-200 p-4">
-            <NetworkGraphPanel
-              locations={dashboardData.locations}
-              routes={dashboardData.routes}
-              onRouteSelected={selectRoute}
-              selectedRouteId={selectedRouteId}
-              // Pass the main degradation percentage
-              mainDegradationPercentage={
-                dashboardData.issueDetails.degradationPercentage
-              }
-            />
+            {networkGraphProps && <MemoizedNetworkGraph {...networkGraphProps} />}
           </div>
 
-          {/* Right Panel - Route Details */}
-          {/* Removed fixed height, let it fill */}
+          {/* Right Panel - Route Details - use memoized component */}
           <div className="route-detail-container overflow-y-auto">
-            {" "}
-            {/* Added overflow-y-auto */}
-            {dashboardData.selectedRoute ? (
-              <RouteDetailPanel
-                routeDetails={dashboardData.selectedRoute}
-                historicalData={dashboardData.historicalData}
-                sourceLocationName={
-                  locationsMap[dashboardData.selectedRoute.sourceId]?.name ||
-                  dashboardData.selectedRoute.sourceId
-                }
-                destinationLocationName={
-                  locationsMap[dashboardData.selectedRoute.destinationId]
-                    ?.name || dashboardData.selectedRoute.destinationId
-                }
-              />
+            {isRouteLoading ? (
+              <div className="h-full flex items-center justify-center">
+                <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500"></div>
+              </div>
+            ) : dashboardData?.selectedRoute && routeDetailProps ? (
+              <MemoizedRouteDetailPanel {...routeDetailProps} />
             ) : (
               <div className="h-full flex items-center justify-center text-black">
                 <div className="text-center text-gray-500">

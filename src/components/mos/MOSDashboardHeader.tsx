@@ -1,105 +1,12 @@
 import React from "react";
+import SvgIcon from "components/common/SvgIcon"; // Import the new icon component
 
 interface MOSDashboardHeaderProps {
   serviceName: string;
-  currentTime: string; // Not used in this static version
-  startTime: string; // Not used in this static version
+  // currentTime and startTime removed as they were unused
 }
 
-// Simple SVG Icon components (replace with your actual icon library if preferred)
-const SearchIcon = () => (
-  <svg
-    width="16"
-    height="16"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <circle cx="11" cy="11" r="8"></circle>
-    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-  </svg>
-);
-const GridIcon = () => (
-  <svg
-    width="16"
-    height="16"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <rect x="3" y="3" width="7" height="7"></rect>
-    <rect x="14" y="3" width="7" height="7"></rect>
-    <rect x="14" y="14" width="7" height="7"></rect>
-    <rect x="3" y="14" width="7" height="7"></rect>
-  </svg>
-); // Adjusted grid icon
-const FilterIcon = () => (
-  <svg
-    width="16"
-    height="16"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
-  </svg>
-); // Filter icon
-const LinkIcon = () => (
-  <svg
-    width="16"
-    height="16"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
-  </svg>
-);
-const MenuIcon = () => (
-  <svg
-    width="16"
-    height="16"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <line x1="3" y1="12" x2="21" y2="12"></line>
-    <line x1="3" y1="6" x2="21" y2="6"></line>
-    <line x1="3" y1="18" x2="21" y2="18"></line>
-  </svg>
-);
-const MoreHorizontalIcon = () => (
-  <svg
-    width="16"
-    height="16"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <circle cx="12" cy="12" r="1"></circle>
-    <circle cx="19" cy="12" r="1"></circle>
-    <circle cx="5" cy="12" r="1"></circle>
-  </svg>
-); // More horizontal icon
+// Removed local SVG Icon components
 
 const MOSDashboardHeader: React.FC<MOSDashboardHeaderProps> = ({
   serviceName,
@@ -161,27 +68,27 @@ const MOSDashboardHeader: React.FC<MOSDashboardHeaderProps> = ({
           </div>
         </div>
 
-        {/* Right Section: Icons */}
+        {/* Right Section: Icons using SvgIcon */}
         <div className="flex-none flex items-center space-x-3 text-gray-400">
           <button className="hover:text-white">
-            <SearchIcon />
+            <SvgIcon name="search" size={16} />
           </button>
           <span className="text-gray-600">|</span>
           <button className="hover:text-white">
-            <GridIcon />
+            <SvgIcon name="grid" size={16} />
           </button>
           <button className="hover:text-white">
-            <FilterIcon />
+            <SvgIcon name="filter" size={16} />
           </button>
           <button className="hover:text-white">
-            <LinkIcon />
+            <SvgIcon name="link" size={16} />
           </button>
           <span className="text-gray-600">|</span>
           <button className="hover:text-white">
-            <MenuIcon />
+            <SvgIcon name="menu" size={16} />
           </button>
           <button className="hover:text-white">
-            <MoreHorizontalIcon />
+            <SvgIcon name="more-horizontal" size={16} />
           </button>
         </div>
       </div>

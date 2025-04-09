@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useLayoutEffect } from "react";
+import React, { useRef, useLayoutEffect, memo } from "react";
 import * as d3 from "d3";
 import { HistoricalData } from "types/mos"; // Adjust path
 
@@ -6,9 +6,8 @@ interface RouteHistoricalChartProps {
   data: HistoricalData[];
 }
 
-const RouteHistoricalChart: React.FC<RouteHistoricalChartProps> = ({
-  data,
-}) => {
+// Use React.memo to prevent unnecessary re-renders when props haven't changed
+const RouteHistoricalChart = memo(({ data }: RouteHistoricalChartProps) => {
   const chartRef = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null); // Ref for container div
 
@@ -155,6 +154,6 @@ const RouteHistoricalChart: React.FC<RouteHistoricalChartProps> = ({
       ></svg>
     </div>
   );
-};
+});
 
 export default RouteHistoricalChart;
