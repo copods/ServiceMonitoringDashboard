@@ -68,5 +68,6 @@ export interface MosDashboardData {
   locations: Location[];
   routes: Route[];
   selectedRoute: RouteDetails | null;
-  historicalData: HistoricalData[];
+  historicalData: HistoricalData[]; // Keep for backward compatibility
+  routeHistoricalData?: Record<string, HistoricalData[]>; // Add new field for route-specific data
 }

@@ -14,8 +14,10 @@ const MemoizedRouteDetailPanel = React.memo(RouteDetailPanel);
 const MOSDashboard: React.FC = () => {
   const {
     dashboardData,
+    historicalData, // Get historical data from the hook
     isLoading,
     isRouteLoading,
+    isHistoricalDataLoading, // Get loading state for historical data
     error,
     selectedRouteId,
     selectedSourceId,
@@ -25,9 +27,8 @@ const MOSDashboard: React.FC = () => {
     locationsMap,
     retryFetch,
   } = useMOSDashboardData();
-  
-  // Memoize all props before any conditional returns
-  // 1. Network Graph props
+
+  // Network Graph props
   const networkGraphProps = useMemo(() => {
     if (!dashboardData) return null;
     return {
@@ -38,26 +39,32 @@ const MOSDashboard: React.FC = () => {
       mainDegradationPercentage: dashboardData.issueDetails?.degradationPercentage || 0
     };
   }, [dashboardData, selectedRouteId, selectRoute]);
-  
-  // 2. Route Detail props
+
+  // Update route detail props to include historical data
   const routeDetailProps = useMemo(() => {
     if (!dashboardData?.selectedRoute) return null;
     return {
       routeDetails: dashboardData.selectedRoute,
-      historicalData: dashboardData.historicalData || [],
+      historicalData: historicalData, // Use route-specific historical data
+      isHistoricalDataLoading, // Pass loading state to the component
       sourceLocationName: locationsMap[dashboardData.selectedRoute.sourceId]?.name || dashboardData.selectedRoute.sourceId,
       destinationLocationName: locationsMap[dashboardData.selectedRoute.destinationId]?.name || dashboardData.selectedRoute.destinationId,
     };
-  }, [dashboardData?.selectedRoute, dashboardData?.historicalData, locationsMap]);
+  }, [
+    dashboardData?.selectedRoute,
+    historicalData,
+    isHistoricalDataLoading,
+    locationsMap
+  ]);
 
-  // 3. Header props
+  // Header props
   const headerProps = useMemo(() => {
     return {
       serviceName: dashboardData?.serviceInfo?.name || ''
     };
   }, [dashboardData?.serviceInfo?.name]);
 
-  // 4. Issue Banner props
+  // Issue Banner props
   const issueBannerProps = useMemo(() => {
     if (!dashboardData?.issueDetails) return null;
     return {
@@ -71,16 +78,14 @@ const MOSDashboard: React.FC = () => {
         const location = Object.values(locationsMap).find(loc => loc.name === locationName);
         if (location) {
           changeSourceLocation(location.id);
-        } else {
-          console.warn(`Location ID not found for name: ${locationName}`);
         }
       }
     };
   }, [
-    dashboardData?.issueDetails, 
-    selectedSourceId, 
-    availableLocationNames, 
-    locationsMap, 
+    dashboardData?.issueDetails,
+    selectedSourceId,
+    availableLocationNames,
+    locationsMap,
     changeSourceLocation
   ]);
 
@@ -95,8 +100,7 @@ const MOSDashboard: React.FC = () => {
 
   // Error handling
   if (error) {
-    const errorMessage = error || "An unknown error occurred.";
-    return <DashboardErrorState error={errorMessage} onRetry={retryFetch} />;
+    return <DashboardErrorState error={error} onRetry={retryFetch} />;
   }
 
   // No data handling
@@ -111,20 +115,18 @@ const MOSDashboard: React.FC = () => {
   return (
     // Main container with left side border
     <div className="min-h-screen bg-white text-black mos-dashboard flex">
-      {/* Left side border/navigation bar (just a color strip with home icon at bottom) */}
+      {/* Left side border/navigation bar */}
       <div className="w-6 bg-[#123141] flex flex-col items-center">
-        {/* Empty top area - no content */}
-        
         {/* Home icon at bottom */}
         <div className="mt-auto mb-4">
-          <svg 
-            width="16" 
-            height="16" 
-            viewBox="0 0 24 24" 
-            fill="none" 
-            stroke="#8A939C" 
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#8A939C"
             strokeWidth="2"
-            strokeLinecap="round" 
+            strokeLinecap="round"
             strokeLinejoin="round"
           >
             <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
@@ -136,7 +138,7 @@ const MOSDashboard: React.FC = () => {
       {/* Main content container */}
       <div className="flex-grow flex flex-col">
         {/* Header - Full width */}
-        <MemoizedHeader {...headerProps} />
+        {headerProps && <MemoizedHeader {...headerProps} />}
 
         {/* Main Content Area below header - approximating 45/55 split */}
         <div className="flex-grow flex flex-row">
@@ -148,7 +150,7 @@ const MOSDashboard: React.FC = () => {
                 <MemoizedIssueBanner {...issueBannerProps} />
               </div>
             )}
-            
+
             {/* Network Graph in bottom row - takes remaining height */}
             <div className="flex-grow">
               {networkGraphProps && <MemoizedNetworkGraph {...networkGraphProps} />}

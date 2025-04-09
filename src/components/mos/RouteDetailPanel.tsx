@@ -6,6 +6,7 @@ import SvgIcon from "components/common/SvgIcon"; // Import SvgIcon
 interface RouteDetailPanelProps {
   routeDetails: RouteDetails;
   historicalData: HistoricalData[];
+  isHistoricalDataLoading?: boolean; // Add this line for loading state
   sourceLocationName: string;
   destinationLocationName: string;
 }
@@ -77,12 +78,13 @@ const ProgressIndicator: React.FC<{ percentage: number; size?: number }> = ({
 const RouteDetailPanel: React.FC<RouteDetailPanelProps> = ({
   routeDetails,
   historicalData,
+  isHistoricalDataLoading = false, // Add default value
   sourceLocationName,
   destinationLocationName,
 }) => {
   const { forwardPath, returnPath, analysis, additionalStats } = routeDetails;
 
-  // --- Memoized Sections (Updated Text Positioning & Wrapping) ---
+  // --- Memoized Sections (Unchanged) ---
   const forwardPathSection = useMemo(
     () => (
       <div className="flex items-center justify-between space-x-2">
@@ -217,7 +219,7 @@ const RouteDetailPanel: React.FC<RouteDetailPanelProps> = ({
     [analysis, sourceLocationName, destinationLocationName],
   );
 
-  // --- Return JSX (Structure Unchanged) ---
+  // --- Return JSX (Only chart section modified) ---
   return (
     <div className="bg-white text-black h-full flex flex-col">
       {/* Title Section */}
@@ -248,7 +250,7 @@ const RouteDetailPanel: React.FC<RouteDetailPanelProps> = ({
               </button>
             </div>
           </div>
-          {/* Chart Area */}
+          {/* Chart Area - Updated with loading state and fallback */}
           <div className="border border-gray-200 rounded p-3">
             <div className="flex justify-between items-center mb-2">
               <h4 className="text-xs font-medium text-gray-700">
@@ -258,8 +260,18 @@ const RouteDetailPanel: React.FC<RouteDetailPanelProps> = ({
                 <SvgIcon name="download" size={16} />
               </button>
             </div>
-            <div className="h-48">
-              <RouteHistoricalChart data={historicalData} />
+            <div className="h-48 relative">
+              {isHistoricalDataLoading ? (
+                <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-70">
+                  <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+                </div>
+              ) : historicalData.length > 0 ? (
+                <RouteHistoricalChart data={historicalData} />
+              ) : (
+                <div className="flex items-center justify-center h-full text-gray-400">
+                  No historical data available
+                </div>
+              )}
             </div>
           </div>
         </div>

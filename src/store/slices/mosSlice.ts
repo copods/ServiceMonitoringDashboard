@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
 import { RootState } from '../index';
-import { MosDashboardData, RouteDetails, Location } from '../../types/mos';
-import { fetchCompleteMOSDashboardData, fetchRouteDetails } from '../../services/api/mosApi';
+import { MosDashboardData, RouteDetails, Location, HistoricalData } from '../../types/mos';
+import { fetchCompleteMOSDashboardData, fetchRouteDetails, fetchHistoricalData } from '../../services/api/mosApi';
 
 // Define the argument type for the thunk
 interface FetchInitialMOSDataArgs {
@@ -16,21 +16,8 @@ export const fetchInitialMOSData = createAsyncThunk<
   { rejectValue: string } // Type for rejected action payload
 >('mos/fetchInitialData', async ({ sourceId, routeId }, { rejectWithValue }) => {
   try {
-    // Pass sourceId to the API call
-    const data = await fetchCompleteMOSDashboardData(sourceId);
-    if (routeId && data) {
-      try {
-        // Fetch initial route details if an ID is provided
-        const routeDetails = await fetchRouteDetails(routeId);
-        data.selectedRoute = routeDetails;
-      } catch (routeError) {
-        // Use routeId here instead of the old initialRouteId
-        console.warn(`Failed to fetch initial route details for ${routeId}:`, routeError);
-        data.selectedRoute = null; // Ensure it's null if fetch fails
-      }
-    } else if (data) {
-      data.selectedRoute = null; // Ensure selectedRoute is null if no initial ID
-    }
+    // Pass sourceId and optional routeId to the API call
+    const data = await fetchCompleteMOSDashboardData(sourceId, routeId);
     if (!data) {
       throw new Error('No data received from API');
     }
@@ -58,25 +45,43 @@ export const fetchRouteDetailsById = createAsyncThunk<
   }
 });
 
+// New thunk for fetching route-specific historical data
+export const fetchHistoricalDataForRoute = createAsyncThunk<
+  { routeId: string, historicalData: HistoricalData[] }, // Return type: object with routeId and data
+  { routeId: string, sourceId: string }, // Args type: routeId and sourceId
+  { rejectValue: string }
+>('mos/fetchHistoricalData', async ({ routeId, sourceId }, { rejectWithValue }) => {
+  try {
+    const data = await fetchHistoricalData(routeId, sourceId);
+    return { routeId, historicalData: data };
+  } catch (err: any) {
+    console.error(`Error fetching historical data for route ${routeId}:`, err);
+    return rejectWithValue(err.message || `Failed to fetch historical data for route ${routeId}.`);
+  }
+});
 
 interface MOSState {
   data: MosDashboardData | null;
-  locationsMap: Record<string, Location>; // Add locationsMap
-  isLoading: boolean; // For initial data load
-  isRouteLoading: boolean; // For specific route detail loading
+  locationsMap: Record<string, Location>;
+  routeHistoricalData: Record<string, HistoricalData[]>; // Add this line
+  isLoading: boolean;
+  isRouteLoading: boolean;
+  isHistoricalDataLoading: boolean; // Add this line
   error: string | null;
-  selectedRouteId: string | null; // Keep track of the selected ID
-  selectedSourceId: string; // New state for selected source location
+  selectedRouteId: string | null;
+  selectedSourceId: string;
 }
 
 const initialState: MOSState = {
   data: null,
   locationsMap: {},
+  routeHistoricalData: {}, // Add this line
   isLoading: false,
   isRouteLoading: false,
+  isHistoricalDataLoading: false, // Add this line
   error: null,
-  selectedRouteId: "denver-pune", // Set initial default route ID here
-  selectedSourceId: "denver", // Default source is Denver
+  selectedRouteId: "denver-pune",
+  selectedSourceId: "denver",
 };
 
 const mosSlice = createSlice({
@@ -115,13 +120,20 @@ const mosSlice = createSlice({
       if (state.data) {
         state.data.selectedRoute = null;
       }
-      // Indicate loading starts for the new source data
-      // Note: The actual data fetching will be triggered by the hook/component
-      // based on this state change. We don't set isLoading here directly
-      // as the fetchInitialMOSData thunk handles loading state.
+      // Reset historical data when changing source
+      state.routeHistoricalData = {};
+      if (state.data) {
+        state.data.historicalData = [];
+      }
       state.error = null; // Clear previous errors
     },
-    // Removed manual fetch status reducers, handled by extraReducers
+    // Reset historical data when source changes
+    resetHistoricalData(state) {
+      state.routeHistoricalData = {};
+      if (state.data) {
+        state.data.historicalData = [];
+      }
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -133,36 +145,43 @@ const mosSlice = createSlice({
       .addCase(fetchInitialMOSData.fulfilled, (state, action) => {
         state.isLoading = false;
         state.data = action.payload;
+
         // Update locations map after successful fetch
         const map: Record<string, Location> = {};
         action.payload.locations.forEach((location) => {
           map[location.id] = location;
         });
         state.locationsMap = map;
+
+        // Initialize or update route-specific historical data if present in the response
+        if (action.payload.routeHistoricalData) {
+          state.routeHistoricalData = {
+            ...state.routeHistoricalData,
+            ...action.payload.routeHistoricalData
+          };
+        }
+
         // If initial fetch included route details, update loading state
         if (action.payload.selectedRoute) {
           state.isRouteLoading = false;
         }
+
         // Set selectedRouteId based on initial fetch if it wasn't set or fetched successfully
         if (!state.selectedRouteId && action.payload.selectedRoute) {
-           state.selectedRouteId = action.payload.selectedRoute.id; // Assuming RouteDetails has an id
-        } else if (!action.payload.selectedRoute) {
-           // If initial fetch didn't get route details (e.g., no initial ID provided or fetch failed)
-           // Ensure selectedRouteId reflects this if it was previously set
-           // state.selectedRouteId = null; // Or keep the default? Let's keep default for now.
+           state.selectedRouteId = action.payload.selectedRoute.id;
         }
-
       })
       .addCase(fetchInitialMOSData.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload ?? 'Failed to fetch initial data';
         state.data = null;
         state.locationsMap = {};
+        state.routeHistoricalData = {};
       })
+
       // Route Details Fetching
       .addCase(fetchRouteDetailsById.pending, (state, action) => {
-        // We set isRouteLoading in the setSelectedRouteIdAction reducer
-        // state.isRouteLoading = true;
+        state.isRouteLoading = true;
         // Set selectedRouteId when fetch starts based on the argument
         state.selectedRouteId = action.meta.arg;
         state.error = null; // Clear previous errors specifically for route loading
@@ -179,19 +198,49 @@ const mosSlice = createSlice({
         state.isRouteLoading = false;
         // Keep existing data, but show an error
         state.error = action.payload ?? 'Failed to fetch route details';
-        // Optionally clear selectedRoute or revert ID if needed
-        // state.selectedRouteId = null; // Or revert to previous? Depends on desired UX
         if (state.data) {
           state.data.selectedRoute = null; // Clear potentially stale route data
+        }
+      })
+
+      // Historical Data Fetching
+      .addCase(fetchHistoricalDataForRoute.pending, (state) => {
+        state.isHistoricalDataLoading = true;
+        state.error = null; // Clear previous errors specifically for historical data loading
+      })
+      .addCase(fetchHistoricalDataForRoute.fulfilled, (state, action) => {
+        state.isHistoricalDataLoading = false;
+
+        // Store the historical data in the map with routeId as key
+        state.routeHistoricalData[action.payload.routeId] = action.payload.historicalData;
+
+        // Also update the backward-compatible historicalData if the route is selected
+        if (state.selectedRouteId === action.payload.routeId && state.data) {
+          state.data.historicalData = action.payload.historicalData;
+        }
+
+        // Update the routeHistoricalData map in the data object if it exists
+        if (state.data) {
+          if (!state.data.routeHistoricalData) state.data.routeHistoricalData = {};
+          state.data.routeHistoricalData[action.payload.routeId] = action.payload.historicalData;
+        }
+      })
+      .addCase(fetchHistoricalDataForRoute.rejected, (state, action) => {
+        state.isHistoricalDataLoading = false;
+        // Only set error if there's no existing route data
+        if (!state.routeHistoricalData[action.meta.arg.routeId]) {
+          state.error = action.payload ?? 'Failed to fetch historical data';
         }
       });
   },
 });
 
-export const { 
-  setSelectedRouteIdAction, 
+// Export the new actions
+export const {
+  setSelectedRouteIdAction,
   _updateLocationsMap,
-  setSelectedSourceLocation // Export the new action
+  setSelectedSourceLocation,
+  resetHistoricalData
 } = mosSlice.actions;
 
 // Selectors
@@ -199,9 +248,15 @@ export const selectMOSData = (state: RootState) => state.mos.data;
 export const selectMOSLocationsMap = (state: RootState) => state.mos.locationsMap;
 export const selectMOSIsLoading = (state: RootState) => state.mos.isLoading;
 export const selectMOSIsRouteLoading = (state: RootState) => state.mos.isRouteLoading;
+export const selectIsHistoricalDataLoading = (state: RootState) => state.mos.isHistoricalDataLoading;
 export const selectMOSError = (state: RootState) => state.mos.error;
 export const selectSelectedRouteId = (state: RootState) => state.mos.selectedRouteId;
-// Add a selector for the source ID
 export const selectSelectedSourceId = (state: RootState) => state.mos.selectedSourceId;
+
+// Add a new selector for route-specific historical data
+export const selectHistoricalDataForRoute = (routeId: string | null) => (state: RootState) => {
+  if (!routeId) return [];
+  return state.mos.routeHistoricalData[routeId] || [];
+};
 
 export default mosSlice.reducer;

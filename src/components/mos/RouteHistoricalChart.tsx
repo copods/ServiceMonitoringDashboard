@@ -1,6 +1,6 @@
-import React, { useRef, useLayoutEffect, memo } from "react";
+import React, { useRef, useLayoutEffect, memo, useState } from "react";
 import * as d3 from "d3";
-import { HistoricalData } from "types/mos"; // Adjust path
+import { HistoricalData } from "types/mos";
 
 interface RouteHistoricalChartProps {
   data: HistoricalData[];
@@ -9,147 +9,195 @@ interface RouteHistoricalChartProps {
 // Use React.memo to prevent unnecessary re-renders when props haven't changed
 const RouteHistoricalChart = memo(({ data }: RouteHistoricalChartProps) => {
   const chartRef = useRef<SVGSVGElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null); // Ref for container div
+  const containerRef = useRef<HTMLDivElement>(null);
+  // Add state for transition tracking
+  const [isTransitioning, setIsTransitioning] = useState(false);
+
+  // Use key to force chart rerender on data change
+  const dataKey = data.map(d => `${d.month}-${d.ingressValue}`).join('|');
 
   // Use useLayoutEffect for measurements before paint
   useLayoutEffect(() => {
     if (!chartRef.current || !containerRef.current || !data.length) return;
 
-    // Clear previous chart
-    d3.select(chartRef.current).selectAll("*").remove();
+    // Indicate transition is starting
+    setIsTransitioning(true);
 
-    // Setup dimensions based on container
-    const margin = { top: 10, right: 10, bottom: 20, left: 30 }; // Adjusted margins
-    // Get dimensions from the container div
-    const containerWidth = containerRef.current.clientWidth;
-    const containerHeight = containerRef.current.clientHeight;
+    // Use a timeout to allow React to render any loading indicators
+    const timeoutId = setTimeout(() => {
+      // Clear previous chart
+      d3.select(chartRef.current).selectAll("*").remove();
 
-    const width = containerWidth - margin.left - margin.right;
-    const height = containerHeight - margin.top - margin.bottom;
+      // Setup dimensions based on container
+      const margin = { top: 10, right: 10, bottom: 20, left: 30 };
+      const containerWidth = containerRef.current?.clientWidth || 300;
+      const containerHeight = containerRef.current?.clientHeight || 200;
 
-    // Ensure dimensions are positive
-    if (width <= 0 || height <= 0) return;
+      const width = containerWidth - margin.left - margin.right;
+      const height = containerHeight - margin.top - margin.bottom;
 
-    // Create the SVG container within the chartRef SVG
-    const svg = d3
-      .select(chartRef.current)
-      .attr("viewBox", `0 0 ${containerWidth} ${containerHeight}`) // Make SVG responsive
-      .append("g")
-      .attr("transform", `translate(${margin.left},${margin.top})`);
+      // Ensure dimensions are positive
+      if (width <= 0 || height <= 0) {
+        setIsTransitioning(false);
+        return;
+      }
 
-    // Define scales
-    const xScale = d3
-      .scaleBand<string>() // Explicitly type scaleBand
-      .domain(data.map((d) => d.month))
-      .range([0, width])
-      .padding(0.6); // Adjust padding to make bars thinner
+      // Create the SVG container within the chartRef SVG
+      const svg = d3
+        .select(chartRef.current)
+        .attr("viewBox", `0 0 ${containerWidth} ${containerHeight}`)
+        .append("g")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    const yScale = d3
-      .scaleLinear()
-      .domain([0, 200]) // Fixed scale [0, 200]
-      .range([height, 0]);
+      // Define scales
+      const xScale = d3
+        .scaleBand<string>()
+        .domain(data.map((d) => d.month))
+        .range([0, width])
+        .padding(0.6);
 
-    // Define colors
-    const barColor = "#3845a3"; // Dark blue for bars
-    const lineColor = "#000000"; // Black for line and dots
-    const gridColor = "#e5e7eb"; // Light gray for grid
-    const axisColor = "#6b7280"; // Gray for axis text/lines
+      // Dynamically calculate y-scale domain from data
+      const maxValue = d3.max(data, d => Math.max(d.ingressValue, d.egressValue)) || 200;
+      const yScale = d3
+        .scaleLinear()
+        .domain([0, Math.ceil(maxValue / 50) * 50]) // Round up to nearest 50
+        .range([height, 0]);
 
-    // Add horizontal grid lines at specific values
-    const gridValues = [0, 25, 50, 150, 200];
-    svg
-      .selectAll(".grid-line")
-      .data(gridValues)
-      .enter()
-      .append("line")
-      .attr("class", "grid-line")
-      .attr("x1", 0)
-      .attr("x2", width)
-      .attr("y1", (d) => yScale(d))
-      .attr("y2", (d) => yScale(d))
-      .attr("stroke", gridColor)
-      .attr("stroke-width", 0.5); // Thinner grid lines
+      // Define colors
+      const barColor = "#3845a3"; // Blue for bars
+      const lineColor = "#000000"; // Black for line and dots
+      const gridColor = "#e5e7eb"; // Light gray for grid
+      const axisColor = "#6b7280"; // Gray for axis text/lines
 
-    // Add X axis
-    svg
-      .append("g")
-      .attr("transform", `translate(0,${height})`)
-      .call(
-        d3
-          .axisBottom(xScale)
-          .tickSize(0) // Remove tick marks
-          .tickPadding(8), // Padding between ticks and text
-      )
-      .attr("font-size", "9px") // Smaller font
-      .attr("color", axisColor)
-      .select(".domain") // Hide the axis line
-      .attr("stroke", "none");
+      // Add horizontal grid lines at specific values
+      const gridCount = 5;
+      const gridStep = Math.ceil(maxValue / gridCount / 50) * 50;
+      const gridValues = Array.from({ length: gridCount + 1 }, (_, i) => i * gridStep);
 
-    // Add Y axis
-    svg
-      .append("g")
-      .call(
-        d3
-          .axisLeft(yScale)
-          .tickValues(gridValues) // Only show ticks for grid lines
-          .tickSize(0) // Remove tick marks
-          .tickPadding(8), // Padding between ticks and text
-      )
-      .attr("font-size", "9px") // Smaller font
-      .attr("color", axisColor)
-      .select(".domain") // Hide the axis line
-      .attr("stroke", "none");
+      svg
+        .selectAll(".grid-line")
+        .data(gridValues)
+        .enter()
+        .append("line")
+        .attr("class", "grid-line")
+        .attr("x1", 0)
+        .attr("x2", width)
+        .attr("y1", (d) => yScale(d))
+        .attr("y2", (d) => yScale(d))
+        .attr("stroke", gridColor)
+        .attr("stroke-width", 0.5);
 
-    // Create the bars
-    svg
-      .selectAll(".bar")
-      .data(data)
-      .enter()
-      .append("rect")
-      .attr("class", "bar")
-      .attr("x", (d) => xScale(d.month) ?? 0) // Use nullish coalescing
-      .attr("width", xScale.bandwidth())
-      .attr("y", (d) => yScale(d.ingressValue)) // Assuming ingressValue for bars
-      .attr("height", (d) => height - yScale(d.ingressValue))
-      .attr("fill", barColor);
+      // Add X axis
+      svg
+        .append("g")
+        .attr("transform", `translate(0,${height})`)
+        .call(
+          d3
+            .axisBottom(xScale)
+            .tickSize(0)
+            .tickPadding(8),
+        )
+        .attr("font-size", "9px")
+        .attr("color", axisColor)
+        .select(".domain")
+        .attr("stroke", "none");
 
-    // Create a line generator for trend (using ingressValue for the line as well)
-    const lineGenerator = d3
-      .line<HistoricalData>()
-      .x((d) => (xScale(d.month) ?? 0) + xScale.bandwidth() / 2) // Center line on bar
-      .y((d) => yScale(d.ingressValue)) // Line follows ingressValue
-      .curve(d3.curveMonotoneX); // Smooth curve
+      // Add Y axis
+      svg
+        .append("g")
+        .call(
+          d3
+            .axisLeft(yScale)
+            .tickValues(gridValues)
+            .tickSize(0)
+            .tickPadding(8),
+        )
+        .attr("font-size", "9px")
+        .attr("color", axisColor)
+        .select(".domain")
+        .attr("stroke", "none");
 
-    // Add the line path
-    svg
-      .append("path")
-      .datum(data)
-      .attr("fill", "none")
-      .attr("stroke", lineColor)
-      .attr("stroke-width", 1.5) // Slightly thinner line
-      .attr("d", lineGenerator);
+      // Create the bars
+      svg
+        .selectAll(".bar")
+        .data(data)
+        .enter()
+        .append("rect")
+        .attr("class", "bar")
+        .attr("x", (d) => xScale(d.month) ?? 0)
+        .attr("width", xScale.bandwidth())
+        .attr("y", height) // Start at bottom for animation
+        .attr("height", 0) // Start with height 0 for animation
+        .attr("fill", barColor)
+        .transition() // Add transition
+        .duration(500)
+        .delay((_, i) => i * 50) // Stagger effect
+        .attr("y", (d) => yScale(d.ingressValue))
+        .attr("height", (d) => height - yScale(d.ingressValue));
 
-    // Add dots on the line
-    svg
-      .selectAll(".dot")
-      .data(data)
-      .enter()
-      .append("circle")
-      .attr("class", "dot")
-      .attr("cx", (d) => (xScale(d.month) ?? 0) + xScale.bandwidth() / 2)
-      .attr("cy", (d) => yScale(d.ingressValue))
-      .attr("r", 3) // Smaller dots
-      .attr("fill", lineColor);
+      // Create a line generator for trend
+      const lineGenerator = d3
+        .line<HistoricalData>()
+        .x((d) => (xScale(d.month) ?? 0) + xScale.bandwidth() / 2)
+        .y((d) => yScale(d.ingressValue))
+        .curve(d3.curveMonotoneX);
 
-    // Legend removed as per UI analysis
-  }, [data]); // Rerun effect if data changes
+      // Add the line path with transition
+      const path = svg
+        .append("path")
+        .datum(data)
+        .attr("fill", "none")
+        .attr("stroke", lineColor)
+        .attr("stroke-width", 1.5)
+        .attr("d", lineGenerator);
+
+      // Add line animation
+      const pathLength = path.node()?.getTotalLength() || 0;
+      path
+        .attr("stroke-dasharray", pathLength)
+        .attr("stroke-dashoffset", pathLength)
+        .transition()
+        .duration(1000)
+        .attr("stroke-dashoffset", 0);
+
+      // Add dots on the line with transition
+      svg
+        .selectAll(".dot")
+        .data(data)
+        .enter()
+        .append("circle")
+        .attr("class", "dot")
+        .attr("cx", (d) => (xScale(d.month) ?? 0) + xScale.bandwidth() / 2)
+        .attr("cy", (d) => yScale(d.ingressValue))
+        .attr("r", 0) // Start with radius 0 for animation
+        .attr("fill", lineColor)
+        .transition()
+        .duration(500)
+        .delay((_, i) => 1000 + i * 50) // Start after line animation
+        .attr("r", 3);
+
+      // Indicate transition is complete
+      setTimeout(() => {
+        setIsTransitioning(false);
+      }, 1500); // Slightly longer than the animations
+    }, 50);
+
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [data, dataKey]); // Using dataKey as dependency ensures the chart updates when data changes
 
   return (
     // Container div to measure dimensions
-    <div ref={containerRef} className="w-full h-full">
+    <div ref={containerRef} className="w-full h-full relative">
+      {isTransitioning && (
+        <div className="absolute inset-0 bg-white bg-opacity-30 flex items-center justify-center">
+          <div className="w-6 h-6 border-t-2 border-blue-500 rounded-full animate-spin"></div>
+        </div>
+      )}
       <svg
         ref={chartRef}
-        className="w-full h-full block" // Use block to prevent extra space below
+        className="w-full h-full block"
         preserveAspectRatio="xMidYMid meet"
       ></svg>
     </div>

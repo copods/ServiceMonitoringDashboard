@@ -4,8 +4,18 @@ const path = require('path');
 
 // Helper to generate a random number within a range
 const getRandomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
-// Updated getRandomFloat to return a number, rounding handled separately if needed
-const getRandomFloat = (min, max) => parseFloat((Math.random() * (max - min) + min).toFixed(1)); // Keep 1 decimal place but return as number
+const getRandomFloat = (min, max) => parseFloat((Math.random() * (max - min) + min).toFixed(1));
+
+// Simple pseudo-random number generator (PRNG) using mulberry32 algorithm
+// Needed for consistent random data based on route ID seed
+function mulberry32(a) {
+  return function() {
+    var t = a += 0x6D2B79F5;
+    t = Math.imul(t ^ t >>> 15, t | 1);
+    t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  }
+}
 
 // Generate MOS dashboard data based on specification
 const generateMOSData = () => {
@@ -56,6 +66,9 @@ const generateMOSData = () => {
 
   // Create route details objects for all generated routes
   const routeDetails = {};
+  // Create a map to store route-specific historical data
+  const routeHistoricalData = {};
+
   routes.forEach(route => {
     const sourceName = locationMap[route.sourceId]?.name || route.sourceId;
     const destinationName = locationMap[route.destinationId]?.name || route.destinationId;
@@ -87,9 +100,12 @@ const generateMOSData = () => {
         destinationPacketLoss: getRandomFloat(10, 40)
       }
     };
+
+    // Generate unique historical data for each route
+    routeHistoricalData[route.id] = generateHistoricalDataForRoute(route.id, route.sourceId, route.destinationId);
   });
 
-  // Generate historical data (sample for overtime view - remains generic for now)
+  // Generate historical data (sample for overtime view - generic fallback)
   const historicalData = [
     { month: "Apr", ingressValue: 120, egressValue: 150 },
     { month: "May", ingressValue: 130, egressValue: 155 },
@@ -121,10 +137,35 @@ const generateMOSData = () => {
     locations,
     routes, // Use the newly generated routes
     routeDetails, // Use the newly generated details
-    historicalData
+    historicalData, // Keep for backward compatibility
+    routeHistoricalData // Add the route-specific historical data
   };
 
   return mosDashboardData;
+};
+
+// New helper function to generate unique historical data for each route
+const generateHistoricalDataForRoute = (routeId, sourceId, destinationId) => {
+  // Use route components to seed random values for consistency
+  const seed = routeId.split('').reduce((a, b) => a + b.charCodeAt(0), 0);
+  const random = mulberry32(seed);
+
+  // Base pattern that will be unique per route due to the seed
+  const baseValue = 80 + random() * 70;
+  const volatility = 10 + random() * 30;
+
+  return [
+    { month: "Apr", ingressValue: Math.round(baseValue + (random() - 0.5) * volatility), egressValue: Math.round(baseValue * 1.1 + (random() - 0.5) * volatility) },
+    { month: "May", ingressValue: Math.round(baseValue + (random() - 0.5) * volatility), egressValue: Math.round(baseValue * 1.1 + (random() - 0.5) * volatility) },
+    { month: "Jun", ingressValue: Math.round(baseValue + (random() - 0.5) * volatility), egressValue: Math.round(baseValue * 1.1 + (random() - 0.5) * volatility) },
+    { month: "Jul", ingressValue: Math.round(baseValue + (random() - 0.5) * volatility), egressValue: Math.round(baseValue * 1.1 + (random() - 0.5) * volatility) },
+    { month: "Aug", ingressValue: Math.round(baseValue + (random() - 0.5) * volatility), egressValue: Math.round(baseValue * 1.1 + (random() - 0.5) * volatility) },
+    { month: "Sep", ingressValue: Math.round(baseValue + (random() - 0.5) * volatility), egressValue: Math.round(baseValue * 1.1 + (random() - 0.5) * volatility) },
+    { month: "Oct", ingressValue: Math.round(baseValue + (random() - 0.5) * volatility), egressValue: Math.round(baseValue * 1.1 + (random() - 0.5) * volatility) },
+    { month: "Nov", ingressValue: Math.round(baseValue + (random() - 0.5) * volatility), egressValue: Math.round(baseValue * 1.1 + (random() - 0.5) * volatility) },
+    { month: "Dec", ingressValue: Math.round(baseValue + (random() - 0.5) * volatility), egressValue: Math.round(baseValue * 1.1 + (random() - 0.5) * volatility) },
+    { month: "Jan", ingressValue: Math.round(baseValue + (random() - 0.5) * volatility), egressValue: Math.round(baseValue * 1.1 + (random() - 0.5) * volatility) }
+  ];
 };
 
 // Write data to file
@@ -142,7 +183,7 @@ const saveMOSData = () => {
     JSON.stringify(mosData, null, 2)
   );
 
-  console.log("MOS Dashboard data generated successfully with routes between all locations!");
+  console.log("MOS Dashboard data generated successfully with route-specific historical data!");
 };
 
 // Execute the function to save the data
