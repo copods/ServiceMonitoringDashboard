@@ -1,4 +1,4 @@
-import React, { useMemo } from "react"; // Added useMemo
+import React, { useMemo } from "react";
 import { useMOSDashboardData } from "hooks/useMOSDashboardData";
 import MOSDashboardHeader from "components/mos/MOSDashboardHeader";
 import IssueDetailsBanner from "components/mos/IssueDetailsBanner";
@@ -93,42 +93,46 @@ const MOSDashboard: React.FC = () => {
   return (
     // Main container uses white background, black text
     <div className="min-h-screen bg-white text-black mos-dashboard flex flex-col">
-      {/* Use memoized header component with memoized props */}
+      {/* Header - Full width */}
       <MemoizedHeader {...headerProps} />
 
-      {/* Main Content Area below header */}
-      <div className="flex-grow flex flex-col">
-        {/* Use memoized issue banner with memoized props */}
-        {issueBannerProps && <MemoizedIssueBanner {...issueBannerProps} />}
-
-        {/* Two Panel Layout takes remaining height */}
-        <div className="flex-grow grid grid-cols-1 lg:grid-cols-2 gap-0 mos-dashboard-grid">
-          {/* Left Panel - Network Graph - use memoized component */}
-          <div className="network-graph-container border-r border-gray-200 p-4">
+      {/* Main Content Area below header - approximating 45/55 split */}
+      <div className="flex-grow flex flex-row">
+        {/* Left Column - approximately 45% width */}
+        <div className="w-5/12 flex flex-col border-r border-gray-200">
+          {/* Issue Banner in top row */}
+          {issueBannerProps && (
+            <div className="w-full">
+              <MemoizedIssueBanner {...issueBannerProps} />
+            </div>
+          )}
+          
+          {/* Network Graph in bottom row - takes remaining height */}
+          <div className="flex-grow p-4">
             {networkGraphProps && <MemoizedNetworkGraph {...networkGraphProps} />}
           </div>
+        </div>
 
-          {/* Right Panel - Route Details - use memoized component */}
-          <div className="route-detail-container overflow-y-auto">
-            {isRouteLoading ? (
-              <div className="h-full flex items-center justify-center">
-                <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500"></div>
+        {/* Right Column - approximately 55% width */}
+        <div className="w-7/12 overflow-y-auto">
+          {isRouteLoading ? (
+            <div className="h-full flex items-center justify-center">
+              <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500"></div>
+            </div>
+          ) : dashboardData?.selectedRoute && routeDetailProps ? (
+            <MemoizedRouteDetailPanel {...routeDetailProps} />
+          ) : (
+            <div className="h-full flex items-center justify-center text-black">
+              <div className="text-center text-gray-500">
+                <p className="text-lg mb-4">
+                  Select a route on the network graph to view details
+                </p>
+                <p className="text-gray-400">
+                  Click on any connection line or destination node
+                </p>
               </div>
-            ) : dashboardData?.selectedRoute && routeDetailProps ? (
-              <MemoizedRouteDetailPanel {...routeDetailProps} />
-            ) : (
-              <div className="h-full flex items-center justify-center text-black">
-                <div className="text-center text-gray-500">
-                  <p className="text-lg mb-4">
-                    Select a route on the network graph to view details
-                  </p>
-                  <p className="text-gray-400">
-                    Click on any connection line or destination node
-                  </p>
-                </div>
-              </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
