@@ -55,6 +55,7 @@ export const useMOSDashboardData = (): UseMOSDashboardDataResult => {
   }, [dispatch, dashboardData, isLoading, selectedRouteId, selectedSourceId]); // Add selectedSourceId dependency
 
   // Function to select a route and fetch its details
+  // Define selectRoute *before* the useEffect that uses it
   const selectRoute = useCallback((routeId: string) => {
     // Prevent selection if same route is clicked or route loading is in progress
     if (!routeId || selectedRouteId === routeId || isRouteLoading) {
@@ -73,6 +74,21 @@ export const useMOSDashboardData = (): UseMOSDashboardDataResult => {
     // dispatch(setSelectedRouteIdAction(routeId));
 
   }, [dispatch, selectedRouteId, isRouteLoading]); // Add dependencies
+
+  // Effect to automatically select the first route when data loads for a new source
+  // and no route is currently selected.
+  // Now defined *after* selectRoute
+  useEffect(() => {
+    // Check if loading is finished, data is available, has routes, and no route is selected
+    if (!isLoading && dashboardData && dashboardData.routes.length > 0 && !selectedRouteId) {
+      const firstRouteId = dashboardData.routes[0].id;
+      console.log(`Auto-selecting first route: ${firstRouteId}`);
+      // Use the existing selectRoute function to fetch details
+      selectRoute(firstRouteId); 
+    }
+    // Dependencies: run when loading finishes or data/selectedRouteId changes
+    // Add selectRoute to dependency array as it's used inside
+  }, [isLoading, dashboardData, selectedRouteId, selectRoute, dispatch]); 
 
   // Function to change the source location
   const changeSourceLocation = useCallback((locationId: string) => {
