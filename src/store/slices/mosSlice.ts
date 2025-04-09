@@ -3,21 +3,29 @@ import { RootState } from '../index';
 import { MosDashboardData, RouteDetails, Location } from '../../types/mos';
 import { fetchCompleteMOSDashboardData, fetchRouteDetails } from '../../services/api/mosApi';
 
+// Define the argument type for the thunk
+interface FetchInitialMOSDataArgs {
+  sourceId: string;
+  routeId?: string;
+}
+
 // Async Thunks
 export const fetchInitialMOSData = createAsyncThunk<
   MosDashboardData, // Return type on success
-  string | undefined, // Argument type (optional initial routeId)
+  FetchInitialMOSDataArgs, // Argument type (sourceId and optional routeId)
   { rejectValue: string } // Type for rejected action payload
->('mos/fetchInitialData', async (initialRouteId, { rejectWithValue }) => {
+>('mos/fetchInitialData', async ({ sourceId, routeId }, { rejectWithValue }) => {
   try {
-    const data = await fetchCompleteMOSDashboardData();
-    if (initialRouteId && data) {
+    // Pass sourceId to the API call
+    const data = await fetchCompleteMOSDashboardData(sourceId);
+    if (routeId && data) {
       try {
         // Fetch initial route details if an ID is provided
-        const routeDetails = await fetchRouteDetails(initialRouteId);
+        const routeDetails = await fetchRouteDetails(routeId);
         data.selectedRoute = routeDetails;
       } catch (routeError) {
-        console.warn(`Failed to fetch initial route details for ${initialRouteId}:`, routeError);
+        // Use routeId here instead of the old initialRouteId
+        console.warn(`Failed to fetch initial route details for ${routeId}:`, routeError);
         data.selectedRoute = null; // Ensure it's null if fetch fails
       }
     } else if (data) {
@@ -58,6 +66,7 @@ interface MOSState {
   isRouteLoading: boolean; // For specific route detail loading
   error: string | null;
   selectedRouteId: string | null; // Keep track of the selected ID
+  selectedSourceId: string; // New state for selected source location
 }
 
 const initialState: MOSState = {
@@ -67,6 +76,7 @@ const initialState: MOSState = {
   isRouteLoading: false,
   error: null,
   selectedRouteId: "denver-pune", // Set initial default route ID here
+  selectedSourceId: "denver", // Default source is Denver
 };
 
 const mosSlice = createSlice({
@@ -96,7 +106,21 @@ const mosSlice = createSlice({
       } else {
         state.locationsMap = {};
       }
-    }
+    },
+    // New reducer for changing source location
+    setSelectedSourceLocation(state, action: PayloadAction<string>) {
+      state.selectedSourceId = action.payload;
+      // Reset selected route when source changes
+      state.selectedRouteId = null;
+      if (state.data) {
+        state.data.selectedRoute = null;
+      }
+      // Indicate loading starts for the new source data
+      // Note: The actual data fetching will be triggered by the hook/component
+      // based on this state change. We don't set isLoading here directly
+      // as the fetchInitialMOSData thunk handles loading state.
+      state.error = null; // Clear previous errors
+    },
     // Removed manual fetch status reducers, handled by extraReducers
   },
   extraReducers: (builder) => {
@@ -164,7 +188,11 @@ const mosSlice = createSlice({
   },
 });
 
-export const { setSelectedRouteIdAction, _updateLocationsMap } = mosSlice.actions;
+export const { 
+  setSelectedRouteIdAction, 
+  _updateLocationsMap,
+  setSelectedSourceLocation // Export the new action
+} = mosSlice.actions;
 
 // Selectors
 export const selectMOSData = (state: RootState) => state.mos.data;
@@ -173,5 +201,7 @@ export const selectMOSIsLoading = (state: RootState) => state.mos.isLoading;
 export const selectMOSIsRouteLoading = (state: RootState) => state.mos.isRouteLoading;
 export const selectMOSError = (state: RootState) => state.mos.error;
 export const selectSelectedRouteId = (state: RootState) => state.mos.selectedRouteId;
+// Add a selector for the source ID
+export const selectSelectedSourceId = (state: RootState) => state.mos.selectedSourceId;
 
 export default mosSlice.reducer;

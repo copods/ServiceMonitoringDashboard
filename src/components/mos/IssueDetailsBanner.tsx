@@ -1,5 +1,5 @@
-import React from "react";
-import SvgIcon from "components/common/SvgIcon"; // Import SvgIcon
+import React, { useState, useRef, useEffect } from "react";
+import SvgIcon from "components/common/SvgIcon";
 
 interface IssueDetailsBannerProps {
   mainNode: string;
@@ -7,9 +7,9 @@ interface IssueDetailsBannerProps {
   application: string;
   vlan: string;
   codec: string;
+  availableLocations: string[];
+  onLocationChange: (locationName: string) => void;
 }
-
-// Removed local icon definitions
 
 const IssueDetailsBanner: React.FC<IssueDetailsBannerProps> = ({
   mainNode,
@@ -17,26 +17,47 @@ const IssueDetailsBanner: React.FC<IssueDetailsBannerProps> = ({
   application,
   vlan,
   codec,
+  availableLocations,
+  onLocationChange,
 }) => {
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
+
+  const handleLocationSelect = (location: string) => {
+    onLocationChange(location);
+    setDropdownOpen(false);
+  };
+
   return (
-    // White background, black text, padding, bottom border
     <div className="bg-white text-black py-3 px-6 border-b border-gray-200">
       <div className="flex items-center justify-between">
         {/* Left Side: Title and Details */}
         <div>
           <h2 className="text-lg font-semibold text-gray-800">
-            {" "}
-            {/* Slightly smaller, bolder */}
             {degradationPercentage}% MoS Degradation leaving {mainNode}
           </h2>
           <div className="text-xs text-gray-500 mt-1">
-            {" "}
-            {/* Smaller text */}
             Application: {application} | VLAN: {vlan} | Codec: {codec}
           </div>
         </div>
 
-        {/* Right Side: Sort Controls using SvgIcon */}
+        {/* Right Side: Sort Controls with Dropdown */}
         <div className="flex items-center space-x-3 text-gray-600">
           <button className="hover:text-black">
             <SvgIcon name="sort-asc" size={16} />
@@ -44,8 +65,32 @@ const IssueDetailsBanner: React.FC<IssueDetailsBannerProps> = ({
           <button className="hover:text-black">
             <SvgIcon name="list" size={16} />
           </button>
-          <div className="text-xs font-medium text-gray-700">
-            Sort By: Impact from Denver &#9662; {/* Arrow down */}
+          
+          {/* Dropdown Component */}
+          <div className="relative" ref={dropdownRef}>
+            <button 
+              onClick={toggleDropdown}
+              className="flex items-center text-xs font-medium text-gray-700 px-2 py-1.5 border border-gray-300 rounded hover:bg-gray-50"
+            >
+              <span>Sort By: Impact from {mainNode}</span>
+              <SvgIcon name={dropdownOpen ? "chevron-up" : "chevron-down"} size={14} className="ml-1" />
+            </button>
+            
+            {dropdownOpen && (
+              <div className="absolute right-0 mt-1 w-48 bg-white rounded shadow-lg z-10 py-1 border border-gray-200">
+                {availableLocations.map((location) => (
+                  <button
+                    key={location}
+                    className={`block w-full text-left px-4 py-2 text-xs ${
+                      location === mainNode ? "bg-gray-100 font-medium" : "hover:bg-gray-50"
+                    }`}
+                    onClick={() => handleLocationSelect(location)}
+                  >
+                    Impact from {location}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>

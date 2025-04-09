@@ -30,23 +30,31 @@ export const fetchRouteDetails = async (routeId: string): Promise<RouteDetails> 
 
 /**
  * Fetches historical data for the MOS dashboard
+ * @param sourceId The ID of the source location (optional, defaults to 'denver')
  */
-export const fetchHistoricalData = async (): Promise<HistoricalData[]> => {
-  const response = await api.get('/api/mos/historical');
+export const fetchHistoricalData = async (sourceId: string = 'denver'): Promise<HistoricalData[]> => {
+  // Add sourceId as a query parameter
+  const response = await api.get(`/api/mos/historical?sourceId=${sourceId}`);
   return response.data;
 };
 
 /**
  * Fetches complete MOS dashboard data including route details and historical data
  * This is a convenience method that combines multiple API calls
+ * @param sourceId The ID of the source location (optional, defaults to 'denver')
  */
-export const fetchCompleteMOSDashboardData = async (): Promise<MosDashboardData> => {
-  const dashboardData = await fetchMOSDashboardData();
-  const historicalData = await fetchHistoricalData();
-  
+export const fetchCompleteMOSDashboardData = async (sourceId: string = 'denver'): Promise<MosDashboardData> => {
+  // Add sourceId as a query parameter to the dashboard fetch
+  // Note: We assume the dashboard endpoint itself needs the sourceId now,
+  // replacing the separate fetchMOSDashboardData call.
+  // If fetchMOSDashboardData still exists and is needed without sourceId,
+  // this logic might need adjustment based on API design.
+  const response = await api.get(`/api/mos/dashboard?sourceId=${sourceId}`);
+  const historicalData = await fetchHistoricalData(sourceId); // Pass sourceId here too
+
   // Initially, no route is selected
   return {
-    ...dashboardData,
+    ...response.data, // Use data from the combined dashboard fetch
     selectedRoute: null,
     historicalData
   };

@@ -8,13 +8,31 @@ const dataPath = path.join(__dirname, '..', 'data/mos-data.json');
 // Endpoint for MOS dashboard overview data
 router.get('/dashboard', (req, res) => {
   const data = getMOSData(dataPath);
+  // Read sourceId from query, default to 'denver'
+  const sourceId = req.query.sourceId || 'denver'; 
   
-  // Return the essential data needed for dashboard overview
+  // Filter routes based on sourceId
+  const filteredRoutes = data.routes.filter(route => route.sourceId === sourceId);
+  
+  // Update issue details based on the selected source
+  const sourceLocation = data.locations.find(loc => loc.id === sourceId);
+  let issueDetails = { ...data.issueDetails }; // Clone original details
+  if (sourceLocation) {
+    issueDetails.mainNode = sourceLocation.name;
+    // Note: Degradation percentage could also be made source-specific if needed
+    // issueDetails.degradationPercentage = generateDegradationForSource(sourceId); 
+  } else {
+    // Handle case where sourceId might be invalid, fallback or error?
+    console.warn(`Source location with ID ${sourceId} not found in mock data.`);
+    // Keep default mainNode or set to something indicative?
+  }
+  
+  // Return the essential data needed for dashboard overview, with filtered routes and updated details
   res.json({
     serviceInfo: data.serviceInfo,
-    issueDetails: data.issueDetails,
+    issueDetails: issueDetails, // Use updated details
     locations: data.locations,
-    routes: data.routes
+    routes: filteredRoutes // Use filtered routes
   });
 });
 
@@ -33,7 +51,14 @@ router.get('/route/:routeId', (req, res) => {
 // Endpoint for historical data
 router.get('/historical', (req, res) => {
   const data = getMOSData(dataPath);
+  // Read sourceId from query, default to 'denver'
+  const sourceId = req.query.sourceId || 'denver'; 
   
+  // Note: Currently, mock historical data is not source-specific.
+  // Returning the same data regardless of sourceId.
+  // This could be enhanced later if needed.
+  console.log(`Fetching historical data (mock, sourceId: ${sourceId} ignored)`);
+
   if (data.historicalData) {
     res.json(data.historicalData);
   } else {

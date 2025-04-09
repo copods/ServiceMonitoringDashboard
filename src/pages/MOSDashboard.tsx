@@ -18,7 +18,10 @@ const MOSDashboard: React.FC = () => {
     isRouteLoading,
     error,
     selectedRouteId,
+    selectedSourceId, // Get new state
+    availableLocationNames, // Get new state
     selectRoute,
+    changeSourceLocation, // Get new function
     locationsMap,
     retryFetch,
   } = useMOSDashboardData();
@@ -58,13 +61,30 @@ const MOSDashboard: React.FC = () => {
   const issueBannerProps = useMemo(() => {
     if (!dashboardData?.issueDetails) return null;
     return {
-      mainNode: dashboardData.issueDetails.mainNode,
+      mainNode: locationsMap[selectedSourceId]?.name || selectedSourceId, // Use selected source name
       degradationPercentage: dashboardData.issueDetails.degradationPercentage,
       application: dashboardData.issueDetails.application,
       vlan: dashboardData.issueDetails.vlan,
-      codec: dashboardData.issueDetails.codec
+      codec: dashboardData.issueDetails.codec,
+      availableLocations: availableLocationNames, // Pass available location names
+      onLocationChange: (locationName: string) => { // Pass handler
+        // Find the location ID by name from the map
+        const location = Object.values(locationsMap).find(loc => loc.name === locationName);
+        if (location) {
+          changeSourceLocation(location.id); // Call hook function with ID
+        } else {
+          console.warn(`Location ID not found for name: ${locationName}`);
+        }
+      }
     };
-  }, [dashboardData?.issueDetails]);
+    // Add dependencies for the new props and handler
+  }, [
+    dashboardData?.issueDetails, 
+    selectedSourceId, 
+    availableLocationNames, 
+    locationsMap, 
+    changeSourceLocation
+  ]);
 
   // Loading state handling
   if (isLoading) {

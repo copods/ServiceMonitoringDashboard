@@ -1,14 +1,16 @@
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useMemo } from "react"; // Add useMemo
 import { useAppDispatch, useAppSelector } from "store"; // Assuming store index exports these
 import {
   fetchInitialMOSData,
   fetchRouteDetailsById,
+  setSelectedSourceLocation, // Import new action
   selectMOSData,
   selectMOSLocationsMap,
   selectMOSIsLoading,
   selectMOSIsRouteLoading,
   selectMOSError,
   selectSelectedRouteId,
+  selectSelectedSourceId, // Import new selector
   // setSelectedRouteIdAction // Potentially needed if we want instant UI feedback before fetch
 } from "store/slices/mosSlice";
 import { MosDashboardData, Location } from "types/mos"; // Keep type imports
@@ -21,7 +23,10 @@ interface UseMOSDashboardDataResult {
   isRouteLoading: boolean; // Reflects route detail loading state from Redux
   error: string | null; // Reflects error state from Redux
   selectedRouteId: string | null; // Reflects selected route ID from Redux
+  selectedSourceId: string; // Add selected source ID
+  availableLocationNames: string[]; // Add available location names
   selectRoute: (routeId: string) => void; // Function to trigger route selection/fetch
+  changeSourceLocation: (locationId: string) => void; // Function to change source location
   retryFetch: () => void; // Function to retry initial data fetch
 }
 
@@ -35,15 +40,19 @@ export const useMOSDashboardData = (): UseMOSDashboardDataResult => {
   const isRouteLoading = useAppSelector(selectMOSIsRouteLoading);
   const error = useAppSelector(selectMOSError);
   const selectedRouteId = useAppSelector(selectSelectedRouteId); // Get initial/current ID from store
+  const selectedSourceId = useAppSelector(selectSelectedSourceId); // Get selected source ID
 
-  // Fetch initial data on mount using the initial selectedRouteId from the store
+  // Fetch initial data on mount using the initial selectedRouteId and selectedSourceId from the store
   useEffect(() => {
     // Only fetch if data isn't already loaded or loading
-    // This prevents re-fetching on component re-renders if data is present
     if (!dashboardData && !isLoading) {
-       dispatch(fetchInitialMOSData(selectedRouteId ?? undefined)); // Pass current selected ID or undefined
+       // Pass both sourceId and optional routeId
+       dispatch(fetchInitialMOSData({ 
+         sourceId: selectedSourceId, 
+         routeId: selectedRouteId ?? undefined 
+       }));
     }
-  }, [dispatch, dashboardData, isLoading, selectedRouteId]); // Add dependencies
+  }, [dispatch, dashboardData, isLoading, selectedRouteId, selectedSourceId]); // Add selectedSourceId dependency
 
   // Function to select a route and fetch its details
   const selectRoute = useCallback((routeId: string) => {
@@ -65,11 +74,32 @@ export const useMOSDashboardData = (): UseMOSDashboardDataResult => {
 
   }, [dispatch, selectedRouteId, isRouteLoading]); // Add dependencies
 
+  // Function to change the source location
+  const changeSourceLocation = useCallback((locationId: string) => {
+    if (locationId !== selectedSourceId) {
+      // Dispatch action to update the source ID in Redux state
+      dispatch(setSelectedSourceLocation(locationId));
+      // Trigger data fetch for the new source location
+      // No routeId is passed initially when changing source
+      dispatch(fetchInitialMOSData({ sourceId: locationId })); 
+    }
+  }, [dispatch, selectedSourceId]); // Add dependencies
+
+  // Get all available location names for the dropdown
+  const availableLocationNames = useMemo(() => {
+    if (!dashboardData?.locations) return [];
+    // Sort alphabetically for consistent dropdown order
+    return dashboardData.locations.map(location => location.name).sort(); 
+  }, [dashboardData?.locations]);
+
   // Function to retry fetching initial data
   const retryFetch = useCallback(() => {
-    // Dispatch the initial fetch thunk again, passing the current selected ID from store
-    dispatch(fetchInitialMOSData(selectedRouteId ?? undefined));
-  }, [dispatch, selectedRouteId]); // Add dependency
+    // Dispatch the initial fetch thunk again, passing the current selected IDs from store
+    dispatch(fetchInitialMOSData({ 
+      sourceId: selectedSourceId, 
+      routeId: selectedRouteId ?? undefined 
+    }));
+  }, [dispatch, selectedRouteId, selectedSourceId]); // Add dependencies
 
   // Return the state selected from Redux and the action dispatching functions
   return {
@@ -79,7 +109,10 @@ export const useMOSDashboardData = (): UseMOSDashboardDataResult => {
     isRouteLoading,
     error,
     selectedRouteId,
+    selectedSourceId, // Return new state
+    availableLocationNames, // Return location names
     selectRoute,
+    changeSourceLocation, // Return new function
     retryFetch,
   };
 };

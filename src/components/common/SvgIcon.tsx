@@ -83,6 +83,16 @@ const iconRegistry: Record<string, React.ReactNode> = {
       <line x1="12" y1="15" x2="12" y2="3"></line>
     </>
   ),
+  'chevron-down': (
+    <>
+      <polyline points="6 9 12 15 18 9"></polyline>
+    </>
+  ),
+  'chevron-up': (
+    <>
+      <polyline points="18 15 12 9 6 15"></polyline>
+    </>
+  ),
   // Add node etc.
 };
 

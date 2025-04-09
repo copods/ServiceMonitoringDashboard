@@ -83,64 +83,505 @@
       "id": "denver-pune",
       "sourceId": "denver",
       "destinationId": "pune",
-      "streamCount": 50000,
-      "mosPercentage": 37,
-      "packetLossPercentage": 64.9,
-      "impactPercentage": 90
+      "streamCount": 24461,
+      "mosPercentage": 38,
+      "packetLossPercentage": 65.1,
+      "impactPercentage": 81
     },
     {
       "id": "denver-berlin",
       "sourceId": "denver",
       "destinationId": "berlin",
-      "streamCount": 42000,
-      "mosPercentage": 42,
-      "packetLossPercentage": 58.2,
-      "impactPercentage": 80
+      "streamCount": 35648,
+      "mosPercentage": 30,
+      "packetLossPercentage": 69.5,
+      "impactPercentage": 94
     },
     {
       "id": "denver-newYork",
       "sourceId": "denver",
       "destinationId": "newYork",
-      "streamCount": 36000,
+      "streamCount": 44513,
       "mosPercentage": 45,
-      "packetLossPercentage": 52.7,
-      "impactPercentage": 75
+      "packetLossPercentage": 58.2,
+      "impactPercentage": 65
     },
     {
       "id": "denver-bangalore",
       "sourceId": "denver",
       "destinationId": "bangalore",
-      "streamCount": 28000,
-      "mosPercentage": 38,
-      "packetLossPercentage": 61.5,
-      "impactPercentage": 85
+      "streamCount": 41290,
+      "mosPercentage": 31,
+      "packetLossPercentage": 40.7,
+      "impactPercentage": 86
     },
     {
       "id": "denver-california",
       "sourceId": "denver",
       "destinationId": "california",
-      "streamCount": 45000,
-      "mosPercentage": 48,
-      "packetLossPercentage": 49.8,
-      "impactPercentage": 70
+      "streamCount": 30327,
+      "mosPercentage": 61,
+      "packetLossPercentage": 60,
+      "impactPercentage": 72
     },
     {
       "id": "denver-seattle",
       "sourceId": "denver",
       "destinationId": "seattle",
-      "streamCount": 30000,
-      "mosPercentage": 52,
-      "packetLossPercentage": 45.3,
-      "impactPercentage": 65
+      "streamCount": 22742,
+      "mosPercentage": 64,
+      "packetLossPercentage": 60.9,
+      "impactPercentage": 78
     },
     {
       "id": "denver-mumbai",
       "sourceId": "denver",
       "destinationId": "mumbai",
-      "streamCount": 38000,
+      "streamCount": 10252,
+      "mosPercentage": 53,
+      "packetLossPercentage": 46.4,
+      "impactPercentage": 79
+    },
+    {
+      "id": "pune-denver",
+      "sourceId": "pune",
+      "destinationId": "denver",
+      "streamCount": 31113,
+      "mosPercentage": 30,
+      "packetLossPercentage": 54.2,
+      "impactPercentage": 94
+    },
+    {
+      "id": "pune-berlin",
+      "sourceId": "pune",
+      "destinationId": "berlin",
+      "streamCount": 14844,
       "mosPercentage": 40,
-      "packetLossPercentage": 59.4,
+      "packetLossPercentage": 67.2,
+      "impactPercentage": 80
+    },
+    {
+      "id": "pune-newYork",
+      "sourceId": "pune",
+      "destinationId": "newYork",
+      "streamCount": 52007,
+      "mosPercentage": 38,
+      "packetLossPercentage": 67.9,
+      "impactPercentage": 83
+    },
+    {
+      "id": "pune-bangalore",
+      "sourceId": "pune",
+      "destinationId": "bangalore",
+      "streamCount": 20506,
+      "mosPercentage": 46,
+      "packetLossPercentage": 43.9,
+      "impactPercentage": 75
+    },
+    {
+      "id": "pune-california",
+      "sourceId": "pune",
+      "destinationId": "california",
+      "streamCount": 44889,
+      "mosPercentage": 42,
+      "packetLossPercentage": 58.3,
+      "impactPercentage": 88
+    },
+    {
+      "id": "pune-seattle",
+      "sourceId": "pune",
+      "destinationId": "seattle",
+      "streamCount": 25647,
+      "mosPercentage": 37,
+      "packetLossPercentage": 60.4,
+      "impactPercentage": 74
+    },
+    {
+      "id": "pune-mumbai",
+      "sourceId": "pune",
+      "destinationId": "mumbai",
+      "streamCount": 52442,
+      "mosPercentage": 52,
+      "packetLossPercentage": 63.7,
+      "impactPercentage": 70
+    },
+    {
+      "id": "berlin-denver",
+      "sourceId": "berlin",
+      "destinationId": "denver",
+      "streamCount": 24170,
+      "mosPercentage": 35,
+      "packetLossPercentage": 53.8,
+      "impactPercentage": 68
+    },
+    {
+      "id": "berlin-pune",
+      "sourceId": "berlin",
+      "destinationId": "pune",
+      "streamCount": 18974,
+      "mosPercentage": 49,
+      "packetLossPercentage": 61.2,
       "impactPercentage": 82
+    },
+    {
+      "id": "berlin-newYork",
+      "sourceId": "berlin",
+      "destinationId": "newYork",
+      "streamCount": 49619,
+      "mosPercentage": 38,
+      "packetLossPercentage": 50.7,
+      "impactPercentage": 78
+    },
+    {
+      "id": "berlin-bangalore",
+      "sourceId": "berlin",
+      "destinationId": "bangalore",
+      "streamCount": 13873,
+      "mosPercentage": 43,
+      "packetLossPercentage": 52,
+      "impactPercentage": 68
+    },
+    {
+      "id": "berlin-california",
+      "sourceId": "berlin",
+      "destinationId": "california",
+      "streamCount": 43175,
+      "mosPercentage": 50,
+      "packetLossPercentage": 56.4,
+      "impactPercentage": 90
+    },
+    {
+      "id": "berlin-seattle",
+      "sourceId": "berlin",
+      "destinationId": "seattle",
+      "streamCount": 11873,
+      "mosPercentage": 34,
+      "packetLossPercentage": 64.6,
+      "impactPercentage": 74
+    },
+    {
+      "id": "berlin-mumbai",
+      "sourceId": "berlin",
+      "destinationId": "mumbai",
+      "streamCount": 24935,
+      "mosPercentage": 58,
+      "packetLossPercentage": 60.1,
+      "impactPercentage": 73
+    },
+    {
+      "id": "newYork-denver",
+      "sourceId": "newYork",
+      "destinationId": "denver",
+      "streamCount": 44300,
+      "mosPercentage": 51,
+      "packetLossPercentage": 48.5,
+      "impactPercentage": 80
+    },
+    {
+      "id": "newYork-pune",
+      "sourceId": "newYork",
+      "destinationId": "pune",
+      "streamCount": 51123,
+      "mosPercentage": 47,
+      "packetLossPercentage": 41.5,
+      "impactPercentage": 89
+    },
+    {
+      "id": "newYork-berlin",
+      "sourceId": "newYork",
+      "destinationId": "berlin",
+      "streamCount": 11640,
+      "mosPercentage": 36,
+      "packetLossPercentage": 66.1,
+      "impactPercentage": 88
+    },
+    {
+      "id": "newYork-bangalore",
+      "sourceId": "newYork",
+      "destinationId": "bangalore",
+      "streamCount": 42765,
+      "mosPercentage": 35,
+      "packetLossPercentage": 43.1,
+      "impactPercentage": 79
+    },
+    {
+      "id": "newYork-california",
+      "sourceId": "newYork",
+      "destinationId": "california",
+      "streamCount": 44814,
+      "mosPercentage": 70,
+      "packetLossPercentage": 45.5,
+      "impactPercentage": 80
+    },
+    {
+      "id": "newYork-seattle",
+      "sourceId": "newYork",
+      "destinationId": "seattle",
+      "streamCount": 44892,
+      "mosPercentage": 44,
+      "packetLossPercentage": 64.9,
+      "impactPercentage": 88
+    },
+    {
+      "id": "newYork-mumbai",
+      "sourceId": "newYork",
+      "destinationId": "mumbai",
+      "streamCount": 11037,
+      "mosPercentage": 53,
+      "packetLossPercentage": 59,
+      "impactPercentage": 94
+    },
+    {
+      "id": "bangalore-denver",
+      "sourceId": "bangalore",
+      "destinationId": "denver",
+      "streamCount": 44874,
+      "mosPercentage": 44,
+      "packetLossPercentage": 57.9,
+      "impactPercentage": 85
+    },
+    {
+      "id": "bangalore-pune",
+      "sourceId": "bangalore",
+      "destinationId": "pune",
+      "streamCount": 45008,
+      "mosPercentage": 51,
+      "packetLossPercentage": 46.4,
+      "impactPercentage": 66
+    },
+    {
+      "id": "bangalore-berlin",
+      "sourceId": "bangalore",
+      "destinationId": "berlin",
+      "streamCount": 40903,
+      "mosPercentage": 41,
+      "packetLossPercentage": 67.6,
+      "impactPercentage": 69
+    },
+    {
+      "id": "bangalore-newYork",
+      "sourceId": "bangalore",
+      "destinationId": "newYork",
+      "streamCount": 18039,
+      "mosPercentage": 36,
+      "packetLossPercentage": 64.3,
+      "impactPercentage": 61
+    },
+    {
+      "id": "bangalore-california",
+      "sourceId": "bangalore",
+      "destinationId": "california",
+      "streamCount": 26313,
+      "mosPercentage": 44,
+      "packetLossPercentage": 50.5,
+      "impactPercentage": 68
+    },
+    {
+      "id": "bangalore-seattle",
+      "sourceId": "bangalore",
+      "destinationId": "seattle",
+      "streamCount": 16838,
+      "mosPercentage": 45,
+      "packetLossPercentage": 48.1,
+      "impactPercentage": 91
+    },
+    {
+      "id": "bangalore-mumbai",
+      "sourceId": "bangalore",
+      "destinationId": "mumbai",
+      "streamCount": 17854,
+      "mosPercentage": 69,
+      "packetLossPercentage": 56.3,
+      "impactPercentage": 76
+    },
+    {
+      "id": "california-denver",
+      "sourceId": "california",
+      "destinationId": "denver",
+      "streamCount": 15660,
+      "mosPercentage": 66,
+      "packetLossPercentage": 50.8,
+      "impactPercentage": 77
+    },
+    {
+      "id": "california-pune",
+      "sourceId": "california",
+      "destinationId": "pune",
+      "streamCount": 36666,
+      "mosPercentage": 47,
+      "packetLossPercentage": 54.6,
+      "impactPercentage": 80
+    },
+    {
+      "id": "california-berlin",
+      "sourceId": "california",
+      "destinationId": "berlin",
+      "streamCount": 27990,
+      "mosPercentage": 41,
+      "packetLossPercentage": 63.2,
+      "impactPercentage": 94
+    },
+    {
+      "id": "california-newYork",
+      "sourceId": "california",
+      "destinationId": "newYork",
+      "streamCount": 47792,
+      "mosPercentage": 46,
+      "packetLossPercentage": 42.2,
+      "impactPercentage": 77
+    },
+    {
+      "id": "california-bangalore",
+      "sourceId": "california",
+      "destinationId": "bangalore",
+      "streamCount": 40360,
+      "mosPercentage": 55,
+      "packetLossPercentage": 46.4,
+      "impactPercentage": 95
+    },
+    {
+      "id": "california-seattle",
+      "sourceId": "california",
+      "destinationId": "seattle",
+      "streamCount": 20938,
+      "mosPercentage": 66,
+      "packetLossPercentage": 67.2,
+      "impactPercentage": 79
+    },
+    {
+      "id": "california-mumbai",
+      "sourceId": "california",
+      "destinationId": "mumbai",
+      "streamCount": 43392,
+      "mosPercentage": 31,
+      "packetLossPercentage": 53.8,
+      "impactPercentage": 66
+    },
+    {
+      "id": "seattle-denver",
+      "sourceId": "seattle",
+      "destinationId": "denver",
+      "streamCount": 35280,
+      "mosPercentage": 43,
+      "packetLossPercentage": 41.2,
+      "impactPercentage": 89
+    },
+    {
+      "id": "seattle-pune",
+      "sourceId": "seattle",
+      "destinationId": "pune",
+      "streamCount": 48883,
+      "mosPercentage": 50,
+      "packetLossPercentage": 42.8,
+      "impactPercentage": 66
+    },
+    {
+      "id": "seattle-berlin",
+      "sourceId": "seattle",
+      "destinationId": "berlin",
+      "streamCount": 27381,
+      "mosPercentage": 40,
+      "packetLossPercentage": 51.1,
+      "impactPercentage": 81
+    },
+    {
+      "id": "seattle-newYork",
+      "sourceId": "seattle",
+      "destinationId": "newYork",
+      "streamCount": 39980,
+      "mosPercentage": 43,
+      "packetLossPercentage": 49.3,
+      "impactPercentage": 95
+    },
+    {
+      "id": "seattle-bangalore",
+      "sourceId": "seattle",
+      "destinationId": "bangalore",
+      "streamCount": 29764,
+      "mosPercentage": 33,
+      "packetLossPercentage": 65.2,
+      "impactPercentage": 81
+    },
+    {
+      "id": "seattle-california",
+      "sourceId": "seattle",
+      "destinationId": "california",
+      "streamCount": 44381,
+      "mosPercentage": 54,
+      "packetLossPercentage": 45.6,
+      "impactPercentage": 66
+    },
+    {
+      "id": "seattle-mumbai",
+      "sourceId": "seattle",
+      "destinationId": "mumbai",
+      "streamCount": 40678,
+      "mosPercentage": 49,
+      "packetLossPercentage": 50.5,
+      "impactPercentage": 60
+    },
+    {
+      "id": "mumbai-denver",
+      "sourceId": "mumbai",
+      "destinationId": "denver",
+      "streamCount": 40922,
+      "mosPercentage": 39,
+      "packetLossPercentage": 58.1,
+      "impactPercentage": 68
+    },
+    {
+      "id": "mumbai-pune",
+      "sourceId": "mumbai",
+      "destinationId": "pune",
+      "streamCount": 32714,
+      "mosPercentage": 43,
+      "packetLossPercentage": 51.8,
+      "impactPercentage": 94
+    },
+    {
+      "id": "mumbai-berlin",
+      "sourceId": "mumbai",
+      "destinationId": "berlin",
+      "streamCount": 40058,
+      "mosPercentage": 51,
+      "packetLossPercentage": 60.2,
+      "impactPercentage": 70
+    },
+    {
+      "id": "mumbai-newYork",
+      "sourceId": "mumbai",
+      "destinationId": "newYork",
+      "streamCount": 10045,
+      "mosPercentage": 31,
+      "packetLossPercentage": 45.7,
+      "impactPercentage": 70
+    },
+    {
+      "id": "mumbai-bangalore",
+      "sourceId": "mumbai",
+      "destinationId": "bangalore",
+      "streamCount": 21479,
+      "mosPercentage": 58,
+      "packetLossPercentage": 60.6,
+      "impactPercentage": 67
+    },
+    {
+      "id": "mumbai-california",
+      "sourceId": "mumbai",
+      "destinationId": "california",
+      "streamCount": 19236,
+      "mosPercentage": 40,
+      "packetLossPercentage": 51.8,
+      "impactPercentage": 73
+    },
+    {
+      "id": "mumbai-seattle",
+      "sourceId": "mumbai",
+      "destinationId": "seattle",
+      "streamCount": 13881,
+      "mosPercentage": 36,
+      "packetLossPercentage": 58.4,
+      "impactPercentage": 90
     }
   ],
   "routeDetails": {
@@ -149,26 +590,26 @@
       "sourceId": "denver",
       "destinationId": "pune",
       "forwardPath": {
-        "mosPercentage": 37,
-        "packetLossPercentage": 64.9,
-        "streamCount": 50000,
-        "impactPercentage": 95
+        "mosPercentage": 38,
+        "packetLossPercentage": 65.1,
+        "streamCount": 24461,
+        "impactPercentage": 81
       },
       "returnPath": {
-        "mosPercentage": 90,
-        "streamCount": 8000,
-        "impactPercentage": 50
+        "mosPercentage": 83,
+        "streamCount": 7338,
+        "impactPercentage": 49
       },
       "analysis": {
-        "impactedStreamsPercentage": 90,
-        "sourceToDestPercentage": 7,
+        "impactedStreamsPercentage": 82,
+        "sourceToDestPercentage": 17,
         "overlapAnalysis": "It's inconclusive whether the streams impacted from Denver are the same streams impacted at Pune."
       },
       "additionalStats": {
-        "sourceMOS": 56.9,
-        "sourcePacketLoss": 55,
-        "destinationMOS": 54,
-        "destinationPacketLoss": 25
+        "sourceMOS": 41.7,
+        "sourcePacketLoss": 38.8,
+        "destinationMOS": 64.7,
+        "destinationPacketLoss": 38.7
       }
     },
     "denver-berlin": {
@@ -176,26 +617,26 @@
       "sourceId": "denver",
       "destinationId": "berlin",
       "forwardPath": {
-        "mosPercentage": 42,
-        "packetLossPercentage": 58.2,
-        "streamCount": 42000,
-        "impactPercentage": 85
+        "mosPercentage": 30,
+        "packetLossPercentage": 69.5,
+        "streamCount": 35648,
+        "impactPercentage": 94
       },
       "returnPath": {
-        "mosPercentage": 85,
-        "streamCount": 7000,
-        "impactPercentage": 45
+        "mosPercentage": 66,
+        "streamCount": 7129,
+        "impactPercentage": 60
       },
       "analysis": {
-        "impactedStreamsPercentage": 80,
-        "sourceToDestPercentage": 8,
-        "overlapAnalysis": "Analysis pending for Berlin route impact correlation."
+        "impactedStreamsPercentage": 86,
+        "sourceToDestPercentage": 10,
+        "overlapAnalysis": "It's inconclusive whether the streams impacted from Denver are the same streams impacted at Berlin."
       },
       "additionalStats": {
-        "sourceMOS": 56.9,
-        "sourcePacketLoss": 55,
-        "destinationMOS": 48,
-        "destinationPacketLoss": 30
+        "sourceMOS": 48.1,
+        "sourcePacketLoss": 31.6,
+        "destinationMOS": 40.9,
+        "destinationPacketLoss": 13.8
       }
     },
     "denver-newYork": {
@@ -204,25 +645,25 @@
       "destinationId": "newYork",
       "forwardPath": {
         "mosPercentage": 45,
-        "packetLossPercentage": 52.7,
-        "streamCount": 36000,
-        "impactPercentage": 78
+        "packetLossPercentage": 58.2,
+        "streamCount": 44513,
+        "impactPercentage": 65
       },
       "returnPath": {
-        "mosPercentage": 78,
-        "streamCount": 9000,
-        "impactPercentage": 42
+        "mosPercentage": 93,
+        "streamCount": 4451,
+        "impactPercentage": 31
       },
       "analysis": {
-        "impactedStreamsPercentage": 75,
-        "sourceToDestPercentage": 12,
-        "overlapAnalysis": "Analysis pending for New York route impact correlation."
+        "impactedStreamsPercentage": 62,
+        "sourceToDestPercentage": 5,
+        "overlapAnalysis": "It's inconclusive whether the streams impacted from Denver are the same streams impacted at New York."
       },
       "additionalStats": {
-        "sourceMOS": 56.9,
-        "sourcePacketLoss": 55,
-        "destinationMOS": 50,
-        "destinationPacketLoss": 28
+        "sourceMOS": 42.7,
+        "sourcePacketLoss": 47.6,
+        "destinationMOS": 44.5,
+        "destinationPacketLoss": 21.7
       }
     },
     "denver-bangalore": {
@@ -230,26 +671,26 @@
       "sourceId": "denver",
       "destinationId": "bangalore",
       "forwardPath": {
-        "mosPercentage": 38,
-        "packetLossPercentage": 61.5,
-        "streamCount": 28000,
-        "impactPercentage": 88
+        "mosPercentage": 31,
+        "packetLossPercentage": 40.7,
+        "streamCount": 41290,
+        "impactPercentage": 86
       },
       "returnPath": {
-        "mosPercentage": 82,
-        "streamCount": 5000,
-        "impactPercentage": 48
+        "mosPercentage": 52,
+        "streamCount": 12387,
+        "impactPercentage": 54
       },
       "analysis": {
-        "impactedStreamsPercentage": 85,
-        "sourceToDestPercentage": 6,
-        "overlapAnalysis": "Analysis pending for Bangalore route impact correlation."
+        "impactedStreamsPercentage": 94,
+        "sourceToDestPercentage": 11,
+        "overlapAnalysis": "It's inconclusive whether the streams impacted from Denver are the same streams impacted at Bangalore."
       },
       "additionalStats": {
-        "sourceMOS": 56.9,
-        "sourcePacketLoss": 55,
-        "destinationMOS": 52,
-        "destinationPacketLoss": 32
+        "sourceMOS": 56.2,
+        "sourcePacketLoss": 34.3,
+        "destinationMOS": 41,
+        "destinationPacketLoss": 34
       }
     },
     "denver-california": {
@@ -257,26 +698,26 @@
       "sourceId": "denver",
       "destinationId": "california",
       "forwardPath": {
-        "mosPercentage": 48,
-        "packetLossPercentage": 49.8,
-        "streamCount": 45000,
+        "mosPercentage": 61,
+        "packetLossPercentage": 60,
+        "streamCount": 30327,
         "impactPercentage": 72
       },
       "returnPath": {
-        "mosPercentage": 75,
-        "streamCount": 15000,
-        "impactPercentage": 38
+        "mosPercentage": 62,
+        "streamCount": 9098,
+        "impactPercentage": 51
       },
       "analysis": {
-        "impactedStreamsPercentage": 70,
-        "sourceToDestPercentage": 15,
-        "overlapAnalysis": "Analysis pending for California route impact correlation."
+        "impactedStreamsPercentage": 71,
+        "sourceToDestPercentage": 8,
+        "overlapAnalysis": "It's inconclusive whether the streams impacted from Denver are the same streams impacted at California."
       },
       "additionalStats": {
-        "sourceMOS": 56.9,
-        "sourcePacketLoss": 55,
-        "destinationMOS": 58,
-        "destinationPacketLoss": 22
+        "sourceMOS": 58.3,
+        "sourcePacketLoss": 54.6,
+        "destinationMOS": 64.2,
+        "destinationPacketLoss": 25.2
       }
     },
     "denver-seattle": {
@@ -284,26 +725,26 @@
       "sourceId": "denver",
       "destinationId": "seattle",
       "forwardPath": {
-        "mosPercentage": 52,
-        "packetLossPercentage": 45.3,
-        "streamCount": 30000,
-        "impactPercentage": 68
+        "mosPercentage": 64,
+        "packetLossPercentage": 60.9,
+        "streamCount": 22742,
+        "impactPercentage": 78
       },
       "returnPath": {
-        "mosPercentage": 72,
-        "streamCount": 12000,
-        "impactPercentage": 35
+        "mosPercentage": 76,
+        "streamCount": 2274,
+        "impactPercentage": 38
       },
       "analysis": {
-        "impactedStreamsPercentage": 65,
+        "impactedStreamsPercentage": 66,
         "sourceToDestPercentage": 18,
-        "overlapAnalysis": "Analysis pending for Seattle route impact correlation."
+        "overlapAnalysis": "It's inconclusive whether the streams impacted from Denver are the same streams impacted at Seattle."
       },
       "additionalStats": {
-        "sourceMOS": 56.9,
-        "sourcePacketLoss": 55,
-        "destinationMOS": 62,
-        "destinationPacketLoss": 20
+        "sourceMOS": 59.7,
+        "sourcePacketLoss": 58.4,
+        "destinationMOS": 58.5,
+        "destinationPacketLoss": 13.1
       }
     },
     "denver-mumbai": {
@@ -311,26 +752,1349 @@
       "sourceId": "denver",
       "destinationId": "mumbai",
       "forwardPath": {
+        "mosPercentage": 53,
+        "packetLossPercentage": 46.4,
+        "streamCount": 10252,
+        "impactPercentage": 79
+      },
+      "returnPath": {
+        "mosPercentage": 89,
+        "streamCount": 3075,
+        "impactPercentage": 52
+      },
+      "analysis": {
+        "impactedStreamsPercentage": 62,
+        "sourceToDestPercentage": 8,
+        "overlapAnalysis": "It's inconclusive whether the streams impacted from Denver are the same streams impacted at Mumbai."
+      },
+      "additionalStats": {
+        "sourceMOS": 55.8,
+        "sourcePacketLoss": 56.6,
+        "destinationMOS": 53.6,
+        "destinationPacketLoss": 12.7
+      }
+    },
+    "pune-denver": {
+      "id": "pune-denver",
+      "sourceId": "pune",
+      "destinationId": "denver",
+      "forwardPath": {
+        "mosPercentage": 30,
+        "packetLossPercentage": 54.2,
+        "streamCount": 31113,
+        "impactPercentage": 94
+      },
+      "returnPath": {
+        "mosPercentage": 56,
+        "streamCount": 6222,
+        "impactPercentage": 55
+      },
+      "analysis": {
+        "impactedStreamsPercentage": 86,
+        "sourceToDestPercentage": 12,
+        "overlapAnalysis": "It's inconclusive whether the streams impacted from Pune are the same streams impacted at Denver."
+      },
+      "additionalStats": {
+        "sourceMOS": 55.6,
+        "sourcePacketLoss": 45.7,
+        "destinationMOS": 58.8,
+        "destinationPacketLoss": 26.1
+      }
+    },
+    "pune-berlin": {
+      "id": "pune-berlin",
+      "sourceId": "pune",
+      "destinationId": "berlin",
+      "forwardPath": {
         "mosPercentage": 40,
-        "packetLossPercentage": 59.4,
-        "streamCount": 38000,
+        "packetLossPercentage": 67.2,
+        "streamCount": 14844,
+        "impactPercentage": 80
+      },
+      "returnPath": {
+        "mosPercentage": 65,
+        "streamCount": 1484,
+        "impactPercentage": 48
+      },
+      "analysis": {
+        "impactedStreamsPercentage": 63,
+        "sourceToDestPercentage": 7,
+        "overlapAnalysis": "It's inconclusive whether the streams impacted from Pune are the same streams impacted at Berlin."
+      },
+      "additionalStats": {
+        "sourceMOS": 60,
+        "sourcePacketLoss": 57.7,
+        "destinationMOS": 51.4,
+        "destinationPacketLoss": 12.4
+      }
+    },
+    "pune-newYork": {
+      "id": "pune-newYork",
+      "sourceId": "pune",
+      "destinationId": "newYork",
+      "forwardPath": {
+        "mosPercentage": 38,
+        "packetLossPercentage": 67.9,
+        "streamCount": 52007,
+        "impactPercentage": 83
+      },
+      "returnPath": {
+        "mosPercentage": 57,
+        "streamCount": 15602,
+        "impactPercentage": 38
+      },
+      "analysis": {
+        "impactedStreamsPercentage": 84,
+        "sourceToDestPercentage": 11,
+        "overlapAnalysis": "It's inconclusive whether the streams impacted from Pune are the same streams impacted at New York."
+      },
+      "additionalStats": {
+        "sourceMOS": 60.2,
+        "sourcePacketLoss": 57.3,
+        "destinationMOS": 50.6,
+        "destinationPacketLoss": 38.1
+      }
+    },
+    "pune-bangalore": {
+      "id": "pune-bangalore",
+      "sourceId": "pune",
+      "destinationId": "bangalore",
+      "forwardPath": {
+        "mosPercentage": 46,
+        "packetLossPercentage": 43.9,
+        "streamCount": 20506,
+        "impactPercentage": 75
+      },
+      "returnPath": {
+        "mosPercentage": 80,
+        "streamCount": 6151,
+        "impactPercentage": 39
+      },
+      "analysis": {
+        "impactedStreamsPercentage": 79,
+        "sourceToDestPercentage": 14,
+        "overlapAnalysis": "It's inconclusive whether the streams impacted from Pune are the same streams impacted at Bangalore."
+      },
+      "additionalStats": {
+        "sourceMOS": 54.8,
+        "sourcePacketLoss": 43.2,
+        "destinationMOS": 64.2,
+        "destinationPacketLoss": 30.5
+      }
+    },
+    "pune-california": {
+      "id": "pune-california",
+      "sourceId": "pune",
+      "destinationId": "california",
+      "forwardPath": {
+        "mosPercentage": 42,
+        "packetLossPercentage": 58.3,
+        "streamCount": 44889,
+        "impactPercentage": 88
+      },
+      "returnPath": {
+        "mosPercentage": 91,
+        "streamCount": 8977,
+        "impactPercentage": 52
+      },
+      "analysis": {
+        "impactedStreamsPercentage": 74,
+        "sourceToDestPercentage": 12,
+        "overlapAnalysis": "It's inconclusive whether the streams impacted from Pune are the same streams impacted at California."
+      },
+      "additionalStats": {
+        "sourceMOS": 62.3,
+        "sourcePacketLoss": 42.2,
+        "destinationMOS": 50,
+        "destinationPacketLoss": 21.1
+      }
+    },
+    "pune-seattle": {
+      "id": "pune-seattle",
+      "sourceId": "pune",
+      "destinationId": "seattle",
+      "forwardPath": {
+        "mosPercentage": 37,
+        "packetLossPercentage": 60.4,
+        "streamCount": 25647,
+        "impactPercentage": 74
+      },
+      "returnPath": {
+        "mosPercentage": 80,
+        "streamCount": 2564,
+        "impactPercentage": 50
+      },
+      "analysis": {
+        "impactedStreamsPercentage": 91,
+        "sourceToDestPercentage": 17,
+        "overlapAnalysis": "It's inconclusive whether the streams impacted from Pune are the same streams impacted at Seattle."
+      },
+      "additionalStats": {
+        "sourceMOS": 48.5,
+        "sourcePacketLoss": 45.2,
+        "destinationMOS": 58.3,
+        "destinationPacketLoss": 12
+      }
+    },
+    "pune-mumbai": {
+      "id": "pune-mumbai",
+      "sourceId": "pune",
+      "destinationId": "mumbai",
+      "forwardPath": {
+        "mosPercentage": 52,
+        "packetLossPercentage": 63.7,
+        "streamCount": 52442,
+        "impactPercentage": 70
+      },
+      "returnPath": {
+        "mosPercentage": 55,
+        "streamCount": 15732,
+        "impactPercentage": 58
+      },
+      "analysis": {
+        "impactedStreamsPercentage": 83,
+        "sourceToDestPercentage": 12,
+        "overlapAnalysis": "It's inconclusive whether the streams impacted from Pune are the same streams impacted at Mumbai."
+      },
+      "additionalStats": {
+        "sourceMOS": 55.9,
+        "sourcePacketLoss": 45.9,
+        "destinationMOS": 45.5,
+        "destinationPacketLoss": 27.4
+      }
+    },
+    "berlin-denver": {
+      "id": "berlin-denver",
+      "sourceId": "berlin",
+      "destinationId": "denver",
+      "forwardPath": {
+        "mosPercentage": 35,
+        "packetLossPercentage": 53.8,
+        "streamCount": 24170,
+        "impactPercentage": 68
+      },
+      "returnPath": {
+        "mosPercentage": 82,
+        "streamCount": 7251,
+        "impactPercentage": 54
+      },
+      "analysis": {
+        "impactedStreamsPercentage": 94,
+        "sourceToDestPercentage": 9,
+        "overlapAnalysis": "It's inconclusive whether the streams impacted from Berlin are the same streams impacted at Denver."
+      },
+      "additionalStats": {
+        "sourceMOS": 61.7,
+        "sourcePacketLoss": 32,
+        "destinationMOS": 46.1,
+        "destinationPacketLoss": 37
+      }
+    },
+    "berlin-pune": {
+      "id": "berlin-pune",
+      "sourceId": "berlin",
+      "destinationId": "pune",
+      "forwardPath": {
+        "mosPercentage": 49,
+        "packetLossPercentage": 61.2,
+        "streamCount": 18974,
         "impactPercentage": 82
       },
       "returnPath": {
-        "mosPercentage": 88,
-        "streamCount": 6500,
-        "impactPercentage": 46
+        "mosPercentage": 53,
+        "streamCount": 1897,
+        "impactPercentage": 58
+      },
+      "analysis": {
+        "impactedStreamsPercentage": 91,
+        "sourceToDestPercentage": 17,
+        "overlapAnalysis": "It's inconclusive whether the streams impacted from Berlin are the same streams impacted at Pune."
+      },
+      "additionalStats": {
+        "sourceMOS": 51.7,
+        "sourcePacketLoss": 59.3,
+        "destinationMOS": 53.6,
+        "destinationPacketLoss": 15.4
+      }
+    },
+    "berlin-newYork": {
+      "id": "berlin-newYork",
+      "sourceId": "berlin",
+      "destinationId": "newYork",
+      "forwardPath": {
+        "mosPercentage": 38,
+        "packetLossPercentage": 50.7,
+        "streamCount": 49619,
+        "impactPercentage": 78
+      },
+      "returnPath": {
+        "mosPercentage": 54,
+        "streamCount": 9923,
+        "impactPercentage": 30
+      },
+      "analysis": {
+        "impactedStreamsPercentage": 86,
+        "sourceToDestPercentage": 9,
+        "overlapAnalysis": "It's inconclusive whether the streams impacted from Berlin are the same streams impacted at New York."
+      },
+      "additionalStats": {
+        "sourceMOS": 50.5,
+        "sourcePacketLoss": 46.7,
+        "destinationMOS": 40.7,
+        "destinationPacketLoss": 32.8
+      }
+    },
+    "berlin-bangalore": {
+      "id": "berlin-bangalore",
+      "sourceId": "berlin",
+      "destinationId": "bangalore",
+      "forwardPath": {
+        "mosPercentage": 43,
+        "packetLossPercentage": 52,
+        "streamCount": 13873,
+        "impactPercentage": 68
+      },
+      "returnPath": {
+        "mosPercentage": 73,
+        "streamCount": 4161,
+        "impactPercentage": 51
+      },
+      "analysis": {
+        "impactedStreamsPercentage": 83,
+        "sourceToDestPercentage": 17,
+        "overlapAnalysis": "It's inconclusive whether the streams impacted from Berlin are the same streams impacted at Bangalore."
+      },
+      "additionalStats": {
+        "sourceMOS": 58.7,
+        "sourcePacketLoss": 50.4,
+        "destinationMOS": 40.3,
+        "destinationPacketLoss": 36.7
+      }
+    },
+    "berlin-california": {
+      "id": "berlin-california",
+      "sourceId": "berlin",
+      "destinationId": "california",
+      "forwardPath": {
+        "mosPercentage": 50,
+        "packetLossPercentage": 56.4,
+        "streamCount": 43175,
+        "impactPercentage": 90
+      },
+      "returnPath": {
+        "mosPercentage": 94,
+        "streamCount": 4317,
+        "impactPercentage": 38
+      },
+      "analysis": {
+        "impactedStreamsPercentage": 94,
+        "sourceToDestPercentage": 9,
+        "overlapAnalysis": "It's inconclusive whether the streams impacted from Berlin are the same streams impacted at California."
+      },
+      "additionalStats": {
+        "sourceMOS": 47.9,
+        "sourcePacketLoss": 39.7,
+        "destinationMOS": 54.6,
+        "destinationPacketLoss": 29.3
+      }
+    },
+    "berlin-seattle": {
+      "id": "berlin-seattle",
+      "sourceId": "berlin",
+      "destinationId": "seattle",
+      "forwardPath": {
+        "mosPercentage": 34,
+        "packetLossPercentage": 64.6,
+        "streamCount": 11873,
+        "impactPercentage": 74
+      },
+      "returnPath": {
+        "mosPercentage": 94,
+        "streamCount": 3561,
+        "impactPercentage": 30
+      },
+      "analysis": {
+        "impactedStreamsPercentage": 81,
+        "sourceToDestPercentage": 20,
+        "overlapAnalysis": "It's inconclusive whether the streams impacted from Berlin are the same streams impacted at Seattle."
+      },
+      "additionalStats": {
+        "sourceMOS": 57.1,
+        "sourcePacketLoss": 34.2,
+        "destinationMOS": 60,
+        "destinationPacketLoss": 11.4
+      }
+    },
+    "berlin-mumbai": {
+      "id": "berlin-mumbai",
+      "sourceId": "berlin",
+      "destinationId": "mumbai",
+      "forwardPath": {
+        "mosPercentage": 58,
+        "packetLossPercentage": 60.1,
+        "streamCount": 24935,
+        "impactPercentage": 73
+      },
+      "returnPath": {
+        "mosPercentage": 55,
+        "streamCount": 9974,
+        "impactPercentage": 34
+      },
+      "analysis": {
+        "impactedStreamsPercentage": 90,
+        "sourceToDestPercentage": 15,
+        "overlapAnalysis": "It's inconclusive whether the streams impacted from Berlin are the same streams impacted at Mumbai."
+      },
+      "additionalStats": {
+        "sourceMOS": 59.1,
+        "sourcePacketLoss": 59.1,
+        "destinationMOS": 57.8,
+        "destinationPacketLoss": 29.9
+      }
+    },
+    "newYork-denver": {
+      "id": "newYork-denver",
+      "sourceId": "newYork",
+      "destinationId": "denver",
+      "forwardPath": {
+        "mosPercentage": 51,
+        "packetLossPercentage": 48.5,
+        "streamCount": 44300,
+        "impactPercentage": 80
+      },
+      "returnPath": {
+        "mosPercentage": 84,
+        "streamCount": 13290,
+        "impactPercentage": 37
+      },
+      "analysis": {
+        "impactedStreamsPercentage": 67,
+        "sourceToDestPercentage": 18,
+        "overlapAnalysis": "It's inconclusive whether the streams impacted from New York are the same streams impacted at Denver."
+      },
+      "additionalStats": {
+        "sourceMOS": 62.3,
+        "sourcePacketLoss": 47.9,
+        "destinationMOS": 58.2,
+        "destinationPacketLoss": 26.6
+      }
+    },
+    "newYork-pune": {
+      "id": "newYork-pune",
+      "sourceId": "newYork",
+      "destinationId": "pune",
+      "forwardPath": {
+        "mosPercentage": 47,
+        "packetLossPercentage": 41.5,
+        "streamCount": 51123,
+        "impactPercentage": 89
+      },
+      "returnPath": {
+        "mosPercentage": 54,
+        "streamCount": 10224,
+        "impactPercentage": 31
+      },
+      "analysis": {
+        "impactedStreamsPercentage": 77,
+        "sourceToDestPercentage": 16,
+        "overlapAnalysis": "It's inconclusive whether the streams impacted from New York are the same streams impacted at Pune."
+      },
+      "additionalStats": {
+        "sourceMOS": 54.1,
+        "sourcePacketLoss": 47.9,
+        "destinationMOS": 59.7,
+        "destinationPacketLoss": 22.5
+      }
+    },
+    "newYork-berlin": {
+      "id": "newYork-berlin",
+      "sourceId": "newYork",
+      "destinationId": "berlin",
+      "forwardPath": {
+        "mosPercentage": 36,
+        "packetLossPercentage": 66.1,
+        "streamCount": 11640,
+        "impactPercentage": 88
+      },
+      "returnPath": {
+        "mosPercentage": 84,
+        "streamCount": 3492,
+        "impactPercentage": 49
+      },
+      "analysis": {
+        "impactedStreamsPercentage": 61,
+        "sourceToDestPercentage": 7,
+        "overlapAnalysis": "It's inconclusive whether the streams impacted from New York are the same streams impacted at Berlin."
+      },
+      "additionalStats": {
+        "sourceMOS": 57.8,
+        "sourcePacketLoss": 54.1,
+        "destinationMOS": 44.3,
+        "destinationPacketLoss": 24.7
+      }
+    },
+    "newYork-bangalore": {
+      "id": "newYork-bangalore",
+      "sourceId": "newYork",
+      "destinationId": "bangalore",
+      "forwardPath": {
+        "mosPercentage": 35,
+        "packetLossPercentage": 43.1,
+        "streamCount": 42765,
+        "impactPercentage": 79
+      },
+      "returnPath": {
+        "mosPercentage": 50,
+        "streamCount": 12829,
+        "impactPercentage": 35
+      },
+      "analysis": {
+        "impactedStreamsPercentage": 81,
+        "sourceToDestPercentage": 14,
+        "overlapAnalysis": "It's inconclusive whether the streams impacted from New York are the same streams impacted at Bangalore."
+      },
+      "additionalStats": {
+        "sourceMOS": 40.9,
+        "sourcePacketLoss": 41.5,
+        "destinationMOS": 53.4,
+        "destinationPacketLoss": 29.2
+      }
+    },
+    "newYork-california": {
+      "id": "newYork-california",
+      "sourceId": "newYork",
+      "destinationId": "california",
+      "forwardPath": {
+        "mosPercentage": 70,
+        "packetLossPercentage": 45.5,
+        "streamCount": 44814,
+        "impactPercentage": 80
+      },
+      "returnPath": {
+        "mosPercentage": 70,
+        "streamCount": 13444,
+        "impactPercentage": 30
+      },
+      "analysis": {
+        "impactedStreamsPercentage": 69,
+        "sourceToDestPercentage": 15,
+        "overlapAnalysis": "It's inconclusive whether the streams impacted from New York are the same streams impacted at California."
+      },
+      "additionalStats": {
+        "sourceMOS": 54.6,
+        "sourcePacketLoss": 41.9,
+        "destinationMOS": 42.2,
+        "destinationPacketLoss": 25.8
+      }
+    },
+    "newYork-seattle": {
+      "id": "newYork-seattle",
+      "sourceId": "newYork",
+      "destinationId": "seattle",
+      "forwardPath": {
+        "mosPercentage": 44,
+        "packetLossPercentage": 64.9,
+        "streamCount": 44892,
+        "impactPercentage": 88
+      },
+      "returnPath": {
+        "mosPercentage": 65,
+        "streamCount": 4489,
+        "impactPercentage": 31
+      },
+      "analysis": {
+        "impactedStreamsPercentage": 67,
+        "sourceToDestPercentage": 12,
+        "overlapAnalysis": "It's inconclusive whether the streams impacted from New York are the same streams impacted at Seattle."
+      },
+      "additionalStats": {
+        "sourceMOS": 61.1,
+        "sourcePacketLoss": 42.3,
+        "destinationMOS": 43.4,
+        "destinationPacketLoss": 35.7
+      }
+    },
+    "newYork-mumbai": {
+      "id": "newYork-mumbai",
+      "sourceId": "newYork",
+      "destinationId": "mumbai",
+      "forwardPath": {
+        "mosPercentage": 53,
+        "packetLossPercentage": 59,
+        "streamCount": 11037,
+        "impactPercentage": 94
+      },
+      "returnPath": {
+        "mosPercentage": 50,
+        "streamCount": 3311,
+        "impactPercentage": 39
+      },
+      "analysis": {
+        "impactedStreamsPercentage": 78,
+        "sourceToDestPercentage": 11,
+        "overlapAnalysis": "It's inconclusive whether the streams impacted from New York are the same streams impacted at Mumbai."
+      },
+      "additionalStats": {
+        "sourceMOS": 60.4,
+        "sourcePacketLoss": 54.1,
+        "destinationMOS": 50.5,
+        "destinationPacketLoss": 12.1
+      }
+    },
+    "bangalore-denver": {
+      "id": "bangalore-denver",
+      "sourceId": "bangalore",
+      "destinationId": "denver",
+      "forwardPath": {
+        "mosPercentage": 44,
+        "packetLossPercentage": 57.9,
+        "streamCount": 44874,
+        "impactPercentage": 85
+      },
+      "returnPath": {
+        "mosPercentage": 95,
+        "streamCount": 8974,
+        "impactPercentage": 59
+      },
+      "analysis": {
+        "impactedStreamsPercentage": 92,
+        "sourceToDestPercentage": 12,
+        "overlapAnalysis": "It's inconclusive whether the streams impacted from Bangalore are the same streams impacted at Denver."
+      },
+      "additionalStats": {
+        "sourceMOS": 54.5,
+        "sourcePacketLoss": 40.2,
+        "destinationMOS": 53.8,
+        "destinationPacketLoss": 29.6
+      }
+    },
+    "bangalore-pune": {
+      "id": "bangalore-pune",
+      "sourceId": "bangalore",
+      "destinationId": "pune",
+      "forwardPath": {
+        "mosPercentage": 51,
+        "packetLossPercentage": 46.4,
+        "streamCount": 45008,
+        "impactPercentage": 66
+      },
+      "returnPath": {
+        "mosPercentage": 95,
+        "streamCount": 18003,
+        "impactPercentage": 56
+      },
+      "analysis": {
+        "impactedStreamsPercentage": 84,
+        "sourceToDestPercentage": 11,
+        "overlapAnalysis": "It's inconclusive whether the streams impacted from Bangalore are the same streams impacted at Pune."
+      },
+      "additionalStats": {
+        "sourceMOS": 41.9,
+        "sourcePacketLoss": 55.2,
+        "destinationMOS": 55.3,
+        "destinationPacketLoss": 33.1
+      }
+    },
+    "bangalore-berlin": {
+      "id": "bangalore-berlin",
+      "sourceId": "bangalore",
+      "destinationId": "berlin",
+      "forwardPath": {
+        "mosPercentage": 41,
+        "packetLossPercentage": 67.6,
+        "streamCount": 40903,
+        "impactPercentage": 69
+      },
+      "returnPath": {
+        "mosPercentage": 83,
+        "streamCount": 12270,
+        "impactPercentage": 57
+      },
+      "analysis": {
+        "impactedStreamsPercentage": 61,
+        "sourceToDestPercentage": 6,
+        "overlapAnalysis": "It's inconclusive whether the streams impacted from Bangalore are the same streams impacted at Berlin."
+      },
+      "additionalStats": {
+        "sourceMOS": 46.1,
+        "sourcePacketLoss": 41.6,
+        "destinationMOS": 51.6,
+        "destinationPacketLoss": 20.2
+      }
+    },
+    "bangalore-newYork": {
+      "id": "bangalore-newYork",
+      "sourceId": "bangalore",
+      "destinationId": "newYork",
+      "forwardPath": {
+        "mosPercentage": 36,
+        "packetLossPercentage": 64.3,
+        "streamCount": 18039,
+        "impactPercentage": 61
+      },
+      "returnPath": {
+        "mosPercentage": 69,
+        "streamCount": 5411,
+        "impactPercentage": 30
+      },
+      "analysis": {
+        "impactedStreamsPercentage": 66,
+        "sourceToDestPercentage": 10,
+        "overlapAnalysis": "It's inconclusive whether the streams impacted from Bangalore are the same streams impacted at New York."
+      },
+      "additionalStats": {
+        "sourceMOS": 41.4,
+        "sourcePacketLoss": 32.6,
+        "destinationMOS": 61.2,
+        "destinationPacketLoss": 30
+      }
+    },
+    "bangalore-california": {
+      "id": "bangalore-california",
+      "sourceId": "bangalore",
+      "destinationId": "california",
+      "forwardPath": {
+        "mosPercentage": 44,
+        "packetLossPercentage": 50.5,
+        "streamCount": 26313,
+        "impactPercentage": 68
+      },
+      "returnPath": {
+        "mosPercentage": 70,
+        "streamCount": 2631,
+        "impactPercentage": 54
+      },
+      "analysis": {
+        "impactedStreamsPercentage": 85,
+        "sourceToDestPercentage": 9,
+        "overlapAnalysis": "It's inconclusive whether the streams impacted from Bangalore are the same streams impacted at California."
+      },
+      "additionalStats": {
+        "sourceMOS": 44.2,
+        "sourcePacketLoss": 47.1,
+        "destinationMOS": 57.6,
+        "destinationPacketLoss": 39.3
+      }
+    },
+    "bangalore-seattle": {
+      "id": "bangalore-seattle",
+      "sourceId": "bangalore",
+      "destinationId": "seattle",
+      "forwardPath": {
+        "mosPercentage": 45,
+        "packetLossPercentage": 48.1,
+        "streamCount": 16838,
+        "impactPercentage": 91
+      },
+      "returnPath": {
+        "mosPercentage": 89,
+        "streamCount": 1683,
+        "impactPercentage": 56
+      },
+      "analysis": {
+        "impactedStreamsPercentage": 71,
+        "sourceToDestPercentage": 13,
+        "overlapAnalysis": "It's inconclusive whether the streams impacted from Bangalore are the same streams impacted at Seattle."
+      },
+      "additionalStats": {
+        "sourceMOS": 54,
+        "sourcePacketLoss": 34.2,
+        "destinationMOS": 46.5,
+        "destinationPacketLoss": 21.5
+      }
+    },
+    "bangalore-mumbai": {
+      "id": "bangalore-mumbai",
+      "sourceId": "bangalore",
+      "destinationId": "mumbai",
+      "forwardPath": {
+        "mosPercentage": 69,
+        "packetLossPercentage": 56.3,
+        "streamCount": 17854,
+        "impactPercentage": 76
+      },
+      "returnPath": {
+        "mosPercentage": 95,
+        "streamCount": 3570,
+        "impactPercentage": 39
+      },
+      "analysis": {
+        "impactedStreamsPercentage": 68,
+        "sourceToDestPercentage": 20,
+        "overlapAnalysis": "It's inconclusive whether the streams impacted from Bangalore are the same streams impacted at Mumbai."
+      },
+      "additionalStats": {
+        "sourceMOS": 49.7,
+        "sourcePacketLoss": 55.8,
+        "destinationMOS": 61.6,
+        "destinationPacketLoss": 32.6
+      }
+    },
+    "california-denver": {
+      "id": "california-denver",
+      "sourceId": "california",
+      "destinationId": "denver",
+      "forwardPath": {
+        "mosPercentage": 66,
+        "packetLossPercentage": 50.8,
+        "streamCount": 15660,
+        "impactPercentage": 77
+      },
+      "returnPath": {
+        "mosPercentage": 59,
+        "streamCount": 4698,
+        "impactPercentage": 37
       },
       "analysis": {
         "impactedStreamsPercentage": 82,
-        "sourceToDestPercentage": 9,
-        "overlapAnalysis": "Analysis pending for Mumbai route impact correlation."
+        "sourceToDestPercentage": 10,
+        "overlapAnalysis": "It's inconclusive whether the streams impacted from California are the same streams impacted at Denver."
       },
       "additionalStats": {
-        "sourceMOS": 56.9,
-        "sourcePacketLoss": 55,
-        "destinationMOS": 56,
-        "destinationPacketLoss": 29
+        "sourceMOS": 58.7,
+        "sourcePacketLoss": 55.6,
+        "destinationMOS": 64.1,
+        "destinationPacketLoss": 34.8
+      }
+    },
+    "california-pune": {
+      "id": "california-pune",
+      "sourceId": "california",
+      "destinationId": "pune",
+      "forwardPath": {
+        "mosPercentage": 47,
+        "packetLossPercentage": 54.6,
+        "streamCount": 36666,
+        "impactPercentage": 80
+      },
+      "returnPath": {
+        "mosPercentage": 61,
+        "streamCount": 3666,
+        "impactPercentage": 42
+      },
+      "analysis": {
+        "impactedStreamsPercentage": 77,
+        "sourceToDestPercentage": 15,
+        "overlapAnalysis": "It's inconclusive whether the streams impacted from California are the same streams impacted at Pune."
+      },
+      "additionalStats": {
+        "sourceMOS": 45.5,
+        "sourcePacketLoss": 53.1,
+        "destinationMOS": 53.9,
+        "destinationPacketLoss": 12.6
+      }
+    },
+    "california-berlin": {
+      "id": "california-berlin",
+      "sourceId": "california",
+      "destinationId": "berlin",
+      "forwardPath": {
+        "mosPercentage": 41,
+        "packetLossPercentage": 63.2,
+        "streamCount": 27990,
+        "impactPercentage": 94
+      },
+      "returnPath": {
+        "mosPercentage": 74,
+        "streamCount": 5598,
+        "impactPercentage": 47
+      },
+      "analysis": {
+        "impactedStreamsPercentage": 66,
+        "sourceToDestPercentage": 10,
+        "overlapAnalysis": "It's inconclusive whether the streams impacted from California are the same streams impacted at Berlin."
+      },
+      "additionalStats": {
+        "sourceMOS": 52.5,
+        "sourcePacketLoss": 55.7,
+        "destinationMOS": 63.8,
+        "destinationPacketLoss": 22.6
+      }
+    },
+    "california-newYork": {
+      "id": "california-newYork",
+      "sourceId": "california",
+      "destinationId": "newYork",
+      "forwardPath": {
+        "mosPercentage": 46,
+        "packetLossPercentage": 42.2,
+        "streamCount": 47792,
+        "impactPercentage": 77
+      },
+      "returnPath": {
+        "mosPercentage": 73,
+        "streamCount": 14337,
+        "impactPercentage": 58
+      },
+      "analysis": {
+        "impactedStreamsPercentage": 70,
+        "sourceToDestPercentage": 5,
+        "overlapAnalysis": "It's inconclusive whether the streams impacted from California are the same streams impacted at New York."
+      },
+      "additionalStats": {
+        "sourceMOS": 45.5,
+        "sourcePacketLoss": 45.1,
+        "destinationMOS": 58.5,
+        "destinationPacketLoss": 22.6
+      }
+    },
+    "california-bangalore": {
+      "id": "california-bangalore",
+      "sourceId": "california",
+      "destinationId": "bangalore",
+      "forwardPath": {
+        "mosPercentage": 55,
+        "packetLossPercentage": 46.4,
+        "streamCount": 40360,
+        "impactPercentage": 95
+      },
+      "returnPath": {
+        "mosPercentage": 71,
+        "streamCount": 4036,
+        "impactPercentage": 30
+      },
+      "analysis": {
+        "impactedStreamsPercentage": 70,
+        "sourceToDestPercentage": 18,
+        "overlapAnalysis": "It's inconclusive whether the streams impacted from California are the same streams impacted at Bangalore."
+      },
+      "additionalStats": {
+        "sourceMOS": 63.6,
+        "sourcePacketLoss": 39.8,
+        "destinationMOS": 46.5,
+        "destinationPacketLoss": 17.9
+      }
+    },
+    "california-seattle": {
+      "id": "california-seattle",
+      "sourceId": "california",
+      "destinationId": "seattle",
+      "forwardPath": {
+        "mosPercentage": 66,
+        "packetLossPercentage": 67.2,
+        "streamCount": 20938,
+        "impactPercentage": 79
+      },
+      "returnPath": {
+        "mosPercentage": 88,
+        "streamCount": 4187,
+        "impactPercentage": 60
+      },
+      "analysis": {
+        "impactedStreamsPercentage": 95,
+        "sourceToDestPercentage": 12,
+        "overlapAnalysis": "It's inconclusive whether the streams impacted from California are the same streams impacted at Seattle."
+      },
+      "additionalStats": {
+        "sourceMOS": 64,
+        "sourcePacketLoss": 45.8,
+        "destinationMOS": 57.2,
+        "destinationPacketLoss": 27.4
+      }
+    },
+    "california-mumbai": {
+      "id": "california-mumbai",
+      "sourceId": "california",
+      "destinationId": "mumbai",
+      "forwardPath": {
+        "mosPercentage": 31,
+        "packetLossPercentage": 53.8,
+        "streamCount": 43392,
+        "impactPercentage": 66
+      },
+      "returnPath": {
+        "mosPercentage": 60,
+        "streamCount": 4339,
+        "impactPercentage": 43
+      },
+      "analysis": {
+        "impactedStreamsPercentage": 64,
+        "sourceToDestPercentage": 19,
+        "overlapAnalysis": "It's inconclusive whether the streams impacted from California are the same streams impacted at Mumbai."
+      },
+      "additionalStats": {
+        "sourceMOS": 42.2,
+        "sourcePacketLoss": 30.8,
+        "destinationMOS": 53.4,
+        "destinationPacketLoss": 35.8
+      }
+    },
+    "seattle-denver": {
+      "id": "seattle-denver",
+      "sourceId": "seattle",
+      "destinationId": "denver",
+      "forwardPath": {
+        "mosPercentage": 43,
+        "packetLossPercentage": 41.2,
+        "streamCount": 35280,
+        "impactPercentage": 89
+      },
+      "returnPath": {
+        "mosPercentage": 69,
+        "streamCount": 3528,
+        "impactPercentage": 33
+      },
+      "analysis": {
+        "impactedStreamsPercentage": 71,
+        "sourceToDestPercentage": 16,
+        "overlapAnalysis": "It's inconclusive whether the streams impacted from Seattle are the same streams impacted at Denver."
+      },
+      "additionalStats": {
+        "sourceMOS": 55.3,
+        "sourcePacketLoss": 30.3,
+        "destinationMOS": 54.6,
+        "destinationPacketLoss": 30.4
+      }
+    },
+    "seattle-pune": {
+      "id": "seattle-pune",
+      "sourceId": "seattle",
+      "destinationId": "pune",
+      "forwardPath": {
+        "mosPercentage": 50,
+        "packetLossPercentage": 42.8,
+        "streamCount": 48883,
+        "impactPercentage": 66
+      },
+      "returnPath": {
+        "mosPercentage": 54,
+        "streamCount": 4888,
+        "impactPercentage": 60
+      },
+      "analysis": {
+        "impactedStreamsPercentage": 88,
+        "sourceToDestPercentage": 9,
+        "overlapAnalysis": "It's inconclusive whether the streams impacted from Seattle are the same streams impacted at Pune."
+      },
+      "additionalStats": {
+        "sourceMOS": 62.3,
+        "sourcePacketLoss": 42.2,
+        "destinationMOS": 42.4,
+        "destinationPacketLoss": 16.3
+      }
+    },
+    "seattle-berlin": {
+      "id": "seattle-berlin",
+      "sourceId": "seattle",
+      "destinationId": "berlin",
+      "forwardPath": {
+        "mosPercentage": 40,
+        "packetLossPercentage": 51.1,
+        "streamCount": 27381,
+        "impactPercentage": 81
+      },
+      "returnPath": {
+        "mosPercentage": 51,
+        "streamCount": 2738,
+        "impactPercentage": 31
+      },
+      "analysis": {
+        "impactedStreamsPercentage": 72,
+        "sourceToDestPercentage": 14,
+        "overlapAnalysis": "It's inconclusive whether the streams impacted from Seattle are the same streams impacted at Berlin."
+      },
+      "additionalStats": {
+        "sourceMOS": 55.3,
+        "sourcePacketLoss": 47.2,
+        "destinationMOS": 59.1,
+        "destinationPacketLoss": 38.8
+      }
+    },
+    "seattle-newYork": {
+      "id": "seattle-newYork",
+      "sourceId": "seattle",
+      "destinationId": "newYork",
+      "forwardPath": {
+        "mosPercentage": 43,
+        "packetLossPercentage": 49.3,
+        "streamCount": 39980,
+        "impactPercentage": 95
+      },
+      "returnPath": {
+        "mosPercentage": 82,
+        "streamCount": 15992,
+        "impactPercentage": 30
+      },
+      "analysis": {
+        "impactedStreamsPercentage": 78,
+        "sourceToDestPercentage": 12,
+        "overlapAnalysis": "It's inconclusive whether the streams impacted from Seattle are the same streams impacted at New York."
+      },
+      "additionalStats": {
+        "sourceMOS": 40.4,
+        "sourcePacketLoss": 44.1,
+        "destinationMOS": 48.6,
+        "destinationPacketLoss": 35.5
+      }
+    },
+    "seattle-bangalore": {
+      "id": "seattle-bangalore",
+      "sourceId": "seattle",
+      "destinationId": "bangalore",
+      "forwardPath": {
+        "mosPercentage": 33,
+        "packetLossPercentage": 65.2,
+        "streamCount": 29764,
+        "impactPercentage": 81
+      },
+      "returnPath": {
+        "mosPercentage": 90,
+        "streamCount": 8929,
+        "impactPercentage": 47
+      },
+      "analysis": {
+        "impactedStreamsPercentage": 65,
+        "sourceToDestPercentage": 20,
+        "overlapAnalysis": "It's inconclusive whether the streams impacted from Seattle are the same streams impacted at Bangalore."
+      },
+      "additionalStats": {
+        "sourceMOS": 59.3,
+        "sourcePacketLoss": 45.3,
+        "destinationMOS": 44.6,
+        "destinationPacketLoss": 35.8
+      }
+    },
+    "seattle-california": {
+      "id": "seattle-california",
+      "sourceId": "seattle",
+      "destinationId": "california",
+      "forwardPath": {
+        "mosPercentage": 54,
+        "packetLossPercentage": 45.6,
+        "streamCount": 44381,
+        "impactPercentage": 66
+      },
+      "returnPath": {
+        "mosPercentage": 60,
+        "streamCount": 4438,
+        "impactPercentage": 37
+      },
+      "analysis": {
+        "impactedStreamsPercentage": 73,
+        "sourceToDestPercentage": 10,
+        "overlapAnalysis": "It's inconclusive whether the streams impacted from Seattle are the same streams impacted at California."
+      },
+      "additionalStats": {
+        "sourceMOS": 43.6,
+        "sourcePacketLoss": 30.5,
+        "destinationMOS": 45,
+        "destinationPacketLoss": 11.1
+      }
+    },
+    "seattle-mumbai": {
+      "id": "seattle-mumbai",
+      "sourceId": "seattle",
+      "destinationId": "mumbai",
+      "forwardPath": {
+        "mosPercentage": 49,
+        "packetLossPercentage": 50.5,
+        "streamCount": 40678,
+        "impactPercentage": 60
+      },
+      "returnPath": {
+        "mosPercentage": 71,
+        "streamCount": 8135,
+        "impactPercentage": 53
+      },
+      "analysis": {
+        "impactedStreamsPercentage": 80,
+        "sourceToDestPercentage": 15,
+        "overlapAnalysis": "It's inconclusive whether the streams impacted from Seattle are the same streams impacted at Mumbai."
+      },
+      "additionalStats": {
+        "sourceMOS": 63.1,
+        "sourcePacketLoss": 56.6,
+        "destinationMOS": 49.9,
+        "destinationPacketLoss": 19.4
+      }
+    },
+    "mumbai-denver": {
+      "id": "mumbai-denver",
+      "sourceId": "mumbai",
+      "destinationId": "denver",
+      "forwardPath": {
+        "mosPercentage": 39,
+        "packetLossPercentage": 58.1,
+        "streamCount": 40922,
+        "impactPercentage": 68
+      },
+      "returnPath": {
+        "mosPercentage": 78,
+        "streamCount": 4092,
+        "impactPercentage": 59
+      },
+      "analysis": {
+        "impactedStreamsPercentage": 89,
+        "sourceToDestPercentage": 8,
+        "overlapAnalysis": "It's inconclusive whether the streams impacted from Mumbai are the same streams impacted at Denver."
+      },
+      "additionalStats": {
+        "sourceMOS": 42.1,
+        "sourcePacketLoss": 44.5,
+        "destinationMOS": 56.3,
+        "destinationPacketLoss": 27.5
+      }
+    },
+    "mumbai-pune": {
+      "id": "mumbai-pune",
+      "sourceId": "mumbai",
+      "destinationId": "pune",
+      "forwardPath": {
+        "mosPercentage": 43,
+        "packetLossPercentage": 51.8,
+        "streamCount": 32714,
+        "impactPercentage": 94
+      },
+      "returnPath": {
+        "mosPercentage": 83,
+        "streamCount": 9814,
+        "impactPercentage": 33
+      },
+      "analysis": {
+        "impactedStreamsPercentage": 89,
+        "sourceToDestPercentage": 12,
+        "overlapAnalysis": "It's inconclusive whether the streams impacted from Mumbai are the same streams impacted at Pune."
+      },
+      "additionalStats": {
+        "sourceMOS": 49.7,
+        "sourcePacketLoss": 53.8,
+        "destinationMOS": 50.7,
+        "destinationPacketLoss": 10.5
+      }
+    },
+    "mumbai-berlin": {
+      "id": "mumbai-berlin",
+      "sourceId": "mumbai",
+      "destinationId": "berlin",
+      "forwardPath": {
+        "mosPercentage": 51,
+        "packetLossPercentage": 60.2,
+        "streamCount": 40058,
+        "impactPercentage": 70
+      },
+      "returnPath": {
+        "mosPercentage": 67,
+        "streamCount": 4005,
+        "impactPercentage": 40
+      },
+      "analysis": {
+        "impactedStreamsPercentage": 88,
+        "sourceToDestPercentage": 16,
+        "overlapAnalysis": "It's inconclusive whether the streams impacted from Mumbai are the same streams impacted at Berlin."
+      },
+      "additionalStats": {
+        "sourceMOS": 47.1,
+        "sourcePacketLoss": 51.8,
+        "destinationMOS": 47.4,
+        "destinationPacketLoss": 29.6
+      }
+    },
+    "mumbai-newYork": {
+      "id": "mumbai-newYork",
+      "sourceId": "mumbai",
+      "destinationId": "newYork",
+      "forwardPath": {
+        "mosPercentage": 31,
+        "packetLossPercentage": 45.7,
+        "streamCount": 10045,
+        "impactPercentage": 70
+      },
+      "returnPath": {
+        "mosPercentage": 90,
+        "streamCount": 4018,
+        "impactPercentage": 60
+      },
+      "analysis": {
+        "impactedStreamsPercentage": 93,
+        "sourceToDestPercentage": 18,
+        "overlapAnalysis": "It's inconclusive whether the streams impacted from Mumbai are the same streams impacted at New York."
+      },
+      "additionalStats": {
+        "sourceMOS": 59.2,
+        "sourcePacketLoss": 41.1,
+        "destinationMOS": 55.5,
+        "destinationPacketLoss": 33.1
+      }
+    },
+    "mumbai-bangalore": {
+      "id": "mumbai-bangalore",
+      "sourceId": "mumbai",
+      "destinationId": "bangalore",
+      "forwardPath": {
+        "mosPercentage": 58,
+        "packetLossPercentage": 60.6,
+        "streamCount": 21479,
+        "impactPercentage": 67
+      },
+      "returnPath": {
+        "mosPercentage": 57,
+        "streamCount": 8591,
+        "impactPercentage": 36
+      },
+      "analysis": {
+        "impactedStreamsPercentage": 78,
+        "sourceToDestPercentage": 9,
+        "overlapAnalysis": "It's inconclusive whether the streams impacted from Mumbai are the same streams impacted at Bangalore."
+      },
+      "additionalStats": {
+        "sourceMOS": 41.2,
+        "sourcePacketLoss": 47.3,
+        "destinationMOS": 56.3,
+        "destinationPacketLoss": 25.6
+      }
+    },
+    "mumbai-california": {
+      "id": "mumbai-california",
+      "sourceId": "mumbai",
+      "destinationId": "california",
+      "forwardPath": {
+        "mosPercentage": 40,
+        "packetLossPercentage": 51.8,
+        "streamCount": 19236,
+        "impactPercentage": 73
+      },
+      "returnPath": {
+        "mosPercentage": 82,
+        "streamCount": 3847,
+        "impactPercentage": 49
+      },
+      "analysis": {
+        "impactedStreamsPercentage": 73,
+        "sourceToDestPercentage": 18,
+        "overlapAnalysis": "It's inconclusive whether the streams impacted from Mumbai are the same streams impacted at California."
+      },
+      "additionalStats": {
+        "sourceMOS": 58.6,
+        "sourcePacketLoss": 53.2,
+        "destinationMOS": 56.7,
+        "destinationPacketLoss": 14.6
+      }
+    },
+    "mumbai-seattle": {
+      "id": "mumbai-seattle",
+      "sourceId": "mumbai",
+      "destinationId": "seattle",
+      "forwardPath": {
+        "mosPercentage": 36,
+        "packetLossPercentage": 58.4,
+        "streamCount": 13881,
+        "impactPercentage": 90
+      },
+      "returnPath": {
+        "mosPercentage": 64,
+        "streamCount": 1388,
+        "impactPercentage": 59
+      },
+      "analysis": {
+        "impactedStreamsPercentage": 74,
+        "sourceToDestPercentage": 18,
+        "overlapAnalysis": "It's inconclusive whether the streams impacted from Mumbai are the same streams impacted at Seattle."
+      },
+      "additionalStats": {
+        "sourceMOS": 47.3,
+        "sourcePacketLoss": 31.9,
+        "destinationMOS": 60.8,
+        "destinationPacketLoss": 24.5
       }
     }
   },
