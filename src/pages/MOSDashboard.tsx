@@ -150,7 +150,7 @@ const MOSDashboard: React.FC = () => {
             )}
             
             {/* Network Graph in bottom row - takes remaining height */}
-            <div className="flex-grow p-4">
+            <div className="flex-grow">
               {networkGraphProps && <MemoizedNetworkGraph {...networkGraphProps} />}
             </div>
           </div>

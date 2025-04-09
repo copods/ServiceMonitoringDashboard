@@ -24,7 +24,7 @@ const MOSDashboardHeader: React.FC<MOSDashboardHeaderProps> = ({
   const thickSeparatorClasses = "bg-white opacity-50 w-[1.5px] self-stretch";
 
   return (
-    <div className="relative border-b border-gray-700 py-2 px-4 text-white overflow-hidden">
+    <div className="relative border-b border-gray-700 py-3 pr-4 text-white overflow-hidden">
       {/* Background layers */}
       <div
         className="absolute inset-0 z-0"

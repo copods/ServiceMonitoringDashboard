@@ -46,7 +46,7 @@ const IssueDetailsBanner: React.FC<IssueDetailsBannerProps> = ({
 
   return (
     // Main container with padding and border
-    <div className="bg-white text-black py-3 px-6 border-b border-gray-200">
+    <div className="bg-white text-black py-3 pb-0 px-6">
       {/* Top Section: Title and Details */}
       <div className="mb-3">
         <h2 className="text-lg font-semibold text-gray-800 flex items-center">
