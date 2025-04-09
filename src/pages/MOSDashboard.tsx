@@ -84,8 +84,8 @@ const MOSDashboard: React.FC = () => {
     changeSourceLocation
   ]);
 
-  // Loading state handling
-  if (isLoading) {
+  // Loading state handling: Show full page spinner only on initial load
+  if (isLoading && !dashboardData) { // Only show full spinner if no data exists yet
     return (
       <div className="flex justify-center items-center h-screen bg-white">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>

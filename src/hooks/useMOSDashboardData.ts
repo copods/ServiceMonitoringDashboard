@@ -10,7 +10,8 @@ import {
   selectMOSIsRouteLoading,
   selectMOSError,
   selectSelectedRouteId,
-  selectSelectedSourceId, // Import new selector
+  selectSelectedSourceId,
+  setSelectedRouteIdAction, // Import new selector
   // setSelectedRouteIdAction // Potentially needed if we want instant UI feedback before fetch
 } from "store/slices/mosSlice";
 import { MosDashboardData, Location } from "types/mos"; // Keep type imports
@@ -67,11 +68,7 @@ export const useMOSDashboardData = (): UseMOSDashboardDataResult => {
     // The thunk's pending action will update selectedRouteId and isRouteLoading state.
     console.log("Dispatching fetchRouteDetailsById for:", routeId);
     dispatch(fetchRouteDetailsById(routeId));
-
-    // Optional: Dispatch an action immediately to update selectedRouteId in UI
-    // if you need instant feedback before the async operation starts/completes.
-    // The thunk already handles this in its pending state, so this might be redundant.
-    // dispatch(setSelectedRouteIdAction(routeId));
+    dispatch(setSelectedRouteIdAction(routeId));
 
   }, [dispatch, selectedRouteId, isRouteLoading]); // Add dependencies
 
