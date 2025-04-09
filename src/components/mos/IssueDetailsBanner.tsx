@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import SvgIcon from "components/common/SvgIcon";
+import SvgIcon from "components/common/SvgIcon"; // Assuming this path is correct
 
 interface IssueDetailsBannerProps {
   mainNode: string;
@@ -30,7 +30,6 @@ const IssueDetailsBanner: React.FC<IssueDetailsBannerProps> = ({
         setDropdownOpen(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
@@ -43,55 +42,52 @@ const IssueDetailsBanner: React.FC<IssueDetailsBannerProps> = ({
     onLocationChange(location);
     setDropdownOpen(false);
   };
+  const listIconName = "list"; // Example: Replace with your actual icon name for 'list'/'view'
 
   return (
+    // Main container with padding and border
     <div className="bg-white text-black py-3 px-6 border-b border-gray-200">
-      <div className="flex items-center justify-between">
-        {/* Left Side: Title and Details */}
-        <div>
-          <h2 className="text-lg font-semibold text-gray-800">
-            {degradationPercentage}% MoS Degradation leaving {mainNode}
-          </h2>
-          <div className="text-xs text-gray-500 mt-1">
-            Application: {application} | VLAN: {vlan} | Codec: {codec}
-          </div>
+      {/* Top Section: Title and Details */}
+      <div className="mb-3">
+        <h2 className="text-lg font-semibold text-gray-800 flex items-center">
+          {degradationPercentage}% MoS Degradation leaving {mainNode}
+        </h2>
+        <div className="text-xs text-gray-500 mt-1">
+          Application: {application} | VLAN: {vlan} | Codec: {codec}
         </div>
+      </div>
 
-        {/* Right Side: Sort Controls with Dropdown */}
-        <div className="flex items-center space-x-3 text-gray-600">
-          <button className="hover:text-black">
-            <SvgIcon name="sort-asc" size={16} />
+      {/* Bottom Section: Sort Controls with Dropdown */}
+      <div className="flex items-center space-x-3 text-gray-600">
+        <button className="hover:text-black">
+          <SvgIcon name={listIconName} size={16} />
+        </button>
+
+        {/* Dropdown Component */}
+        <div className="relative" ref={dropdownRef}>
+          <button
+            onClick={toggleDropdown}
+            className="flex items-center text-xs font-medium text-gray-700 px-2 py-1 border border-gray-300 rounded hover:bg-gray-50"
+          >
+            <span>Sort By: Impact from {mainNode}</span>
+            <SvgIcon name={dropdownOpen ? "chevron-up" : "chevron-down"} size={14} className="ml-1" />
           </button>
-          <button className="hover:text-black">
-            <SvgIcon name="list" size={16} />
-          </button>
-          
-          {/* Dropdown Component */}
-          <div className="relative" ref={dropdownRef}>
-            <button 
-              onClick={toggleDropdown}
-              className="flex items-center text-xs font-medium text-gray-700 px-2 py-1.5 border border-gray-300 rounded hover:bg-gray-50"
-            >
-              <span>Sort By: Impact from {mainNode}</span>
-              <SvgIcon name={dropdownOpen ? "chevron-up" : "chevron-down"} size={14} className="ml-1" />
-            </button>
-            
-            {dropdownOpen && (
-              <div className="absolute right-0 mt-1 w-48 bg-white rounded shadow-lg z-10 py-1 border border-gray-200">
-                {availableLocations.map((location) => (
-                  <button
-                    key={location}
-                    className={`block w-full text-left px-4 py-2 text-xs ${
-                      location === mainNode ? "bg-gray-100 font-medium" : "hover:bg-gray-50"
-                    }`}
-                    onClick={() => handleLocationSelect(location)}
-                  >
-                    Impact from {location}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+
+          {dropdownOpen && (
+            <div className="absolute left-0 mt-1 w-48 bg-white rounded shadow-lg z-10 py-1 border border-gray-200">
+              {availableLocations.map((location) => (
+                <button
+                  key={location}
+                  className={`block w-full text-left px-4 py-2 text-xs ${
+                    location === mainNode ? "bg-gray-100 font-medium" : "hover:bg-gray-50"
+                  }`}
+                  onClick={() => handleLocationSelect(location)}
+                >
+                  Impact from {location}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
