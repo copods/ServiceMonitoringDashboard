@@ -66,6 +66,7 @@ const IssueDetailsBanner: React.FC<IssueDetailsBannerProps> = ({
         {/* Dropdown Component */}
         <div className="relative" ref={dropdownRef}>
           <button
+            type="button" // Add type="button"
             onClick={toggleDropdown}
             className="flex items-center text-xs font-medium text-gray-700 px-2 py-1 border border-gray-300 rounded hover:bg-gray-50"
           >
@@ -77,6 +78,7 @@ const IssueDetailsBanner: React.FC<IssueDetailsBannerProps> = ({
             <div className="absolute left-0 mt-1 w-48 bg-white rounded shadow-lg z-10 py-1 border border-gray-200">
               {availableLocations.map((location) => (
                 <button
+                  type="button" // Add type="button"
                   key={location}
                   className={`block w-full text-left px-4 py-2 text-xs ${
                     location === mainNode ? "bg-gray-100 font-medium" : "hover:bg-gray-50"
