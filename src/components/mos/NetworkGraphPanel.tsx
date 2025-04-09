@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from "react";
+import React, { useMemo, useCallback, useRef, useEffect, useState } from "react";
 import * as d3 from "d3";
 import { Location, Route } from "types/mos"; // Adjust path if needed
 
@@ -12,28 +12,23 @@ interface NetworkGraphPanelProps {
 }
 
 // --- Constants for Layout and Styling ---
-const SVG_WIDTH = "100%"; // Use relative width
-const SVG_HEIGHT = 550; // Keep fixed height or adjust as needed
-const NODE_RADIUS = 28; // Slightly smaller
-const PROGRESS_RADIUS = 18; // Slightly smaller
-const PADDING_Y = 55; // Adjust vertical spacing
+// Fixed radius for nodes and progress indicators
+const DENVER_NODE_RADIUS = 32; // Larger radius for Denver node
+const NODE_RADIUS = 28; 
+const PROGRESS_RADIUS = 18;
 
-const CENTRAL_NODE_X = 80; // Adjusted position
-const CENTRAL_NODE_Y = SVG_HEIGHT / 2;
-
-const PROGRESS_X = 240; // Adjusted position
-const DEST_NODE_X = 400; // Adjusted position
-const TEXT_OFFSET_X = 10; // Space between node/progress and text
+// Minimum vertical spacing between destination nodes
+const MIN_VERTICAL_SPACING = 70; // Increased from previous calculation
 
 // Colors to match UI
 const DEFAULT_LINE_COLOR = "#cccccc";
-const SELECTED_LINE_COLOR = "#2563eb"; // Brighter Blue for selected
+const SELECTED_LINE_COLOR = "#0C6CA2"; // Brighter Blue for selected
 const PROGRESS_HIGH_COLOR = "#dc2626"; // Red-600
 const PROGRESS_LOW_COLOR = "#d1d5db"; // Gray-300
 const PROGRESS_BG_COLOR = "#f3f4f6"; // Gray-100
 const TEXT_COLOR = "#1f2937"; // Gray-800
 const NODE_STROKE_COLOR = "#9ca3af"; // Gray-400
-const SELECTED_NODE_STROKE_COLOR = "#2563eb"; // Brighter Blue
+const SELECTED_NODE_STROKE_COLOR = "#0C6CA2"; // Brighter Blue
 
 // --- D3 Arc Generators ---
 const arcGenerator = d3
@@ -63,72 +58,52 @@ const getCurvePath = (
   return `M ${startX} ${startY} C ${cp1X} ${startY}, ${cp2X} ${endY}, ${endX} ${endY}`;
 };
 
-// Updated Icon Path Generator
+// Updated Icon Path Generator with right-facing arrow pattern
 const getIconPath = (
   cx: number,
   cy: number,
   radius: number,
-  isCentral: boolean = false,
+  isDenver: boolean = false,
   isSelected: boolean = false,
 ): React.ReactNode => {
-  const iconColor = isCentral || isSelected ? SELECTED_NODE_STROKE_COLOR : "#6b7280"; // Gray-500 default
+  const iconColor = isDenver || isSelected ? SELECTED_NODE_STROKE_COLOR : "#6b7280"; // Gray-500 default
   const dotRadius = radius * 0.08;
-  const armLength = radius * 0.35;
-  const dotSpacing = radius * 0.6; // Distance of dots from center
-
-  // Central cross
-  const cross = (
-    <path
-      d={`M ${cx - armLength} ${cy} H ${cx + armLength} M ${cx} ${
-        cy - armLength
-      } V ${cy + armLength}`}
-      stroke={iconColor}
-      strokeWidth="1.5"
-      fill="none"
-    />
-  );
-
-  // Dots arranged horizontally for the arrow-like look
-  const dots = [];
-  const numDots = 5; // Example: 5 dots including center
-  const totalWidth = radius * 1.2; // Width spanned by dots
-  const startX = cx - totalWidth / 2;
-
-  for (let i = 0; i < numDots; i++) {
-    const dotX = startX + (i * totalWidth) / (numDots - 1);
-    // Central node dots are circular, destination dots are linear
-    if (isCentral) {
-      // Simple circular arrangement for central node
-      const angle = (i / numDots) * 2 * Math.PI + Math.PI / 4; // Offset start angle
-      dots.push(
-        <circle
-          key={`dot-${i}`}
-          cx={cx + Math.cos(angle) * dotSpacing}
-          cy={cy + Math.sin(angle) * dotSpacing}
-          r={dotRadius}
-          fill={iconColor}
-        />,
-      );
-    } else {
-      // Linear arrangement for destination nodes
-      dots.push(
-        <circle
-          key={`dot-${i}`}
-          cx={dotX}
-          cy={cy} // Align dots horizontally
-          r={dotRadius}
-          fill={iconColor}
-        />,
-      );
-    }
-  }
-
+  
+  // For all nodes, create a right-facing arrow exactly like the ASCII art
+  // Right-facing arrow pattern based on this ASCII art:
+  //     .
+  //     ..
+  // ........
+  //     ..
+  //     .
+  
+  // Calculate positions more precisely to match the ASCII art
+  const dotSpacing = radius * 0.15; // Closer spacing for a compact arrow
+  
   return (
     <g>
-      {/* Render cross only for central node in this style */}
-      {isCentral && cross}
-      {/* Render dots for all */}
-      {dots}
+      {/* Middle horizontal line - 7 dots in a row (removed the rightmost one) */}
+      <circle cx={cx - dotSpacing*3.5} cy={cy} r={dotRadius} fill={iconColor} />
+      <circle cx={cx - dotSpacing*2.5} cy={cy} r={dotRadius} fill={iconColor} />
+      <circle cx={cx - dotSpacing*1.5} cy={cy} r={dotRadius} fill={iconColor} />
+      <circle cx={cx - dotSpacing*0.5} cy={cy} r={dotRadius} fill={iconColor} />
+      <circle cx={cx + dotSpacing*0.5} cy={cy} r={dotRadius} fill={iconColor} />
+      <circle cx={cx + dotSpacing*1.5} cy={cy} r={dotRadius} fill={iconColor} />
+      <circle cx={cx + dotSpacing*2.5} cy={cy} r={dotRadius} fill={iconColor} />
+      
+      {/* Second row up - 2 dots */}
+      <circle cx={cx} cy={cy - dotSpacing} r={dotRadius} fill={iconColor} />
+      <circle cx={cx + dotSpacing} cy={cy - dotSpacing} r={dotRadius} fill={iconColor} />
+      
+      {/* Top row - 1 dot */}
+      <circle cx={cx} cy={cy - dotSpacing*2} r={dotRadius} fill={iconColor} />
+      
+      {/* Second row down - 2 dots */}
+      <circle cx={cx} cy={cy + dotSpacing} r={dotRadius} fill={iconColor} />
+      <circle cx={cx + dotSpacing} cy={cy + dotSpacing} r={dotRadius} fill={iconColor} />
+      
+      {/* Bottom row - 1 dot */}
+      <circle cx={cx} cy={cy + dotSpacing*2} r={dotRadius} fill={iconColor} />
     </g>
   );
 };
@@ -141,6 +116,82 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
   selectedRouteId,
   mainDegradationPercentage, // Use the prop
 }) => {
+  // Add a ref to the container element to measure its dimensions
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [containerDimensions, setContainerDimensions] = useState({ width: 0, height: 0 });
+  const [layoutPositions, setLayoutPositions] = useState({
+    centralNodeX: 80,
+    progressX: 240,
+    destNodeX: 400,
+    textOffsetX: 10,
+    svgHeight: 550,
+    centralNodeY: 275,
+    paddingY: MIN_VERTICAL_SPACING
+  });
+
+  // Effect to measure container dimensions and update positions
+  useEffect(() => {
+    const updateDimensions = () => {
+      if (containerRef.current) {
+        const width = containerRef.current.clientWidth;
+        const height = containerRef.current.clientHeight;
+        setContainerDimensions({ width, height });
+        
+        // Calculate responsive positions based on container dimensions
+        // These are relative positions that scale with the container
+        const centralX = Math.max(80, width * 0.15); // 15% from the left
+        const progressX = Math.max(240, width * 0.45); // 45% from the left
+        const destX = Math.max(400, width * 0.75); // 75% from the left
+        const textOffset = Math.max(10, width * 0.02); // 2% of width for text offset
+        
+        // Calculate vertical spacing based on container height and number of routes
+        const routeCount = routes.length || 1;
+        const calculatedHeight = Math.max(550, height); // Minimum height of 550px
+        const centralY = calculatedHeight / 2;
+        
+        // Enhanced padding calculation that ensures minimum spacing between nodes
+        // Calculate available height for all routes
+        const availableHeight = calculatedHeight * 0.6; // Use 60% of available height
+        
+        // Calculate required space for all routes with minimum spacing
+        const minRequiredHeight = (routeCount - 1) * MIN_VERTICAL_SPACING;
+        
+        // If there's enough room, distribute evenly; otherwise, use minimum spacing
+        let calculatedPaddingY;
+        
+        if (availableHeight >= minRequiredHeight && routeCount > 1) {
+          // If there's enough space, distribute routes evenly
+          calculatedPaddingY = availableHeight / (routeCount - 1);
+        } else {
+          // If there's not enough space or only one route, use minimum spacing
+          calculatedPaddingY = MIN_VERTICAL_SPACING;
+        }
+        
+        // Cap the padding to reasonable values
+        calculatedPaddingY = Math.min(Math.max(calculatedPaddingY, MIN_VERTICAL_SPACING), 100);
+        
+        setLayoutPositions({
+          centralNodeX: centralX,
+          progressX: progressX,
+          destNodeX: destX,
+          textOffsetX: textOffset,
+          svgHeight: calculatedHeight,
+          centralNodeY: centralY,
+          paddingY: calculatedPaddingY
+        });
+      }
+    };
+
+    // Initial update
+    updateDimensions();
+    
+    // Add resize listener
+    window.addEventListener('resize', updateDimensions);
+    
+    // Cleanup
+    return () => window.removeEventListener('resize', updateDimensions);
+  }, [routes.length]);
+
   // Optimize computation of sourceLocation
   const sourceLocation = useMemo(() => {
     if (!routes || routes.length === 0 || !locations) return null;
@@ -160,10 +211,24 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
 
   // Memoize route rendering logic to prevent recalculations on every render
   const routeElements = useMemo(() => {
-    if (!routes || routes.length === 0 || !sourceLocation) return [];
+    if (!routes || routes.length === 0 || !sourceLocation || containerDimensions.width === 0) return [];
+    
+    const { 
+      centralNodeX, 
+      progressX, 
+      destNodeX, 
+      textOffsetX, 
+      centralNodeY, 
+      paddingY 
+    } = layoutPositions;
     
     const totalDestinations = routes.length;
-    const startY = (SVG_HEIGHT - (totalDestinations - 1) * PADDING_Y) / 2;
+    
+    // Calculate total height needed for all routes
+    const totalRouteHeight = (totalDestinations - 1) * paddingY;
+    
+    // Calculate start Y position to center the routes vertically
+    const startY = centralNodeY - totalRouteHeight / 2;
     
     return routes.map((route, index) => {
       const destinationLocation = locations.find(
@@ -172,7 +237,7 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
       if (!destinationLocation) return null;
 
       const isSelected = route.id === selectedRouteId;
-      const destY = startY + index * PADDING_Y;
+      const destY = startY + index * paddingY;
       const progressY = destY;
 
       const lineColor = isSelected ? SELECTED_LINE_COLOR : DEFAULT_LINE_COLOR;
@@ -189,15 +254,15 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
       const backgroundArcPath = backgroundArcGenerator({} as any) ?? "";
 
       const linePathToProgress = getCurvePath(
-        CENTRAL_NODE_X + NODE_RADIUS * 0.7,
-        CENTRAL_NODE_Y,
-        PROGRESS_X - PROGRESS_RADIUS,
+        centralNodeX + DENVER_NODE_RADIUS, // Start exactly at the edge of the Denver node circle
+        centralNodeY,
+        progressX - PROGRESS_RADIUS,
         progressY,
       );
       const linePathToDest = getCurvePath(
-        PROGRESS_X + PROGRESS_RADIUS,
+        progressX + PROGRESS_RADIUS,
         progressY,
-        DEST_NODE_X - NODE_RADIUS,
+        destNodeX - NODE_RADIUS,
         destY,
       );
 
@@ -217,13 +282,13 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
           />
           <path
             d={linePathToDest}
-            stroke={DEFAULT_LINE_COLOR}
+            stroke={lineColor}
             strokeWidth="1"
             fill="none"
           />
 
           {/* Progress Indicator */}
-          <g transform={`translate(${PROGRESS_X}, ${progressY})`}>
+          <g transform={`translate(${progressX}, ${progressY})`}>
             <path d={backgroundArcPath} fill={PROGRESS_BG_COLOR} />
             <path d={progressArcPath} fill={progressColor} />
             <text
@@ -236,9 +301,11 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
               {progressPercent}%
             </text>
           </g>
+          
+          {/* Streams text - Positioned above the connecting line */}
           <text
-            x={PROGRESS_X + PROGRESS_RADIUS + TEXT_OFFSET_X / 2}
-            y={progressY}
+            x={progressX + PROGRESS_RADIUS + textOffsetX / 2}
+            y={progressY - 12} // Move up by 12 pixels to place above the line
             dominantBaseline="middle"
             fontSize="10"
             fill={TEXT_COLOR}
@@ -249,7 +316,7 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
           {/* Destination Node */}
           <g>
             <circle
-              cx={DEST_NODE_X}
+              cx={destNodeX}
               cy={destY}
               r={NODE_RADIUS}
               fill="white"
@@ -257,14 +324,14 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
               strokeWidth={nodeStrokeWidth}
             />
             {getIconPath(
-              DEST_NODE_X,
+              destNodeX,
               destY,
               NODE_RADIUS * 0.9,
               false,
               isSelected,
             )}
             <text
-              x={DEST_NODE_X + NODE_RADIUS + TEXT_OFFSET_X}
+              x={destNodeX + NODE_RADIUS + textOffsetX}
               y={destY - 4}
               dominantBaseline="middle"
               fontWeight="600"
@@ -274,7 +341,7 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
               {destinationLocation.name}
             </text>
             <text
-              x={DEST_NODE_X + NODE_RADIUS + TEXT_OFFSET_X}
+              x={destNodeX + NODE_RADIUS + textOffsetX}
               y={destY + 8}
               dominantBaseline="middle"
               fontSize="10"
@@ -286,32 +353,34 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
         </g>
       );
     });
-  }, [locations, routes, selectedRouteId, sourceLocation, createRouteClickHandler]); // Removed redundant onRouteSelected dependency
+  }, [locations, routes, selectedRouteId, sourceLocation, createRouteClickHandler, containerDimensions.width, layoutPositions]);
 
   // Memoize the central node to prevent recreation on every render
   const centralNode = useMemo(() => {
-    if (!sourceLocation) return null;
+    if (!sourceLocation || containerDimensions.width === 0) return null;
+    
+    const { centralNodeX, centralNodeY } = layoutPositions;
     
     return (
       <g>
         <circle
-          cx={CENTRAL_NODE_X}
-          cy={CENTRAL_NODE_Y}
-          r={NODE_RADIUS}
+          cx={centralNodeX}
+          cy={centralNodeY}
+          r={DENVER_NODE_RADIUS}
           fill="white"
           stroke={SELECTED_NODE_STROKE_COLOR} // Always blue outline for central
           strokeWidth="1.5"
         />
         {getIconPath(
-          CENTRAL_NODE_X,
-          CENTRAL_NODE_Y,
-          NODE_RADIUS * 0.9, // Icon size relative to node
+          centralNodeX,
+          centralNodeY,
+          DENVER_NODE_RADIUS * 0.9, // Icon size relative to node
           true,
           true, // Always treat central as 'selected' for icon color
         )}
         <text
-          x={CENTRAL_NODE_X}
-          y={CENTRAL_NODE_Y + NODE_RADIUS + 12} // Position text closer
+          x={centralNodeX}
+          y={centralNodeY + DENVER_NODE_RADIUS + 12} // Position text closer
           textAnchor="middle"
           fontWeight="600" // Semibold
           fontSize="11" // Smaller font
@@ -320,8 +389,8 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
           {sourceLocation.name}
         </text>
         <text
-          x={CENTRAL_NODE_X}
-          y={CENTRAL_NODE_Y + NODE_RADIUS + 24} // Position text below name
+          x={centralNodeX}
+          y={centralNodeY + DENVER_NODE_RADIUS + 24} // Position text below name
           textAnchor="middle"
           fontSize="10" // Even smaller font
           fill={TEXT_COLOR}
@@ -330,22 +399,23 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
         </text>
       </g>
     );
-  }, [sourceLocation, mainDegradationPercentage]);
+  }, [sourceLocation, mainDegradationPercentage, containerDimensions.width, layoutPositions]);
 
   return (
-    <svg
-      width={SVG_WIDTH}
-      height={SVG_HEIGHT}
-      viewBox={`0 0 ${500} ${SVG_HEIGHT}`}
-      preserveAspectRatio="xMidYMid meet"
-      style={{ fontFamily: "Arial, sans-serif", maxWidth: "500px" }}
-    >
-      {/* Central Node */}
-      {centralNode}
+    <div ref={containerRef} className="w-full h-full">
+      <svg
+        width="100%"
+        height="100%" 
+        preserveAspectRatio="xMidYMid meet"
+        style={{ fontFamily: "Arial, sans-serif" }}
+      >
+        {/* Central Node */}
+        {centralNode}
 
-      {/* Destination Nodes and Connections - use the memoized elements */}
-      {routeElements}
-    </svg>
+        {/* Destination Nodes and Connections - use the memoized elements */}
+        {routeElements}
+      </svg>
+    </div>
   );
 };
 
