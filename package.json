@@ -33,9 +33,9 @@
     "generate-mos-data": "node mock-server/data/mos-data.json",
     "generate-data": "npm run generate-dashboard-data && npm run generate-mos-data",
     "mock-server": "node mock-server/server.js",
-    "start-react": "react-scripts start",
-    "start": "npm-run-all --parallel start-react mock-server",
-    "dev": "npm run generate-data && npm-run-all --parallel start-react mock-server"
+    "start": "react-scripts start",
+    "start-with-mock-server": "npm-run-all --parallel start mock-server",
+    "dev-with-mock-server": "npm run generate-data && npm run start-with-mock-server"
   },
   "eslintConfig": {
     "extends": [

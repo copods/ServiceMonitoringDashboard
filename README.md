@@ -9,7 +9,7 @@ A real-time dashboard for monitoring service health and performance across multi
 - **Polar Visualization**: Analyze service health and importance with an interactive bubble chart
 - **Critical Services Monitoring**: Track the 6 most critical services with 24-hour activity visualization
 - **Service List**: Browse all services with detailed metrics and status indicators
-- **Real-Time Updates**: Receive live updates of service metrics via WebSocket connection
+- **Simulated Real-Time Updates**: Receive live updates of service metrics via built-in mock data generation
 - **Detailed Service View**: Drill down into detailed service information with performance charts
 
 ## Tech Stack
@@ -18,7 +18,7 @@ A real-time dashboard for monitoring service health and performance across multi
 - **State Management**: Redux with Redux Toolkit
 - **Data Visualization**: D3.js
 - **Styling**: TailwindCSS
-- **API Communication**: Axios for REST API, WebSocket for real-time updates
+- **Mock Data**: Built-in mock data generation for simulated real-time updates
 
 ## Getting Started
 
@@ -40,42 +40,27 @@ cd dashboard-app
 npm install
 ```
 
-3. Generate mock data (first time only):
-```bash
-npm run generate-mock-data
-```
-
 ### Available Scripts
 
 - **`npm start`**: Runs the app in development mode at [http://localhost:3000](http://localhost:3000)
 - **`npm run build`**: Builds the app for production to the `build` folder
 - **`npm test`**: Launches the test runner in interactive watch mode
-- **`npm run mock-api`**: Starts the mock REST API server on port 3001
-- **`npm run mock-ws`**: Starts the mock WebSocket server on port 3002
-- **`npm run mock-servers`**: Runs both mock servers simultaneously
-- **`npm run dev`**: Runs the development environment with mock servers
 
-### Recommended Development Workflow
+### Development Notes
 
-For the best development experience, use:
-```bash
-npm run dev
-```
-
-This command will:
-1. Generate mock data
-2. Start the React development server
-3. Start the mock REST API server
-4. Start the mock WebSocket server
+This application uses built-in mock data rather than external APIs:
+- All API endpoints are mocked internally
+- Real-time updates are simulated with 5-second intervals
+- No external server dependencies required
 
 ## Application Structure
 
 - **`src/components`**: UI components organized by function
 - **`src/store`**: Redux store configuration and slices
-- **`src/services`**: API and WebSocket service implementations
+- **`src/services`**: API service implementations and mock data
 - **`src/hooks`**: Custom React hooks
 - **`src/types`**: TypeScript type definitions
-- **`mock-server`**: Mock data generation and API/WebSocket servers
+- **`mock-server`**: Reference implementation (not required for running the app)
 
 ## Learn More
 

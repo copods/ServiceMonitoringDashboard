@@ -2,13 +2,13 @@ import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { store } from 'store';
-import socketService from 'services/socket/socketService';
+import mockSocketService from 'services/mock-data/mockSocketService';
 import MonitoringDashboard from 'pages/MonitoringDashboard';
 import MOSDashboard from 'pages/MOSDashboard';
 
 const App: React.FC = () => {
   useEffect(() => {
-    const cleanup = socketService.initialize(store.dispatch);
+    const cleanup = mockSocketService.initialize(store.dispatch);
     
     return cleanup;
   }, []);

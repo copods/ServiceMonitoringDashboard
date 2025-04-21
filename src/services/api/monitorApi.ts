@@ -1,28 +1,26 @@
-import axios from 'axios';
+// import axios from 'axios';
 import { Domain } from 'types/domain';
 import { Service } from 'types/service';
+import { getMockDomains, getMockServices, getMockServiceDetails } from '../mock-data/mockDataService';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+// Always use mock data regardless of environment
+// const USE_MOCK_DATA = true;
 
-const api = axios.create({
-  baseURL: API_URL,
-  headers: {
-    'Content-Type': 'application/json'
-  }
-});
-
+// // Only kept for potential future use
+// const API_URL = process.env.REACT_APP_API_URL || '';
+// const api = null; // Not initializing axios since we're always using mock data
 
 export const fetchDomains = async (): Promise<Domain[]> => {
-    const response = await api.get('/api/monitor/domains');
-    return response.data;
-  };
-  
-  export const fetchServices = async (): Promise<Service[]> => {
-    const response = await api.get('/api/monitor/services');
-    return response.data;
-  };
-  
-  export const fetchServiceDetails = async (serviceId: string): Promise<Service> => {
-    const response = await api.get(`/api/monitor/services/${serviceId}`);
-    return response.data;
-  };
+  console.log('Using mock data for domains');
+  return getMockDomains();
+};
+
+export const fetchServices = async (): Promise<Service[]> => {
+  console.log('Using mock data for services');
+  return getMockServices();
+};
+
+export const fetchServiceDetails = async (serviceId: string): Promise<Service> => {
+  console.log(`Using mock data for service details: ${serviceId}`);
+  return getMockServiceDetails(serviceId);
+};
