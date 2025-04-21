@@ -1,14 +1,17 @@
-import axios from 'axios';
+// import axios from 'axios';
 import { MosDashboardData, RouteDetails, HistoricalData } from 'types/mos';
+import { 
+  getMockMOSDashboardData, 
+  getMockRouteDetails, 
+  getMockHistoricalData 
+} from '../mock-data/mockDataService';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+// Always use mock data regardless of environment
+// const USE_MOCK_DATA = true;
 
-const api = axios.create({
-  baseURL: API_URL,
-  headers: {
-    'Content-Type': 'application/json'
-  }
-});
+// // Only kept for potential future use
+// const API_URL = process.env.REACT_APP_API_URL || '';
+// const api = null; // Not initializing axios since we're always using mock data
 
 /**
  * Fetches the MOS dashboard data including service info, issue details,
@@ -16,8 +19,8 @@ const api = axios.create({
  * @param sourceId The ID of the source location (optional, defaults to 'denver')
  */
 export const fetchMOSDashboardData = async (sourceId: string = 'denver'): Promise<MosDashboardData> => {
-  const response = await api.get(`/api/mos/dashboard?sourceId=${sourceId}`);
-  return response.data;
+  console.log(`Using mock data for MOS dashboard, source: ${sourceId}`);
+  return getMockMOSDashboardData(sourceId);
 };
 
 /**
@@ -25,8 +28,8 @@ export const fetchMOSDashboardData = async (sourceId: string = 'denver'): Promis
  * @param routeId The ID of the route to fetch details for
  */
 export const fetchRouteDetails = async (routeId: string): Promise<RouteDetails> => {
-  const response = await api.get(`/api/mos/route/${routeId}`);
-  return response.data;
+  console.log(`Using mock data for route details: ${routeId}`);
+  return getMockRouteDetails(routeId);
 };
 
 /**
@@ -38,9 +41,8 @@ export const fetchHistoricalData = async (
   routeId: string,
   sourceId: string = 'denver'
 ): Promise<HistoricalData[]> => {
-  // Add routeId and sourceId as query parameters
-  const response = await api.get(`/api/mos/historical?sourceId=${sourceId}&routeId=${routeId}`);
-  return response.data;
+  console.log(`Using mock data for historical data, route: ${routeId}, source: ${sourceId}`);
+  return getMockHistoricalData(routeId, sourceId);
 };
 
 /**
@@ -53,26 +55,19 @@ export const fetchCompleteMOSDashboardData = async (
   sourceId: string = 'denver',
   routeId?: string
 ): Promise<MosDashboardData> => {
-  // Fetch dashboard data for the specified source
-  const response = await api.get(`/api/mos/dashboard?sourceId=${sourceId}`);
-
-  // Initialize with empty historicalData - will be fetched when a route is selected
-  const dashboardData: MosDashboardData = {
-    ...response.data,
-    selectedRoute: null,
-    historicalData: response.data.historicalData || [], // Keep existing historical data
-    routeHistoricalData: {} // Initialize empty map for route-specific historical data
-  };
+  console.log(`Using mock data for complete MOS dashboard, source: ${sourceId}`);
+  let dashboardData = await getMockMOSDashboardData(sourceId);
 
   // If a routeId is provided, fetch its details
   if (routeId) {
     try {
-      const routeDetails = await fetchRouteDetails(routeId);
+      const routeDetails = await getMockRouteDetails(routeId);
       dashboardData.selectedRoute = routeDetails;
 
       // Also fetch historical data for the selected route
       try {
-        const historicalData = await fetchHistoricalData(routeId, sourceId);
+        const historicalData = await getMockHistoricalData(routeId, sourceId);
+        
         // Store this in both the backward-compatible location and the route-specific map
         dashboardData.historicalData = historicalData;
         if (!dashboardData.routeHistoricalData) dashboardData.routeHistoricalData = {};
