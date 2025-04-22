@@ -36,186 +36,206 @@ const PolarChart: React.FC<PolarChartProps> = ({
     y: 0,
     content: "",
   });
-  
+
   // Use refs to store previous positions for animations
-  const servicePositionsRef = useRef<Map<string, {
-    x: number, 
-    y: number, 
-    importance: number,
-    angle: number
-  }>>(new Map());
+  const servicePositionsRef = useRef<
+    Map<
+      string,
+      {
+        x: number;
+        y: number;
+        importance: number;
+        angle: number;
+      }
+    >
+  >(new Map());
   const animatingServicesRef = useRef<Set<string>>(new Set());
   const animationRequestRef = useRef<number | null>(null);
-  
+
   // Function references to avoid circular dependencies
   const updateSparkTrailRef = useRef<any>(null);
   const updateAnimatingServicesRef = useRef<any>(null);
-  
+
   // Function to create or update spark trail effect
-  const updateSparkTrail = useCallback((
-    svg: d3.Selection<SVGSVGElement, unknown, null, undefined>,
-    serviceId: string,
-    currentPos: {x: number, y: number},
-    startPos: {x: number, y: number},
-    progress: number,
-    isMovingToCenter: boolean
-  ) => {
-    // Calculate direction vector (from start to current)
-    const directionX = currentPos.x - startPos.x;
-    const directionY = currentPos.y - startPos.y;
-    const distance = Math.sqrt(directionX * directionX + directionY * directionY);
-    
-    // Skip if movement is too small
-    if (distance < 0.5) return;
-    
-    // Get the main chart group (first g element) - using any to avoid TypeScript errors with d3 selections
-    const chart = svg.select('g') as any;
-    
-    // Calculate normalized direction vector
-    const dirX = directionX / distance;
-    const dirY = directionY / distance;
-    
-    // Calculate trail length based on distance and animation progress
-    // More prominent trail for significant importance changes
-    const maxTrailLength = Math.min(35, distance * 0.9);
-    const trailLength = maxTrailLength * (1 - progress * 0.7);
-    
-    // Calculate trail start position (opposite to movement direction)
-    const trailStartX = currentPos.x - dirX * trailLength;
-    const trailStartY = currentPos.y - dirY * trailLength;
-    
-    // Select or create trail element
-    let trail = svg.select(`.spark-trail-${serviceId}`);
-    
-    if (trail.empty()) {
-      // Create trail group in main chart
-      trail = chart.append('g')
-        .attr('class', `spark-trail-${serviceId}`);
-        
-      // Create trail line
-      trail.append('line')
-        .attr('stroke', isMovingToCenter ? '#ffcc00' : '#3498db')
-        .attr('stroke-width', 2)
-        .attr('stroke-dasharray', '2,2');
-      
-      // Create trail particles
-      for (let i = 0; i < 3; i++) {
-        trail.append('circle')
-          .attr('class', `spark-particle-${i}`)
-          .attr('r', 1 + i * 0.5)
-          .attr('fill', isMovingToCenter ? '#ffcc00' : '#3498db')
-          .attr('opacity', 0.8 - i * 0.2);
+  const updateSparkTrail = useCallback(
+    (
+      svg: d3.Selection<SVGSVGElement, unknown, null, undefined>,
+      serviceId: string,
+      currentPos: { x: number; y: number },
+      startPos: { x: number; y: number },
+      progress: number,
+      isMovingToCenter: boolean
+    ) => {
+      // Calculate direction vector (from start to current)
+      const directionX = currentPos.x - startPos.x;
+      const directionY = currentPos.y - startPos.y;
+      const distance = Math.sqrt(
+        directionX * directionX + directionY * directionY
+      );
+
+      // Skip if movement is too small
+      if (distance < 0.5) return;
+
+      // Get the main chart group (first g element) - using any to avoid TypeScript errors with d3 selections
+      const chart = svg.select("g") as any;
+
+      // Calculate normalized direction vector
+      const dirX = directionX / distance;
+      const dirY = directionY / distance;
+
+      // Calculate trail length based on distance and animation progress
+      // More prominent trail for significant importance changes
+      const maxTrailLength = Math.min(35, distance * 0.9);
+      const trailLength = maxTrailLength * (1 - progress * 0.7);
+
+      // Calculate trail start position (opposite to movement direction)
+      const trailStartX = currentPos.x - dirX * trailLength;
+      const trailStartY = currentPos.y - dirY * trailLength;
+
+      // Select or create trail element
+      let trail = svg.select(`.spark-trail-${serviceId}`);
+
+      if (trail.empty()) {
+        // Create trail group in main chart
+        trail = chart.append("g").attr("class", `spark-trail-${serviceId}`);
+
+        // Create trail line
+        trail
+          .append("line")
+          .attr("stroke", isMovingToCenter ? "#ffcc00" : "#3498db")
+          .attr("stroke-width", 2)
+          .attr("stroke-dasharray", "2,2");
+
+        // Create trail particles
+        for (let i = 0; i < 3; i++) {
+          trail
+            .append("circle")
+            .attr("class", `spark-particle-${i}`)
+            .attr("r", 1 + i * 0.5)
+            .attr("fill", isMovingToCenter ? "#ffcc00" : "#3498db")
+            .attr("opacity", 0.8 - i * 0.2);
+        }
       }
-    }
-    
-    // Update trail line
-    trail.select('line')
-      .attr('x1', currentPos.x)
-      .attr('y1', currentPos.y)
-      .attr('x2', trailStartX)
-      .attr('y2', trailStartY)
-      .attr('opacity', 0.6 - progress * 0.6); // Fade out as animation progresses
-    
-    // Update trail particles
-    for (let i = 0; i < 3; i++) {
-      const particleProgress = Math.min(1, progress + i * 0.2);
-      const particleX = currentPos.x + (trailStartX - currentPos.x) * (i * 0.25 + 0.25);
-      const particleY = currentPos.y + (trailStartY - currentPos.y) * (i * 0.25 + 0.25);
-      
-      trail.select(`.spark-particle-${i}`)
-        .attr('cx', particleX)
-        .attr('cy', particleY)
-        .attr('opacity', Math.max(0, 0.7 - particleProgress * 0.7));
-    }
-    
-    // Remove trail when animation completes
-    if (progress >= 0.95) {
-      setTimeout(() => {
-        trail.remove();
-      }, 100);
-    }
-  }, []);
+
+      // Update trail line
+      trail
+        .select("line")
+        .attr("x1", currentPos.x)
+        .attr("y1", currentPos.y)
+        .attr("x2", trailStartX)
+        .attr("y2", trailStartY)
+        .attr("opacity", 0.6 - progress * 0.6); // Fade out as animation progresses
+
+      // Update trail particles
+      for (let i = 0; i < 3; i++) {
+        const particleProgress = Math.min(1, progress + i * 0.2);
+        const particleX =
+          currentPos.x + (trailStartX - currentPos.x) * (i * 0.25 + 0.25);
+        const particleY =
+          currentPos.y + (trailStartY - currentPos.y) * (i * 0.25 + 0.25);
+
+        trail
+          .select(`.spark-particle-${i}`)
+          .attr("cx", particleX)
+          .attr("cy", particleY)
+          .attr("opacity", Math.max(0, 0.7 - particleProgress * 0.7));
+      }
+
+      // Remove trail when animation completes
+      if (progress >= 0.95) {
+        setTimeout(() => {
+          trail.remove();
+        }, 100);
+      }
+    },
+    []
+  );
 
   // Store the function in ref to avoid circular dependencies
   updateSparkTrailRef.current = updateSparkTrail;
-  
+
   // Function to update animating services
   const updateAnimatingServices = useCallback(() => {
     if (!svgRef.current) return;
-    
+
     const svg = d3.select(svgRef.current);
     const radius = Math.min(width, height) / 2 - 16 - 10; // Same radius calculation as in chart
-    
+
     // For each animating service, update its position
-    animatingServicesRef.current.forEach(serviceId => {
-      const service = services.find(s => s.id === serviceId);
+    animatingServicesRef.current.forEach((serviceId) => {
+      const service = services.find((s) => s.id === serviceId);
       if (!service || !service.animatingImportance) {
         animatingServicesRef.current.delete(serviceId);
         return;
       }
-      
+
       // Get current time for animation progress calculation
       const now = Date.now();
       const animationStartTime = service.animationStartTime || now;
       const animationDuration = 2500; // 2.5 seconds for full animation to accommodate larger movements
       const elapsed = now - animationStartTime;
       const progress = Math.min(1, elapsed / animationDuration);
-      
+
       // Get previous position data
       const prevPosition = servicePositionsRef.current.get(serviceId);
       if (!prevPosition) return;
-      
+
       // If animation is complete
       if (progress >= 1) {
         animatingServicesRef.current.delete(serviceId);
         dispatch(completeServiceAnimation(serviceId));
-        
+
         // Remove any spark trails
         svg.select(`.spark-trail-${serviceId}`).remove();
         return;
       }
-      
+
       // Calculate new position based on importance
       const { angle } = prevPosition;
-      const prevImportance = service.previousImportance !== undefined ? service.previousImportance : prevPosition.importance;
+      const prevImportance =
+        service.previousImportance !== undefined
+          ? service.previousImportance
+          : prevPosition.importance;
       const newImportance = service.importance;
-      
+
       // Calculate distances using the same formula as the updated positioning logic
-      const prevDistanceFactor = Math.max(0.1, 1 - (prevImportance/100 * 0.9));
-      const newDistanceFactor = Math.max(0.1, 1 - (newImportance/100 * 0.9));
-      
+      const prevDistanceFactor = Math.max(
+        0.1,
+        1 - (prevImportance / 100) * 0.9
+      );
+      const newDistanceFactor = Math.max(0.1, 1 - (newImportance / 100) * 0.9);
+
       const prevDistance = radius * prevDistanceFactor;
       const newDistance = radius * newDistanceFactor;
-      const currentDistance = prevDistance + (newDistance - prevDistance) * progress;
-      
+      const currentDistance =
+        prevDistance + (newDistance - prevDistance) * progress;
+
       // Calculate new coordinates
       const currentX = currentDistance * Math.cos(angle);
       const currentY = currentDistance * Math.sin(angle);
-      
+
       // Update the service circle position
       const serviceNode = svg.select(`.service-${serviceId}`);
       if (!serviceNode.empty()) {
-        serviceNode
-          .attr("cx", currentX)
-          .attr("cy", currentY);
-          
+        serviceNode.attr("cx", currentX).attr("cy", currentY);
+
         // Update stored position for future animations
         if (progress >= 1) {
           servicePositionsRef.current.set(serviceId, {
             x: currentX,
             y: currentY,
             importance: newImportance,
-            angle
+            angle,
           });
         }
-        
+
         // Create or update spark trail effect using the ref
         if (updateSparkTrailRef.current) {
           updateSparkTrailRef.current(
-            svg, 
-            serviceId, 
-            { x: currentX, y: currentY }, 
-            { x: prevPosition.x, y: prevPosition.y }, 
+            svg,
+            serviceId,
+            { x: currentX, y: currentY },
+            { x: prevPosition.x, y: prevPosition.y },
             progress,
             newImportance > prevImportance
           );
@@ -223,20 +243,20 @@ const PolarChart: React.FC<PolarChartProps> = ({
       }
     });
   }, [width, height, services, dispatch]);
-  
+
   // Store the function in ref to avoid circular dependencies
   updateAnimatingServicesRef.current = updateAnimatingServices;
-  
+
   // Animation loop for service importance changes
   useEffect(() => {
-    const animatingServices = services.filter(s => s.animatingImportance);
-    
+    const animatingServices = services.filter((s) => s.animatingImportance);
+
     if (animatingServices.length > 0) {
       // Store IDs of animating services
       animatingServicesRef.current = new Set(
-        animatingServices.map(service => service.id)
+        animatingServices.map((service) => service.id)
       );
-      
+
       // Set up animation frame loop
       const animate = () => {
         // Continue animation if there are still animating services
@@ -248,10 +268,10 @@ const PolarChart: React.FC<PolarChartProps> = ({
           animationRequestRef.current = requestAnimationFrame(animate);
         }
       };
-      
+
       // Start animation loop
       animationRequestRef.current = requestAnimationFrame(animate);
-      
+
       return () => {
         // Clean up animation frame on unmount or when dependencies change
         if (animationRequestRef.current) {
@@ -283,7 +303,10 @@ const PolarChart: React.FC<PolarChartProps> = ({
       .attr("transform", `translate(${centerX}, ${centerY})`);
 
     // Create pie layout with domain sizes proportional to service counts
-    const pie = d3.pie<Domain>().value((d) => d.totalServices).sort(null);
+    const pie = d3
+      .pie<Domain>()
+      .value((d) => d.totalServices)
+      .sort(null);
 
     const pieData = pie(domains);
 
@@ -304,25 +327,25 @@ const PolarChart: React.FC<PolarChartProps> = ({
       .attr("fill", (d, i) => (i % 2 === 0 ? "#23232B" : "#2E2F34"))
       .attr("stroke", "#333")
       .attr("stroke-width", 1.5);
-      
+
     // Add SVG filters for glow effect
     const defs = svg.append("defs");
-    const filter = defs.append("filter")
+    const filter = defs
+      .append("filter")
       .attr("id", "glow")
       .attr("x", "-50%")
       .attr("y", "-50%")
       .attr("width", "200%")
       .attr("height", "200%");
 
-    filter.append("feGaussianBlur")
+    filter
+      .append("feGaussianBlur")
       .attr("stdDeviation", "2.5")
       .attr("result", "coloredBlur");
 
     const feMerge = filter.append("feMerge");
-    feMerge.append("feMergeNode")
-      .attr("in", "coloredBlur");
-    feMerge.append("feMergeNode")
-      .attr("in", "SourceGraphic");
+    feMerge.append("feMergeNode").attr("in", "coloredBlur");
+    feMerge.append("feMergeNode").attr("in", "SourceGraphic");
 
     // Draw the main outer circle outline
     chart
@@ -379,14 +402,17 @@ const PolarChart: React.FC<PolarChartProps> = ({
       const paddingAngle = domainAngleRange * 0.05;
       const adjustedStartAngle = domainStartAngle + paddingAngle;
       const adjustedEndAngle = domainEndAngle - paddingAngle;
-      const adjustedAngleRange = Math.max(0, adjustedEndAngle - adjustedStartAngle);
+      const adjustedAngleRange = Math.max(
+        0,
+        adjustedEndAngle - adjustedStartAngle
+      );
 
       const random = mulberry32(parseInt(service.id, 16) + serviceIndex * 10);
 
       const importanceFactor = service.importance / 100;
       // Reversed logic: high importance (99%) should be closest to center
       // Allow services with very high importance to appear inside the red circle
-      const baseDistanceFactor = Math.max(0.1, 1 - (importanceFactor * 0.9)); // Higher importance = smaller distance factor
+      const baseDistanceFactor = Math.max(0.1, 1 - importanceFactor * 0.9); // Higher importance = smaller distance factor
       const randomizedDistanceFactor =
         baseDistanceFactor * (0.95 + random() * 0.1);
       // Allow services with very high importance to be positioned inside the red circle (removing the 1/3 minimum)
@@ -410,17 +436,17 @@ const PolarChart: React.FC<PolarChartProps> = ({
         service.status === "critical"
           ? "#F30030"
           : service.status === "warning"
-            ? "#FFCC00"
-            : "#4A4A52";
+          ? "#FFCC00"
+          : "#4A4A52";
 
       // Store initial position data for animations
       servicePositionsRef.current.set(service.id, {
         x,
         y,
         importance: service.importance,
-        angle: cartesianAngle // Store angle for animation calculations
+        angle: cartesianAngle, // Store angle for animation calculations
       });
-      
+
       const bubble = chart
         .append("circle")
         .attr("class", `service-${service.id}`) // Add class for targeting in animations
@@ -432,7 +458,7 @@ const PolarChart: React.FC<PolarChartProps> = ({
         .attr("stroke", "#333")
         .attr("stroke-width", 1)
         .style("cursor", "pointer");
-        
+
       // Add glow effect for animating services
       if (service.animatingImportance) {
         bubble.attr("filter", "url(#glow)");
@@ -450,7 +476,12 @@ const PolarChart: React.FC<PolarChartProps> = ({
           if (!svgRect) return;
           const mouseX = event.clientX - svgRect.left;
           const mouseY = event.clientY - svgRect.top;
-          setTooltip({ visible: true, x: mouseX, y: mouseY, content: tooltipContent });
+          setTooltip({
+            visible: true,
+            x: mouseX,
+            y: mouseY,
+            content: tooltipContent,
+          });
         })
         .on("mousemove", (event) => {
           const svgRect = svgRef.current?.getBoundingClientRect();
@@ -615,7 +646,6 @@ const PolarChart: React.FC<PolarChartProps> = ({
           .text(percentageLabels[i]);
       });
   }, [services, domains, width, height, onServiceSelect]);
-  
 
   return (
     <div className="relative">

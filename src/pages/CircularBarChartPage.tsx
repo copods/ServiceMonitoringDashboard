@@ -12,8 +12,8 @@ const CircularBarChartPage: React.FC = () => {
   const domains = useSelector((state: RootState) => state.domains);
   const domain = domains[0]; // Assuming you want to display the first domain
   const [containerSize, setContainerSize] = useState({
-    width: 700,
-    height: 500,
+    width: 600,
+    height: 400,
   });
   const containerRef = useRef<HTMLDivElement>(null);
   const service = services[0]; // Assuming you want to display the first service
@@ -23,8 +23,8 @@ const CircularBarChartPage: React.FC = () => {
       if (containerRef.current) {
         const { clientWidth, clientHeight } = containerRef.current;
         setContainerSize({
-          width: clientWidth * 0.8,
-          height: clientHeight * 0.8,
+          width: clientWidth * 0.7,
+          height: clientHeight * 0.7,
         });
       }
     };
@@ -50,7 +50,6 @@ const CircularBarChartPage: React.FC = () => {
       ref={containerRef}
       className="flex flex-col items-center justify-center w-full h-full p-4 bg-[#232429]"
     >
-      {/* <div className="bg-[#27282D] py-2 px-4 rounded shadow-md hover:shadow-lg transition-all"> */}
       <div className="flex justify-between items-start ">
         <div>
           <h3 className="text-l font-medium text-white mb-1 drop-shadow-sm">
