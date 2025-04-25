@@ -5,7 +5,6 @@ import { fetchCompleteMOSDashboardData, fetchRouteDetails, fetchHistoricalData }
 
 // Define the argument type for the thunk
 interface FetchInitialMOSDataArgs {
-  serviceName: string;
   sourceId: string;
   routeId?: string;
 }
@@ -15,10 +14,10 @@ export const fetchInitialMOSData = createAsyncThunk<
   MosDashboardData, // Return type on success
   FetchInitialMOSDataArgs, // Argument type (sourceId and optional routeId)
   { rejectValue: string } // Type for rejected action payload
->('mos/fetchInitialData', async ({ sourceId,serviceName, routeId }, { rejectWithValue }) => {
+>('mos/fetchInitialData', async ({ sourceId, routeId }, { rejectWithValue }) => {
   try {
     // Pass sourceId and optional routeId to the API call
-    const data = await fetchCompleteMOSDashboardData(sourceId,serviceName, routeId);
+    const data = await fetchCompleteMOSDashboardData(sourceId, routeId);
     if (!data) {
       throw new Error('No data received from API');
     }

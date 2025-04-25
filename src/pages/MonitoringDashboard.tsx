@@ -1,51 +1,29 @@
-import React, {
-  useEffect,
-  useState,
-  useCallback,
-  useMemo,
-  lazy,
-  Suspense,
-} from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { AppDispatch, RootState } from "store";
-import { updateTimestamp } from "store/slices/uiSlice";
-import { useDashboardData } from "hooks/useDashboardData";
-import { Service } from "types/service";
+import React, { useEffect, useState, useCallback, useMemo, lazy, Suspense } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from 'store';
+import { updateTimestamp } from 'store/slices/uiSlice';
+import { useDashboardData } from 'hooks/useDashboardData';
+import { Service } from 'types/service';
 
-import DashboardErrorState from "components/common/DashboardErrorState";
-import MonitoringDashboardLayout from "components/layout/MonitoringDashboardLayout";
-// import MOSDashboard from "./MOSDashboard";
+import DashboardErrorState from 'components/common/DashboardErrorState';
+import MonitoringDashboardLayout from 'components/layout/MonitoringDashboardLayout';
 
-const DomainOverview = lazy(
-  () => import("components/domain-section/DomainOverview")
-);
-const PolarChart = lazy(
-  () => import("components/charts/polar-chart/PolarChart")
-);
-const TopServicesGrid = lazy(
-  () => import("components/service-cards/TopServicesGrid")
-);
-const ServiceList = lazy(() => import("components/service-cards/ServiceList"));
-const ServiceDetailsModal = lazy(
-  () => import("components/modals/ServiceDetailsModal")
-);
+const DomainOverview = lazy(() => import('components/domain-section/DomainOverview'));
+const PolarChart = lazy(() => import('components/charts/polar-chart/PolarChart'));
+const TopServicesGrid = lazy(() => import('components/service-cards/TopServicesGrid'));
+const ServiceList = lazy(() => import('components/service-cards/ServiceList'));
+const ServiceDetailsModal = lazy(() => import('components/modals/ServiceDetailsModal'));
 
 const TIMESTAMP_UPDATE_INTERVAL = 60000;
 
-const LoadingFallback: React.FC = () => (
-  <div className="p-4 text-center">Loading...</div>
-);
+const LoadingFallback: React.FC = () => <div className="p-4 text-center">Loading...</div>;
 
 const MonitoringDashboard: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const domains = useSelector((state: RootState) => state.domains);
-  const { items: services, topCritical } = useSelector(
-    (state: RootState) => state.services
-  );
+  const { items: services, topCritical } = useSelector((state: RootState) => state.services);
   const { error: dataError, refetchData } = useDashboardData();
-  // Inside your component
-  const navigate = useNavigate();
+
   const [selectedService, setSelectedService] = useState<Service | null>(null);
 
   useEffect(() => {
@@ -56,28 +34,19 @@ const MonitoringDashboard: React.FC = () => {
     return () => clearInterval(intervalId);
   }, [dispatch]);
 
-  useEffect(() => {
-    if (selectedService) {
-      navigate("/mos");
+  const handleServiceSelect = useCallback((serviceId: string) => {
+    const service = services.find(s => s.id === serviceId);
+    if (service) {
+      setSelectedService(service);
     }
-  }, [selectedService, navigate]);
-
-  const handleServiceSelect = useCallback(
-    (serviceId: string) => {
-      const service = services.find((s) => s.id === serviceId);
-      if (service) {
-        setSelectedService(service);
-      }
-    },
-    [services]
-  );
+  }, [services]);
 
   const handleCloseModal = useCallback(() => {
     setSelectedService(null);
   }, []);
 
   const otherServices = useMemo(() => {
-    return services.filter((service) => !topCritical.includes(service.id));
+    return services.filter(service => !topCritical.includes(service.id));
   }, [services, topCritical]);
 
   if (dataError && services.length === 0) {
@@ -129,6 +98,16 @@ const MonitoringDashboard: React.FC = () => {
           />
         </Suspense>
       </div>
+
+      {selectedService && (
+        <Suspense fallback={<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"><LoadingFallback /></div>}>
+          <ServiceDetailsModal
+            service={selectedService}
+            domain={domains.find(d => d.id === selectedService.domainId)}
+            onClose={handleCloseModal}
+          />
+        </Suspense>
+      )}
     </MonitoringDashboardLayout>
   );
 };

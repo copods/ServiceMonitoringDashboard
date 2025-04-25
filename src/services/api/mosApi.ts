@@ -18,9 +18,9 @@ import {
  * locations and routes
  * @param sourceId The ID of the source location (optional, defaults to 'denver')
  */
-export const fetchMOSDashboardData = async (serviceName:string = "INload1", sourceId: string = 'denver'): Promise<MosDashboardData> => {
+export const fetchMOSDashboardData = async (sourceId: string = 'denver'): Promise<MosDashboardData> => {
   console.log(`Using mock data for MOS dashboard, source: ${sourceId}`);
-  return getMockMOSDashboardData(serviceName,sourceId);
+  return getMockMOSDashboardData(sourceId);
 };
 
 /**
@@ -53,11 +53,10 @@ export const fetchHistoricalData = async (
  */
 export const fetchCompleteMOSDashboardData = async (
   sourceId: string = 'denver',
-  serviceName: string = "INload1",
   routeId?: string
 ): Promise<MosDashboardData> => {
   console.log(`Using mock data for complete MOS dashboard, source: ${sourceId}`);
-  let dashboardData = await getMockMOSDashboardData(serviceName, sourceId);
+  let dashboardData = await getMockMOSDashboardData(sourceId);
 
   // If a routeId is provided, fetch its details
   if (routeId) {
