@@ -62,14 +62,11 @@ const CircularBarChartPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Chart container with padding to create space */}
-      {/* <div className="flex justify-center pl-2 pt-5"> */}
       <CircularBarChart
         hourlyData={service.hourlyData}
         width={containerSize.width}
         height={containerSize.height}
       />
-      {/* </div> */}
     </div>
   );
 };
