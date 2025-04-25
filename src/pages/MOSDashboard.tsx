@@ -36,7 +36,8 @@ const MOSDashboard: React.FC = () => {
       routes: dashboardData.routes,
       onRouteSelected: selectRoute,
       selectedRouteId,
-      mainDegradationPercentage: dashboardData.issueDetails?.degradationPercentage || 0
+      mainDegradationPercentage:
+        dashboardData.issueDetails?.degradationPercentage || 0,
     };
   }, [dashboardData, selectedRouteId, selectRoute]);
 
@@ -47,20 +48,24 @@ const MOSDashboard: React.FC = () => {
       routeDetails: dashboardData.selectedRoute,
       historicalData: historicalData, // Use route-specific historical data
       isHistoricalDataLoading, // Pass loading state to the component
-      sourceLocationName: locationsMap[dashboardData.selectedRoute.sourceId]?.name || dashboardData.selectedRoute.sourceId,
-      destinationLocationName: locationsMap[dashboardData.selectedRoute.destinationId]?.name || dashboardData.selectedRoute.destinationId,
+      sourceLocationName:
+        locationsMap[dashboardData.selectedRoute.sourceId]?.name ||
+        dashboardData.selectedRoute.sourceId,
+      destinationLocationName:
+        locationsMap[dashboardData.selectedRoute.destinationId]?.name ||
+        dashboardData.selectedRoute.destinationId,
     };
   }, [
     dashboardData?.selectedRoute,
     historicalData,
     isHistoricalDataLoading,
-    locationsMap
+    locationsMap,
   ]);
 
   // Header props
   const headerProps = useMemo(() => {
     return {
-      serviceName: dashboardData?.serviceInfo?.name || ''
+      serviceName: dashboardData?.serviceInfo?.name || "",
     };
   }, [dashboardData?.serviceInfo?.name]);
 
@@ -75,22 +80,25 @@ const MOSDashboard: React.FC = () => {
       codec: dashboardData.issueDetails.codec,
       availableLocations: availableLocationNames,
       onLocationChange: (locationName: string) => {
-        const location = Object.values(locationsMap).find(loc => loc.name === locationName);
+        const location = Object.values(locationsMap).find(
+          (loc) => loc.name === locationName
+        );
         if (location) {
           changeSourceLocation(location.id);
         }
-      }
+      },
     };
   }, [
     dashboardData?.issueDetails,
     selectedSourceId,
     availableLocationNames,
     locationsMap,
-    changeSourceLocation
+    changeSourceLocation,
   ]);
 
   // Loading state handling: Show full page spinner only on initial load
-  if (isLoading && !dashboardData) { // Only show full spinner if no data exists yet
+  if (isLoading && !dashboardData) {
+    // Only show full spinner if no data exists yet
     return (
       <div className="flex justify-center items-center h-screen bg-white">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
@@ -153,7 +161,9 @@ const MOSDashboard: React.FC = () => {
 
             {/* Network Graph in bottom row - takes remaining height */}
             <div className="flex-grow">
-              {networkGraphProps && <MemoizedNetworkGraph {...networkGraphProps} />}
+              {networkGraphProps && (
+                <MemoizedNetworkGraph {...networkGraphProps} />
+              )}
             </div>
           </div>
 
