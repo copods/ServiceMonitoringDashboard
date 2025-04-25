@@ -1,13 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Routes, Route } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { RootState } from "store";
 import MonitoringDashboard from "pages/MonitoringDashboard";
 import MOSDashboard from "pages/MOSDashboard";
-import { useDashboardData } from "./../hooks/useDashboardData";
-import DashboardErrorState from "./../components/common/DashboardErrorState";
 import PolarChartPage from "./../pages/PolarChartPage";
 import CircularBarChartPage from "./../pages/CircularBarChartPage";
+import NetworkGraphPage from "./../pages/NetworkGraphPage";
 
 const AppRoutes: React.FC = () => {
   return (
@@ -16,6 +13,7 @@ const AppRoutes: React.FC = () => {
       <Route path="/mos" element={<MOSDashboard />} />
       <Route path="/polar-chart" element={<PolarChartPage />} />
       <Route path="/circular-bar-chart" element={<CircularBarChartPage />} />
+      <Route path="/sankey-chart" element={<NetworkGraphPage />} />
     </Routes>
   );
 };
