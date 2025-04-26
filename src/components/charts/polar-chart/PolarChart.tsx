@@ -36,6 +36,7 @@ const PolarChart: React.FC<PolarChartProps> = ({
     y: 0,
     content: "",
   });
+  const hasAnimatedRef = useRef(false);
 
   // Use refs to store previous positions for animations
   const servicePositionsRef = useRef<
@@ -284,16 +285,20 @@ const PolarChart: React.FC<PolarChartProps> = ({
 
   // Main chart rendering
   useEffect(() => {
-    if (!svgRef.current || services.length === 0 || domains.length === 0)
+    if (
+      !svgRef.current ||
+      services.length === 0 ||
+      domains.length === 0 ||
+      hasAnimatedRef.current
+    )
       return;
 
     // Clear previous chart
     d3.select(svgRef.current).selectAll("*").remove();
 
     const svg = d3.select(svgRef.current);
-    // Adjusted radius calculation to leave more space for icons ON the border
-    const iconRadiusSize = 16; // Radius of the icon circle itself
-    const radius = Math.min(width, height) / 2 - iconRadiusSize - 10; // Ensure space for icons + padding
+    const iconRadiusSize = 16;
+    const radius = Math.min(width, height) / 2 - iconRadiusSize - 10;
     const centerX = width / 2;
     const centerY = height / 2;
 
@@ -316,59 +321,114 @@ const PolarChart: React.FC<PolarChartProps> = ({
       .innerRadius(0)
       .outerRadius(radius);
 
-    // Draw domain pie sections
-    chart
+    // Draw domain pie sections with animation
+    const domainSections = chart
       .selectAll(".domain-section")
       .data(pieData)
       .enter()
       .append("path")
       .attr("class", "domain-section")
-      .attr("d", arc)
       .attr("fill", (d, i) => (i % 2 === 0 ? "#23232B" : "#2E2F34"))
       .attr("stroke", "#333")
-      .attr("stroke-width", 1.5);
+      .attr("stroke-width", 1.5)
+      .attr("d", (d) => {
+        const arcGenerator = d3
+          .arc<d3.PieArcDatum<Domain>>()
+          .innerRadius(0)
+          .outerRadius(0)
+          .startAngle(d.startAngle)
+          .endAngle(d.endAngle);
+        return arcGenerator(d) || "";
+      });
 
-    // Add SVG filters for glow effect
-    const defs = svg.append("defs");
-    const filter = defs
-      .append("filter")
-      .attr("id", "glow")
-      .attr("x", "-50%")
-      .attr("y", "-50%")
-      .attr("width", "200%")
-      .attr("height", "200%");
+    // Animate domain sections
+    domainSections
+      .transition()
+      .duration(1000)
+      .attrTween("d", function (d) {
+        const interpolate = d3.interpolate(0, radius);
+        return function (t) {
+          const arcGenerator = d3
+            .arc<d3.PieArcDatum<Domain>>()
+            .innerRadius(0)
+            .outerRadius(interpolate(t))
+            .startAngle(d.startAngle)
+            .endAngle(d.endAngle);
+          return arcGenerator(d) || "";
+        };
+      });
 
-    filter
-      .append("feGaussianBlur")
-      .attr("stdDeviation", "2.5")
-      .attr("result", "coloredBlur");
-
-    const feMerge = filter.append("feMerge");
-    feMerge.append("feMergeNode").attr("in", "coloredBlur");
-    feMerge.append("feMergeNode").attr("in", "SourceGraphic");
-
-    // Draw the main outer circle outline
-    chart
+    // Draw the main outer circle outline with animation
+    const outerCircle = chart
       .append("circle")
-      .attr("r", radius)
+      .attr("r", 0)
       .attr("fill", "none")
       .attr("stroke", "#444")
       .attr("stroke-width", 1);
 
-    // Inner circles and percentage labels setup
+    outerCircle.transition().duration(1000).attr("r", radius);
+
+    // Draw inner circles with animation
     const innerCircleFactors = [1 / 3, 2 / 3];
     const percentageLabels = ["50%", "25%", "05%"];
     const labelPositions = [0.25, 0.5, 0.8];
 
-    // Draw inner circles
-    innerCircleFactors.forEach((factor, i) => {
-      chart
-        .append("circle")
-        .attr("r", radius * factor)
-        .attr("fill", "none")
-        .attr("stroke", i === 0 ? "#F30030" : "#444")
-        .attr("stroke-width", i === 0 ? 1.5 : 1);
-    });
+    const innerCircles = chart
+      .selectAll(".inner-circle")
+      .data(innerCircleFactors)
+      .enter()
+      .append("circle")
+      .attr("r", 0)
+      .attr("fill", "none")
+      .attr("stroke", (d, i) => (i === 0 ? "#F30030" : "#444"))
+      .attr("stroke-width", (d, i) => (i === 0 ? 1.5 : 1));
+
+    innerCircles
+      .transition()
+      .duration(1000)
+      .delay(1000)
+      .attr("r", (d) => radius * d);
+
+    // Add percentage labels with animation
+    const percentageLabelGroup = chart
+      .append("g")
+      .attr("class", "percentage-labels")
+      .raise();
+
+    percentageLabelGroup
+      .selectAll(".percentage-label")
+      .data(labelPositions)
+      .enter()
+      .append("g")
+      .attr("class", "percentage-label")
+      .attr("transform", (d) => `translate(0, ${-radius * d})`)
+      .each(function (d, i) {
+        const g = d3.select(this);
+        g.append("rect")
+          .attr("x", -20)
+          .attr("y", -12)
+          .attr("width", 40)
+          .attr("height", 24)
+          .attr("fill", "#1A1B20")
+          .attr("rx", 4)
+          .attr("opacity", 0)
+          .transition()
+          .duration(1000)
+          .delay(2000)
+          .attr("opacity", 0.85);
+
+        g.append("text")
+          .attr("text-anchor", "middle")
+          .attr("dominant-baseline", "middle")
+          .attr("fill", "white")
+          .attr("font-size", "12px")
+          .attr("opacity", 0)
+          .text(percentageLabels[i])
+          .transition()
+          .duration(1000)
+          .delay(2000)
+          .attr("opacity", 1);
+      });
 
     // Domain lookup map
     const domainMap = new Map<
@@ -386,7 +446,10 @@ const PolarChart: React.FC<PolarChartProps> = ({
       }
     });
 
-    // Plot services
+    // Plot services with animation
+    const totalDelay = 3000; // Longer initial delay
+    const staggerDelay = 5; // Very short delay between points
+
     services.forEach((service, serviceIndex) => {
       const domainInfo = domainMap.get(service.domainId);
       if (!domainInfo) {
@@ -410,20 +473,17 @@ const PolarChart: React.FC<PolarChartProps> = ({
       const random = mulberry32(parseInt(service.id, 16) + serviceIndex * 10);
 
       const importanceFactor = service.importance / 100;
-      // Reversed logic: high importance (99%) should be closest to center
-      // Allow services with very high importance to appear inside the red circle
-      const baseDistanceFactor = Math.max(0.1, 1 - importanceFactor * 0.9); // Higher importance = smaller distance factor
+      const baseDistanceFactor = Math.max(0.1, 1 - importanceFactor * 0.9);
       const randomizedDistanceFactor =
         baseDistanceFactor * (0.95 + random() * 0.1);
-      // Allow services with very high importance to be positioned inside the red circle (removing the 1/3 minimum)
       const finalDistanceFactor = Math.max(
-        0.1, // Lower minimum to allow positioning inside red circle
+        0.1,
         Math.min(1, randomizedDistanceFactor)
       );
       const distance = radius * finalDistanceFactor;
 
       const randomAngle = adjustedStartAngle + random() * adjustedAngleRange;
-      const cartesianAngle = randomAngle - Math.PI / 2; // Angle correction
+      const cartesianAngle = randomAngle - Math.PI / 2;
 
       const x = distance * Math.cos(cartesianAngle);
       const y = distance * Math.sin(cartesianAngle);
@@ -439,6 +499,26 @@ const PolarChart: React.FC<PolarChartProps> = ({
           ? "#FFCC00"
           : "#4A4A52";
 
+      // Create service circle with initial size 0
+      const bubble = chart
+        .append("circle")
+        .attr("class", `service-${service.id}`)
+        .attr("cx", x)
+        .attr("cy", y)
+        .attr("r", 0)
+        .attr("fill", color)
+        .attr("opacity", 0.9)
+        .attr("stroke", "#333")
+        .attr("stroke-width", 1)
+        .style("cursor", "pointer");
+
+      // Animate service circle with staggered timing
+      bubble
+        .transition()
+        .duration(200) // Very short duration
+        .delay(totalDelay + serviceIndex * staggerDelay) // Staggered delay
+        .attr("r", size);
+
       // Store initial position data for animations
       servicePositionsRef.current.set(service.id, {
         x,
@@ -446,18 +526,6 @@ const PolarChart: React.FC<PolarChartProps> = ({
         importance: service.importance,
         angle: cartesianAngle, // Store angle for animation calculations
       });
-
-      const bubble = chart
-        .append("circle")
-        .attr("class", `service-${service.id}`) // Add class for targeting in animations
-        .attr("cx", x)
-        .attr("cy", y)
-        .attr("r", size)
-        .attr("fill", color)
-        .attr("opacity", 0.9)
-        .attr("stroke", "#333")
-        .attr("stroke-width", 1)
-        .style("cursor", "pointer");
 
       // Add glow effect for animating services
       if (service.animatingImportance) {
@@ -502,23 +570,19 @@ const PolarChart: React.FC<PolarChartProps> = ({
       }
     });
 
-    // --- Domain Icons ---
+    // Add Roman numeral labels after circles are drawn
     const domainIconPositions: { domain: Domain; x: number; y: number }[] = [];
     pieData.forEach((domainPie, i) => {
       const domain = domains[i];
       const midAngle = (domainPie.startAngle + domainPie.endAngle) / 2;
-
-      const iconPlacementRadius = radius; // Position icons exactly on the border
-
-      const cartesianMidAngle = midAngle - Math.PI / 2; // Angle correction
-
+      const iconPlacementRadius = radius;
+      const cartesianMidAngle = midAngle - Math.PI / 2;
       const x = iconPlacementRadius * Math.cos(cartesianMidAngle);
       const y = iconPlacementRadius * Math.sin(cartesianMidAngle);
-
       domainIconPositions.push({ domain, x, y });
     });
 
-    // Icons Layer
+    // Icons Layer with animation
     const iconsLayer = chart
       .append("g")
       .attr("class", "domain-icons-layer")
@@ -534,9 +598,14 @@ const PolarChart: React.FC<PolarChartProps> = ({
         .attr("r", iconRadiusSize)
         .attr("fill", "#232429")
         .attr("stroke", domain.colorCode)
-        .attr("stroke-width", 2);
+        .attr("stroke-width", 2)
+        .attr("opacity", 0)
+        .transition()
+        .duration(1000)
+        .delay(2000)
+        .attr("opacity", 1);
 
-      // Roman numeral text
+      // Roman numeral text with animation
       iconGroup
         .append("text")
         .attr("x", x)
@@ -546,10 +615,15 @@ const PolarChart: React.FC<PolarChartProps> = ({
         .attr("fill", domain.colorCode)
         .attr("font-size", "12px")
         .attr("font-weight", "bold")
+        .attr("opacity", 0)
         .text(() => {
           const match = domain.id.match(/\d+$/);
           return match ? toRoman(parseInt(match[0], 10)) : "?";
-        });
+        })
+        .transition()
+        .duration(1000)
+        .delay(2000)
+        .attr("opacity", 1);
     });
 
     // --- Legends ---
@@ -617,34 +691,7 @@ const PolarChart: React.FC<PolarChartProps> = ({
       .attr("dominant-baseline", "middle")
       .text("~10k reqs");
 
-    // --- Percentage Labels ---
-    chart
-      .append("g")
-      .attr("class", "percentage-labels")
-      .raise()
-      .selectAll(".percentage-label")
-      .data(labelPositions)
-      .enter()
-      .append("g")
-      .attr("class", "percentage-label")
-      .attr("transform", (d) => `translate(0, ${-radius * d})`)
-      .each(function (d, i) {
-        const g = d3.select(this);
-        g.append("rect")
-          .attr("x", -20)
-          .attr("y", -12)
-          .attr("width", 40)
-          .attr("height", 24)
-          .attr("fill", "#1A1B20")
-          .attr("rx", 4)
-          .attr("opacity", 0.85);
-        g.append("text")
-          .attr("text-anchor", "middle")
-          .attr("dominant-baseline", "middle")
-          .attr("fill", "white")
-          .attr("font-size", "12px")
-          .text(percentageLabels[i]);
-      });
+    hasAnimatedRef.current = true;
   }, [services, domains, width, height, onServiceSelect]);
 
   return (

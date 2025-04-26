@@ -1,10 +1,12 @@
 import React, { useMemo } from "react";
+import { useLocation } from "react-router-dom";
 import { useMOSDashboardData } from "hooks/useMOSDashboardData";
 import MOSDashboardHeader from "components/mos/MOSDashboardHeader";
 import IssueDetailsBanner from "components/mos/IssueDetailsBanner";
 import NetworkGraphPanel from "components/mos/NetworkGraphPanel";
 import RouteDetailPanel from "components/mos/RouteDetailPanel";
 import DashboardErrorState from "components/common/DashboardErrorState";
+import { Service } from "types/service";
 
 const MemoizedHeader = React.memo(MOSDashboardHeader);
 const MemoizedIssueBanner = React.memo(IssueDetailsBanner);
@@ -12,12 +14,24 @@ const MemoizedNetworkGraph = React.memo(NetworkGraphPanel);
 const MemoizedRouteDetailPanel = React.memo(RouteDetailPanel);
 
 const MOSDashboard: React.FC = () => {
+  const location = useLocation();
+  console.log("Location state:", location.state);
+  const selectedService = location.state?.selectedService as
+    | Service
+    | undefined;
+  console.log("Selected service from state:", selectedService);
+
+  // Function to generate random degradation percentage between 0 and 100
+  const getRandomDegradation = () => {
+    return Math.floor(Math.random() * 101);
+  };
+
   const {
     dashboardData,
-    historicalData, // Get historical data from the hook
+    historicalData,
     isLoading,
     isRouteLoading,
-    isHistoricalDataLoading, // Get loading state for historical data
+    isHistoricalDataLoading,
     error,
     selectedRouteId,
     selectedSourceId,
@@ -36,7 +50,7 @@ const MOSDashboard: React.FC = () => {
       routes: dashboardData.routes,
       onRouteSelected: selectRoute,
       selectedRouteId,
-      mainDegradationPercentage: dashboardData.issueDetails?.degradationPercentage || 0
+      mainDegradationPercentage: getRandomDegradation(),
     };
   }, [dashboardData, selectedRouteId, selectRoute]);
 
@@ -45,52 +59,59 @@ const MOSDashboard: React.FC = () => {
     if (!dashboardData?.selectedRoute) return null;
     return {
       routeDetails: dashboardData.selectedRoute,
-      historicalData: historicalData, // Use route-specific historical data
-      isHistoricalDataLoading, // Pass loading state to the component
-      sourceLocationName: locationsMap[dashboardData.selectedRoute.sourceId]?.name || dashboardData.selectedRoute.sourceId,
-      destinationLocationName: locationsMap[dashboardData.selectedRoute.destinationId]?.name || dashboardData.selectedRoute.destinationId,
+      historicalData: historicalData,
+      isHistoricalDataLoading,
+      sourceLocationName:
+        locationsMap[dashboardData.selectedRoute.sourceId]?.name ||
+        dashboardData.selectedRoute.sourceId,
+      destinationLocationName:
+        locationsMap[dashboardData.selectedRoute.destinationId]?.name ||
+        dashboardData.selectedRoute.destinationId,
     };
   }, [
     dashboardData?.selectedRoute,
     historicalData,
     isHistoricalDataLoading,
-    locationsMap
+    locationsMap,
   ]);
 
   // Header props
   const headerProps = useMemo(() => {
+    console.log("selectedService", selectedService);
     return {
-      serviceName: dashboardData?.serviceInfo?.name || ''
+      serviceName: selectedService?.name || "",
     };
-  }, [dashboardData?.serviceInfo?.name]);
+  }, [selectedService?.name]);
 
   // Issue Banner props
   const issueBannerProps = useMemo(() => {
     if (!dashboardData?.issueDetails) return null;
     return {
       mainNode: locationsMap[selectedSourceId]?.name || selectedSourceId,
-      degradationPercentage: dashboardData.issueDetails.degradationPercentage,
+      degradationPercentage: getRandomDegradation(),
       application: dashboardData.issueDetails.application,
       vlan: dashboardData.issueDetails.vlan,
       codec: dashboardData.issueDetails.codec,
       availableLocations: availableLocationNames,
       onLocationChange: (locationName: string) => {
-        const location = Object.values(locationsMap).find(loc => loc.name === locationName);
+        const location = Object.values(locationsMap).find(
+          (loc) => loc.name === locationName
+        );
         if (location) {
           changeSourceLocation(location.id);
         }
-      }
+      },
     };
   }, [
     dashboardData?.issueDetails,
     selectedSourceId,
     availableLocationNames,
     locationsMap,
-    changeSourceLocation
+    changeSourceLocation,
   ]);
 
   // Loading state handling: Show full page spinner only on initial load
-  if (isLoading && !dashboardData) { // Only show full spinner if no data exists yet
+  if (isLoading && !dashboardData) {
     return (
       <div className="flex justify-center items-center h-screen bg-white">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
@@ -113,11 +134,8 @@ const MOSDashboard: React.FC = () => {
   }
 
   return (
-    // Main container with left side border
     <div className="min-h-screen bg-white text-black mos-dashboard flex">
-      {/* Left side border/navigation bar */}
       <div className="w-6 bg-[#123141] flex flex-col items-center">
-        {/* Home icon at bottom */}
         <div className="mt-auto mb-4">
           <svg
             width="16"
@@ -135,29 +153,24 @@ const MOSDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Main content container */}
       <div className="flex-grow flex flex-col">
-        {/* Header - Full width */}
         {headerProps && <MemoizedHeader {...headerProps} />}
 
-        {/* Main Content Area below header - approximating 45/55 split */}
         <div className="flex-grow flex flex-row">
-          {/* Left Column - approximately 45% width */}
           <div className="w-5/12 flex flex-col border-r border-gray-200">
-            {/* Issue Banner in top row */}
             {issueBannerProps && (
               <div className="w-full">
                 <MemoizedIssueBanner {...issueBannerProps} />
               </div>
             )}
 
-            {/* Network Graph in bottom row - takes remaining height */}
             <div className="flex-grow">
-              {networkGraphProps && <MemoizedNetworkGraph {...networkGraphProps} />}
+              {networkGraphProps && (
+                <MemoizedNetworkGraph {...networkGraphProps} />
+              )}
             </div>
           </div>
 
-          {/* Right Column - approximately 55% width */}
           <div className="w-7/12 overflow-y-auto">
             {isRouteLoading ? (
               <div className="h-full flex items-center justify-center">

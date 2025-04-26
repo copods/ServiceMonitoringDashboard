@@ -3,18 +3,18 @@ import { useAppDispatch, useAppSelector } from "store";
 import {
   fetchInitialMOSData,
   fetchRouteDetailsById,
-  fetchHistoricalDataForRoute, // Import the new thunk
+  fetchHistoricalDataForRoute,
   setSelectedSourceLocation,
-  resetHistoricalData, // Import the new action
+  resetHistoricalData,
   selectMOSData,
   selectMOSLocationsMap,
   selectMOSIsLoading,
   selectMOSIsRouteLoading,
-  selectIsHistoricalDataLoading, // Import the new selector
+  selectIsHistoricalDataLoading,
   selectMOSError,
   selectSelectedRouteId,
   selectSelectedSourceId,
-  selectHistoricalDataForRoute, // Import the new selector
+  selectHistoricalDataForRoute,
   setSelectedRouteIdAction
 } from "store/slices/mosSlice";
 import { MosDashboardData, Location, HistoricalData } from "types/mos";
@@ -23,10 +23,10 @@ import { MosDashboardData, Location, HistoricalData } from "types/mos";
 interface UseMOSDashboardDataResult {
   dashboardData: MosDashboardData | null;
   locationsMap: Record<string, Location>;
-  historicalData: HistoricalData[]; // Add this line
+  historicalData: HistoricalData[];
   isLoading: boolean;
   isRouteLoading: boolean;
-  isHistoricalDataLoading: boolean; // Add this line
+  isHistoricalDataLoading: boolean;
   error: string | null;
   selectedRouteId: string | null;
   selectedSourceId: string;
@@ -44,7 +44,7 @@ export const useMOSDashboardData = (): UseMOSDashboardDataResult => {
   const locationsMap = useAppSelector(selectMOSLocationsMap);
   const isLoading = useAppSelector(selectMOSIsLoading);
   const isRouteLoading = useAppSelector(selectMOSIsRouteLoading);
-  const isHistoricalDataLoading = useAppSelector(selectIsHistoricalDataLoading); // Add this line
+  const isHistoricalDataLoading = useAppSelector(selectIsHistoricalDataLoading);
   const error = useAppSelector(selectMOSError);
   const selectedRouteId = useAppSelector(selectSelectedRouteId);
   const selectedSourceId = useAppSelector(selectSelectedSourceId);
@@ -111,7 +111,7 @@ export const useMOSDashboardData = (): UseMOSDashboardDataResult => {
   const availableLocationNames = useMemo(() => {
     if (!dashboardData?.locations) return [];
     // Sort alphabetically for consistent dropdown order
-    return dashboardData.locations.map(location => location.name).sort();
+    return dashboardData.locations.map((location: Location) => location.name).sort();
   }, [dashboardData?.locations]);
 
   // Function to retry fetching initial data
@@ -127,10 +127,10 @@ export const useMOSDashboardData = (): UseMOSDashboardDataResult => {
   return {
     dashboardData,
     locationsMap,
-    historicalData, // Add this line
+    historicalData,
     isLoading,
     isRouteLoading,
-    isHistoricalDataLoading, // Add this line
+    isHistoricalDataLoading,
     error,
     selectedRouteId,
     selectedSourceId,

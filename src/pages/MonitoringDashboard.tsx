@@ -58,7 +58,8 @@ const MonitoringDashboard: React.FC = () => {
 
   useEffect(() => {
     if (selectedService) {
-      navigate("/mos");
+      console.log("Navigating with selectedService:", selectedService);
+      navigate("/mos", { state: { selectedService } });
     }
   }, [selectedService, navigate]);
 
