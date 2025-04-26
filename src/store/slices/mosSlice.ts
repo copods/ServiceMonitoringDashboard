@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
 import { RootState } from '../index';
 import { MosDashboardData, RouteDetails, Location, HistoricalData } from '../../types/mos';
+import { Service } from '../../types/service';
 import { fetchCompleteMOSDashboardData, fetchRouteDetails, fetchHistoricalData } from '../../services/api/mosApi';
 
 // Define the argument type for the thunk
@@ -11,12 +12,11 @@ interface FetchInitialMOSDataArgs {
 
 // Async Thunks
 export const fetchInitialMOSData = createAsyncThunk<
-  MosDashboardData, // Return type on success
-  FetchInitialMOSDataArgs, // Argument type (sourceId and optional routeId)
-  { rejectValue: string } // Type for rejected action payload
+  MosDashboardData,
+  FetchInitialMOSDataArgs,
+  { rejectValue: string }
 >('mos/fetchInitialData', async ({ sourceId, routeId }, { rejectWithValue }) => {
   try {
-    // Pass sourceId and optional routeId to the API call
     const data = await fetchCompleteMOSDashboardData(sourceId, routeId);
     if (!data) {
       throw new Error('No data received from API');
