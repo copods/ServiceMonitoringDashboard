@@ -257,27 +257,52 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
   const [visibleNodes, setVisibleNodes] = useState<Set<string>>(new Set());
   const [isAnimating, setIsAnimating] = useState(false);
 
-  // Effect to handle node animations
+  // Store the source location ID to detect changes
+  const sourceLocationRef = useRef<string | null>(null);
+
+  // Use useMemo to calculate if the source has changed
+  const sourceLocation = useMemo(() => {
+    if (!routes || routes.length === 0 || !locations) return null;
+    const sourceId = routes[0].sourceId;
+    return locations.find((loc) => loc.id === sourceId);
+  }, [locations, routes]);
+
+  // Effect for handling animation only when source location changes
   useEffect(() => {
-    if (!routes || routes.length === 0 || isAnimating) return;
+    if (!sourceLocation) return;
 
-    setIsAnimating(true);
-    const newVisibleNodes = new Set<string>();
+    const currentSourceId = sourceLocation.id;
 
-    // First show the central node
-    setTimeout(() => {
-      newVisibleNodes.add("central");
-      setVisibleNodes(new Set(newVisibleNodes));
+    // Only reset and animate if source location changed or initial load
+    if (sourceLocationRef.current !== currentSourceId) {
+      // Update the ref to track the current source
+      sourceLocationRef.current = currentSourceId;
 
-      // Then show each route's nodes sequentially
-      routes.forEach((route, index) => {
+      // Reset visibility states
+      setVisibleNodes(new Set());
+      setIsAnimating(true);
+
+      const newVisibleNodes = new Set<string>();
+
+      // Animation logic
+      setTimeout(() => {
+        newVisibleNodes.add("central");
+        setVisibleNodes(new Set(newVisibleNodes));
+
+        routes.forEach((route, index) => {
+          setTimeout(() => {
+            newVisibleNodes.add(route.id);
+            setVisibleNodes(new Set(newVisibleNodes));
+          }, (index + 1) * 150);
+        });
+
+        // Reset animation flag after all nodes are shown
         setTimeout(() => {
-          newVisibleNodes.add(route.id);
-          setVisibleNodes(new Set(newVisibleNodes));
-        }, (index + 1) * 150); // Increased delay between each route
-      });
-    }, 150); // Increased initial delay
-  }, [routes, isAnimating]);
+          setIsAnimating(false);
+        }, (routes.length + 1) * 150);
+      }, 150);
+    }
+  }, [sourceLocation, routes]);
 
   // Effect to measure container dimensions and update positions
   useEffect(() => {
@@ -331,12 +356,6 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
     window.addEventListener("resize", updateDimensions);
     return () => window.removeEventListener("resize", updateDimensions);
   }, [routes.length]);
-
-  const sourceLocation = useMemo(() => {
-    if (!routes || routes.length === 0 || !locations) return null;
-    const sourceId = routes[0].sourceId;
-    return locations.find((loc) => loc.id === sourceId);
-  }, [locations, routes]);
 
   const createRouteClickHandler = useCallback(
     (routeId: string) => {

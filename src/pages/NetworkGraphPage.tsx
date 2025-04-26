@@ -93,8 +93,6 @@ const NetworkGraphPage: React.FC = () => {
     );
   }
 
-  console.log("containerSize", containerSize.height, containerSize.width);
-
   return (
     <div
       ref={containerRef}

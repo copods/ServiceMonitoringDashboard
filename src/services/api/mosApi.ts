@@ -21,6 +21,7 @@ import {
  */
 export const fetchMOSDashboardData = async (sourceId: string = 'denver'): Promise<MosDashboardData> => {
   console.log(`Using mock data for MOS dashboard, source: ${sourceId}`);
+  console.log("here 1 ",getMockMOSDashboardData(sourceId))
   return getMockMOSDashboardData(sourceId);
 };
 
@@ -54,12 +55,13 @@ export const fetchHistoricalData = async (
  * @param service Optional service to update the service info
  */
 export const fetchCompleteMOSDashboardData = async (
-  sourceId: string = 'denver',
+  // sourceId: string = 'denver',
+  sourceId: string ,
   routeId?: string
 ): Promise<MosDashboardData> => {
   console.log(`Using mock data for complete MOS dashboard, source: ${sourceId}`);
   let dashboardData = await getMockMOSDashboardData(sourceId);
-
+console.log("here 2 ",dashboardData)
   // If a routeId is provided, fetch its details
   if (routeId) {
     try {

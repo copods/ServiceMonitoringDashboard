@@ -45,7 +45,13 @@ export const getMockServiceDetails = async (serviceId: string): Promise<Service>
 // MOS API mock functions
 export const getMockMOSDashboardData = async (sourceId: string = 'denver'): Promise<MosDashboardData> => {
   // Filter routes based on sourceId like the mock server does
-  const filteredRoutes = mosData.routes.filter(route => route.sourceId === sourceId);
+  // const filteredRoutes = mosData.routes.filter(route => route.sourceId === sourceId);
+  const filteredRoutes = mosData.routes.filter(route => 
+    (route.sourceId === sourceId ) && 
+    route.sourceId !== route.destinationId // Exclude self-connections
+  );
+
+  console.log('filteredRoutes', filteredRoutes);
   
   return {
     serviceInfo: mosData.serviceInfo,

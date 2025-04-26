@@ -89,7 +89,7 @@ export const useMOSDashboardData = (): UseMOSDashboardDataResult => {
     // Check if loading is finished, data is available, has routes, and no route is selected
     if (!isLoading && dashboardData && dashboardData.routes.length > 0 && !selectedRouteId) {
       const firstRouteId = dashboardData.routes[0].id;
-      console.log(`Auto-selecting first route: ${firstRouteId}`);
+
       // Use the existing selectRoute function to fetch details
       selectRoute(firstRouteId);
     }

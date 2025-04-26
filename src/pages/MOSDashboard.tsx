@@ -15,11 +15,9 @@ const MemoizedRouteDetailPanel = React.memo(RouteDetailPanel);
 
 const MOSDashboard: React.FC = () => {
   const location = useLocation();
-  console.log("Location state:", location.state);
   const selectedService = location.state?.selectedService as
     | Service
     | undefined;
-  console.log("Selected service from state:", selectedService);
 
   // Function to generate random degradation percentage between 0 and 100
   const getRandomDegradation = () => {
@@ -42,6 +40,11 @@ const MOSDashboard: React.FC = () => {
     retryFetch,
   } = useMOSDashboardData();
 
+  // Calculate degradation percentage once for the selected location
+  const currentDegradation = useMemo(() => {
+    return getRandomDegradation();
+  }, [selectedSourceId]); // Recalculate only when selected location changes
+
   // Network Graph props
   const networkGraphProps = useMemo(() => {
     if (!dashboardData) return null;
@@ -50,9 +53,9 @@ const MOSDashboard: React.FC = () => {
       routes: dashboardData.routes,
       onRouteSelected: selectRoute,
       selectedRouteId,
-      mainDegradationPercentage: getRandomDegradation(),
+      mainDegradationPercentage: currentDegradation,
     };
-  }, [dashboardData, selectedRouteId, selectRoute]);
+  }, [dashboardData, selectedRouteId, selectRoute, currentDegradation]);
 
   // Update route detail props to include historical data
   const routeDetailProps = useMemo(() => {
@@ -77,7 +80,6 @@ const MOSDashboard: React.FC = () => {
 
   // Header props
   const headerProps = useMemo(() => {
-    console.log("selectedService", selectedService);
     return {
       serviceName: selectedService?.name || "",
     };
@@ -88,7 +90,7 @@ const MOSDashboard: React.FC = () => {
     if (!dashboardData?.issueDetails) return null;
     return {
       mainNode: locationsMap[selectedSourceId]?.name || selectedSourceId,
-      degradationPercentage: getRandomDegradation(),
+      degradationPercentage: currentDegradation,
       application: dashboardData.issueDetails.application,
       vlan: dashboardData.issueDetails.vlan,
       codec: dashboardData.issueDetails.codec,
@@ -108,6 +110,7 @@ const MOSDashboard: React.FC = () => {
     availableLocationNames,
     locationsMap,
     changeSourceLocation,
+    currentDegradation,
   ]);
 
   // Loading state handling: Show full page spinner only on initial load
