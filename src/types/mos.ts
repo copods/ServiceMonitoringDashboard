@@ -52,12 +52,12 @@ export interface HistoricalData {
 }
 
 export interface MosDashboardData {
-  serviceInfo: Array<{
+  serviceInfo: {
     id: string;
     name: string;
     currentTime: string;
     startTime: string;
-  }>;
+  };
   issueDetails: {
     mainNode: string;
     degradationPercentage: number;

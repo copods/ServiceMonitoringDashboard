@@ -1,6 +1,5 @@
 // import axios from 'axios';
 import { MosDashboardData, RouteDetails, HistoricalData } from 'types/mos';
-import { Service } from 'types/service';
 import { 
   getMockMOSDashboardData, 
   getMockRouteDetails, 
@@ -51,7 +50,6 @@ export const fetchHistoricalData = async (
  * This is a convenience method that combines multiple API calls
  * @param sourceId The ID of the source location (optional, defaults to 'denver')
  * @param routeId Optional initial route ID to fetch details for
- * @param service Optional service to update the service info
  */
 export const fetchCompleteMOSDashboardData = async (
   sourceId: string = 'denver',
