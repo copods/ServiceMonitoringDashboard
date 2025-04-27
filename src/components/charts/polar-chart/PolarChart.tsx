@@ -107,14 +107,14 @@ const PolarChart: React.FC<PolarChartProps> = ({
           .attr("stroke-width", 2)
           .attr("stroke-dasharray", "2,2");
 
-        // Create trail particles
-        for (let i = 0; i < 3; i++) {
+        // Create more trail particles (increased from 3 to 6)
+        for (let i = 0; i < 6; i++) {
           trail
             .append("circle")
             .attr("class", `spark-particle-${i}`)
-            .attr("r", 1 + i * 0.5)
+            .attr("r", 1 + i * 0.3) // Adjusted size progression
             .attr("fill", isMovingToCenter ? "#ffcc00" : "#3498db")
-            .attr("opacity", 0.8 - i * 0.2);
+            .attr("opacity", 0.9 - i * 0.1); // Adjusted opacity progression
         }
       }
 
@@ -125,28 +125,28 @@ const PolarChart: React.FC<PolarChartProps> = ({
         .attr("y1", currentPos.y)
         .attr("x2", trailStartX)
         .attr("y2", trailStartY)
-        .attr("opacity", 0.6 - progress * 0.6); // Fade out as animation progresses
+        .attr("opacity", 0.7 - progress * 0.7); // Increased base opacity
 
-      // Update trail particles
-      for (let i = 0; i < 3; i++) {
-        const particleProgress = Math.min(1, progress + i * 0.2);
+      // Update trail particles with more frequent spacing
+      for (let i = 0; i < 6; i++) {
+        const particleProgress = Math.min(1, progress + i * 0.15); // Reduced from 0.2 to 0.15 for more frequent updates
         const particleX =
-          currentPos.x + (trailStartX - currentPos.x) * (i * 0.25 + 0.25);
+          currentPos.x + (trailStartX - currentPos.x) * (i * 0.15 + 0.15); // Adjusted spacing
         const particleY =
-          currentPos.y + (trailStartY - currentPos.y) * (i * 0.25 + 0.25);
+          currentPos.y + (trailStartY - currentPos.y) * (i * 0.15 + 0.15);
 
         trail
           .select(`.spark-particle-${i}`)
           .attr("cx", particleX)
           .attr("cy", particleY)
-          .attr("opacity", Math.max(0, 0.7 - particleProgress * 0.7));
+          .attr("opacity", Math.max(0, 0.8 - particleProgress * 0.6)); // Adjusted opacity calculation
       }
 
       // Remove trail when animation completes
       if (progress >= 0.95) {
         setTimeout(() => {
           trail.remove();
-        }, 100);
+        }, 50); // Reduced cleanup delay from 100 to 50ms
       }
     },
     []
@@ -173,7 +173,7 @@ const PolarChart: React.FC<PolarChartProps> = ({
       // Get current time for animation progress calculation
       const now = Date.now();
       const animationStartTime = service.animationStartTime || now;
-      const animationDuration = 2500; // 2.5 seconds for full animation to accommodate larger movements
+      const animationDuration = 2000; // Reduced from 2500 to 2000ms for snappier animations
       const elapsed = now - animationStartTime;
       const progress = Math.min(1, elapsed / animationDuration);
 

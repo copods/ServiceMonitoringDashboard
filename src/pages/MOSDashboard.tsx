@@ -136,6 +136,12 @@ const MOSDashboard: React.FC = () => {
     );
   }
 
+  const now = Date.now();
+  const animationStartTime = selectedService?.animationStartTime || now;
+  const animationDuration = 1000; // 1 second for faster animation and more frequent spark trails
+  const elapsed = now - animationStartTime;
+  const progress = Math.min(1, elapsed / animationDuration);
+
   return (
     <div className="min-h-screen bg-white text-black mos-dashboard flex">
       <div className="w-6 bg-[#123141] flex flex-col items-center">
