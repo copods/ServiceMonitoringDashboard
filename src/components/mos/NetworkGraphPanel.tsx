@@ -251,6 +251,20 @@ interface LayoutPositions {
   nodeScale: number;
 }
 
+// Add these helper functions before the NetworkGraphPanel component
+const getPathLength = (path: string): number => {
+  const tempPath = document.createElementNS(
+    "http://www.w3.org/2000/svg",
+    "path"
+  );
+  tempPath.setAttribute("d", path);
+  return tempPath.getTotalLength();
+};
+
+// Add these constants at the top level before the NetworkGraphPanel component
+const LINK_TO_IMPACT_DURATION = 500;
+const LINK_TO_LEAF_DURATION = 500;
+
 // --- The React Component ---
 const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
   locations,
@@ -307,22 +321,53 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
 
       const newVisibleNodes = new Set<string>();
 
-      // Immediately show the central node without animation
+      // Animation timing constants (in ms)
+      const INITIAL_DELAY = 150;
+      const LINK_TO_IMPACT_DURATION = 500;
+      const IMPACT_CIRCLE_DELAY = 150;
+      const LINK_TO_LEAF_DURATION = 500;
+      const LEAF_NODE_DELAY = 150;
+
+      // Step 1: Show central node immediately
       newVisibleNodes.add("central");
       setVisibleNodes(new Set(newVisibleNodes));
 
-      // Animate only the route nodes
-      routes.forEach((route, index) => {
-        setTimeout(() => {
-          newVisibleNodes.add(route.id);
-          setVisibleNodes(new Set(newVisibleNodes));
-        }, (index + 1) * 150);
-      });
+      // Step 2: Animate links to impact circles
+      setTimeout(() => {
+        routes.forEach((route) => {
+          newVisibleNodes.add(`${route.id}-link-to-impact`);
+        });
+        setVisibleNodes(new Set(newVisibleNodes));
+      }, INITIAL_DELAY);
 
-      // Reset animation flag after all nodes are shown
+      // Step 3: Show impact circles
+      setTimeout(() => {
+        routes.forEach((route) => {
+          newVisibleNodes.add(`${route.id}-impact`);
+        });
+        setVisibleNodes(new Set(newVisibleNodes));
+      }, INITIAL_DELAY + LINK_TO_IMPACT_DURATION + IMPACT_CIRCLE_DELAY);
+
+      // Step 4: Animate links to leaf nodes
+      setTimeout(() => {
+        routes.forEach((route) => {
+          newVisibleNodes.add(`${route.id}-link-to-leaf`);
+        });
+        setVisibleNodes(new Set(newVisibleNodes));
+      }, INITIAL_DELAY + LINK_TO_IMPACT_DURATION + IMPACT_CIRCLE_DELAY + IMPACT_CIRCLE_DELAY);
+
+      // Step 5: Show leaf nodes
+      setTimeout(() => {
+        routes.forEach((route) => {
+          newVisibleNodes.add(route.id);
+        });
+        setVisibleNodes(new Set(newVisibleNodes));
+      }, INITIAL_DELAY + LINK_TO_IMPACT_DURATION + IMPACT_CIRCLE_DELAY + IMPACT_CIRCLE_DELAY + LINK_TO_LEAF_DURATION + LEAF_NODE_DELAY);
+
+      // Reset animation flag after all animations complete
       setTimeout(() => {
         setIsAnimating(false);
-      }, routes.length * 150);
+      }, INITIAL_DELAY + LINK_TO_IMPACT_DURATION + IMPACT_CIRCLE_DELAY + IMPACT_CIRCLE_DELAY + LINK_TO_LEAF_DURATION + LEAF_NODE_DELAY + 300);
     }
   }, [sourceLocation, routes]);
 
@@ -515,9 +560,6 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
           onClick={createRouteClickHandler(route.id)}
           style={{
             cursor: "pointer",
-            opacity: isVisible ? 1 : 0,
-            transition: "opacity 0.3s ease-out, transform 0.3s ease-out",
-            transform: isVisible ? "scale(1)" : "scale(0.95)",
           }}
           aria-label={`Route from ${sourceLocation.name} to ${destinationLocation.name}`}
         >
@@ -528,9 +570,13 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
             strokeWidth="1"
             fill="none"
             style={{
-              transition: "stroke 0.25s ease-out",
-              strokeDasharray: isVisible ? "none" : "5,5",
-              strokeDashoffset: isVisible ? 0 : 10,
+              strokeDasharray: `${getPathLength(
+                linePathToProgress
+              )} ${getPathLength(linePathToProgress)}`,
+              strokeDashoffset: visibleNodes.has(`${route.id}-link-to-impact`)
+                ? 0
+                : getPathLength(linePathToProgress),
+              transition: `stroke-dashoffset ${LINK_TO_IMPACT_DURATION}ms ease-in-out, stroke 0.25s ease-out`,
             }}
           />
           <path
@@ -539,15 +585,23 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
             strokeWidth="1"
             fill="none"
             style={{
-              transition: "stroke 0.25s ease-out",
-              strokeDasharray: isVisible ? "none" : "5,5",
-              strokeDashoffset: isVisible ? 0 : 10,
+              strokeDasharray: `${getPathLength(
+                linePathToDest
+              )} ${getPathLength(linePathToDest)}`,
+              strokeDashoffset: visibleNodes.has(`${route.id}-link-to-leaf`)
+                ? 0
+                : getPathLength(linePathToDest),
+              transition: `stroke-dashoffset ${LINK_TO_LEAF_DURATION}ms ease-in-out, stroke 0.25s ease-out`,
             }}
           />
 
           {/* Progress Indicator */}
           <g
             transform={`translate(${progressX}, ${progressY}) scale(${nodeScale})`}
+            style={{
+              opacity: visibleNodes.has(`${route.id}-impact`) ? 1 : 0,
+              transition: "opacity 0.5s ease-out",
+            }}
           >
             <path d={backgroundArcPath} fill={PROGRESS_BG_COLOR} />
             <path
@@ -555,7 +609,6 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
               fill={progressColor}
               style={{
                 transition: "fill 0.25s ease-out",
-                opacity: isVisible ? 1 : 0.7,
               }}
             />
             <text
@@ -564,10 +617,6 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
               fontSize={scaledFontSize}
               fontWeight="600"
               fill={TEXT_COLOR}
-              style={{
-                transition: "opacity 0.25s ease-out",
-                opacity: isVisible ? 1 : 0,
-              }}
             >
               {progressPercent}%
             </text>
@@ -581,8 +630,8 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
             fontSize={scaledFontSize}
             fill={TEXT_COLOR}
             style={{
-              transition: "opacity 0.25s ease-out",
-              opacity: isVisible ? 1 : 0,
+              transition: "opacity 0.5s ease-out",
+              opacity: visibleNodes.has(`${route.id}-impact`) ? 1 : 0,
             }}
           >
             {Math.round(route.streamCount / 1000)}k streams
@@ -591,8 +640,10 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
           {/* Destination Node */}
           <g
             style={{
-              transition: "transform 0.3s ease-out",
-              transform: isVisible ? "scale(1)" : "scale(0.95)",
+              transition: "all 0.5s ease-out",
+              opacity: visibleNodes.has(route.id) ? 1 : 0,
+              transform: visibleNodes.has(route.id) ? "scale(1)" : "scale(0)",
+              transformOrigin: `${destNodeX}px ${destY}px`,
             }}
           >
             <circle
@@ -621,10 +672,6 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
               fontWeight="600"
               fontSize={scaledFontSize}
               fill={TEXT_COLOR}
-              style={{
-                transition: "opacity 0.25s ease-out",
-                opacity: isVisible ? 1 : 0,
-              }}
             >
               {destinationLocation.name}
             </text>
@@ -634,10 +681,6 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
               dominantBaseline="middle"
               fontSize={scaledFontSize}
               fill={TEXT_COLOR}
-              style={{
-                transition: "opacity 0.25s ease-out",
-                opacity: isVisible ? 1 : 0,
-              }}
             >
               {route.mosPercentage}% Deg
             </text>
