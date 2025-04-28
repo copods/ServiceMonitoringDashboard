@@ -1,17 +1,11 @@
 import DashboardErrorState from "components/common/DashboardErrorState";
-import { useState, useEffect, useRef, useMemo, memo } from "react";
+import { useMemo } from "react";
 import { useMOSDashboardData } from "hooks/useMOSDashboardData";
 
 import NetworkGraphPanel from "components/mos/NetworkGraphPanel";
 import IssueDetailsBanner from "components/mos/IssueDetailsBanner";
 
 const NetworkGraphPage: React.FC = () => {
-  const [containerSize, setContainerSize] = useState({
-    width: 600,
-    height: 400,
-  });
-  const containerRef = useRef<HTMLDivElement>(null);
-
   const {
     dashboardData,
     error,
@@ -63,22 +57,6 @@ const NetworkGraphPage: React.FC = () => {
     };
   }, [dashboardData, selectedRouteId, selectRoute]);
 
-  useEffect(() => {
-    const updateSize = () => {
-      if (containerRef.current) {
-        const { clientWidth, clientHeight } = containerRef.current;
-        setContainerSize({
-          width: clientWidth * 0.7,
-          height: clientHeight * 0.7,
-        });
-      }
-    };
-
-    updateSize();
-
-    window.addEventListener("resize", updateSize);
-  }, [containerRef]);
-
   // Error handling
   if (error) {
     return <DashboardErrorState error={error} onRetry={retryFetch} />;
@@ -94,10 +72,7 @@ const NetworkGraphPage: React.FC = () => {
   }
 
   return (
-    <div
-      ref={containerRef}
-      className="flex flex-col items-center justify-center w-full h-full p-4 bg-[#ffffff]"
-    >
+    <div className="flex flex-col items-center justify-center w-full h-full p-4 bg-[#ffffff]">
       {issueBannerProps && (
         <div className="w-full">
           <IssueDetailsBanner {...issueBannerProps} />
