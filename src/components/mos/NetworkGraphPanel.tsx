@@ -285,23 +285,22 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
 
       const newVisibleNodes = new Set<string>();
 
-      // Animation logic
-      setTimeout(() => {
-        newVisibleNodes.add("central");
-        setVisibleNodes(new Set(newVisibleNodes));
+      // Immediately show the central node without animation
+      newVisibleNodes.add("central");
+      setVisibleNodes(new Set(newVisibleNodes));
 
-        routes.forEach((route, index) => {
-          setTimeout(() => {
-            newVisibleNodes.add(route.id);
-            setVisibleNodes(new Set(newVisibleNodes));
-          }, (index + 1) * 150);
-        });
-
-        // Reset animation flag after all nodes are shown
+      // Animate only the route nodes
+      routes.forEach((route, index) => {
         setTimeout(() => {
-          setIsAnimating(false);
-        }, (routes.length + 1) * 150);
-      }, 150);
+          newVisibleNodes.add(route.id);
+          setVisibleNodes(new Set(newVisibleNodes));
+        }, (index + 1) * 150);
+      });
+
+      // Reset animation flag after all nodes are shown
+      setTimeout(() => {
+        setIsAnimating(false);
+      }, routes.length * 150);
     }
   }, [sourceLocation, routes]);
 
@@ -616,20 +615,19 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
     containerDimensions.width
   );
 
-  // Memoize the central node
+  // Memoize the central node with immediate visibility
   const centralNode = useMemo(() => {
     if (!sourceLocation || containerDimensions.width === 0) return null;
 
     const { centralNodeX, centralNodeY } = layoutPositions;
-    const isVisible = visibleNodes.has("central");
-    const opacity = isVisible ? 1 : 0;
+    const isVisible = true; // Always visible
 
     return (
       <g
         style={{
-          opacity,
-          transition: "opacity 0.3s ease-out, transform 0.3s ease-out",
-          transform: isVisible ? "scale(1)" : "scale(0.95)",
+          opacity: 1, // Always fully opaque
+          transition: "transform 0.3s ease-out",
+          transform: "scale(1)", // Always at full scale
         }}
       >
         <circle
@@ -658,8 +656,7 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
           fontSize="15"
           fill={TEXT_COLOR}
           style={{
-            transition: "opacity 0.25s ease-out",
-            opacity: isVisible ? 1 : 0,
+            opacity: 1, // Always visible
           }}
         >
           {sourceLocation.name}
@@ -671,8 +668,7 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
           fontSize="14"
           fill={TEXT_COLOR}
           style={{
-            transition: "opacity 0.25s ease-out",
-            opacity: isVisible ? 1 : 0,
+            opacity: 1, // Always visible
           }}
         >
           {mainDegradationPercentage}% MoS
@@ -684,8 +680,7 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
     mainDegradationPercentage,
     containerDimensions.width,
     layoutPositions,
-    visibleNodes,
-  ]);
+  ]); // Removed visibleNodes dependency
 
   // --- Updated Legend Memo ---
   const legendElement = useMemo(() => {

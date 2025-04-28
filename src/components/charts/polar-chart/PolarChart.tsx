@@ -77,7 +77,7 @@ const PolarChart: React.FC<PolarChartProps> = ({
       // Skip if movement is too small
       if (distance < 0.5) return;
 
-      // Get the main chart group (first g element) - using any to avoid TypeScript errors with d3 selections
+      // Get the main chart group (first g element)
       const chart = svg.select("g") as any;
 
       // Calculate normalized direction vector
@@ -85,9 +85,8 @@ const PolarChart: React.FC<PolarChartProps> = ({
       const dirY = directionY / distance;
 
       // Calculate trail length based on distance and animation progress
-      // More prominent trail for significant importance changes
-      const maxTrailLength = Math.min(35, distance * 0.9);
-      const trailLength = maxTrailLength * (1 - progress * 0.7);
+      const maxTrailLength = Math.min(45, distance * 0.95); // Increased from 35 to 45
+      const trailLength = maxTrailLength * (1 - progress * 0.6); // Reduced from 0.7 to 0.6 for longer trails
 
       // Calculate trail start position (opposite to movement direction)
       const trailStartX = currentPos.x - dirX * trailLength;
@@ -100,53 +99,54 @@ const PolarChart: React.FC<PolarChartProps> = ({
         // Create trail group in main chart
         trail = chart.append("g").attr("class", `spark-trail-${serviceId}`);
 
-        // Create trail line
+        // Create trail line with denser dash pattern
         trail
           .append("line")
           .attr("stroke", isMovingToCenter ? "#ffcc00" : "#3498db")
           .attr("stroke-width", 2)
-          .attr("stroke-dasharray", "2,2");
+          .attr("stroke-dasharray", "1,1"); // Changed from "2,2" to "1,1"
 
-        // Create more trail particles (increased from 3 to 6)
-        for (let i = 0; i < 6; i++) {
+        // Create more trail particles (increased from 6 to 12)
+        for (let i = 0; i < 12; i++) {
           trail
             .append("circle")
             .attr("class", `spark-particle-${i}`)
-            .attr("r", 1 + i * 0.3) // Adjusted size progression
+            .attr("r", 1 + i * 0.2) // Reduced from 0.3 to 0.2 for more uniform sizes
             .attr("fill", isMovingToCenter ? "#ffcc00" : "#3498db")
-            .attr("opacity", 0.9 - i * 0.1); // Adjusted opacity progression
+            .attr("opacity", 0.95 - i * 0.05); // Increased base opacity and reduced decay
         }
       }
 
-      // Update trail line
+      // Update trail line with higher opacity
       trail
         .select("line")
         .attr("x1", currentPos.x)
         .attr("y1", currentPos.y)
         .attr("x2", trailStartX)
         .attr("y2", trailStartY)
-        .attr("opacity", 0.7 - progress * 0.7); // Increased base opacity
+        .attr("opacity", 0.8 - progress * 0.6); // Increased from 0.7 to 0.8
 
       // Update trail particles with more frequent spacing
-      for (let i = 0; i < 6; i++) {
-        const particleProgress = Math.min(1, progress + i * 0.15); // Reduced from 0.2 to 0.15 for more frequent updates
+      for (let i = 0; i < 12; i++) {
+        const particleProgress = Math.min(1, progress + i * 0.0005); // Reduced from 0.001 to 0.0005
         const particleX =
-          currentPos.x + (trailStartX - currentPos.x) * (i * 0.15 + 0.15); // Adjusted spacing
+          currentPos.x + (trailStartX - currentPos.x) * (i * 0.08); // Reduced from 0.15 to 0.08
         const particleY =
-          currentPos.y + (trailStartY - currentPos.y) * (i * 0.15 + 0.15);
+          currentPos.y + (trailStartY - currentPos.y) * (i * 0.08);
 
         trail
           .select(`.spark-particle-${i}`)
           .attr("cx", particleX)
           .attr("cy", particleY)
-          .attr("opacity", Math.max(0, 0.8 - particleProgress * 0.6)); // Adjusted opacity calculation
+          .attr("opacity", Math.max(0, 0.9 - particleProgress * 0.5)); // Increased opacity
       }
 
       // Remove trail when animation completes
-      if (progress >= 0.95) {
+      if (progress >= 0.98) {
+        // Changed from 0.95 to 0.98 to keep trail visible longer
         setTimeout(() => {
           trail.remove();
-        }, 50); // Reduced cleanup delay from 100 to 50ms
+        }, 30); // Reduced from 50ms to 30ms
       }
     },
     []
