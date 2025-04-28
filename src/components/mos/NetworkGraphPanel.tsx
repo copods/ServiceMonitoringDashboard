@@ -19,9 +19,9 @@ interface NetworkGraphPanelProps {
 
 // --- Constants for Layout and Styling ---
 // Fixed radius for nodes and progress indicators
-const DENVER_NODE_RADIUS = 32;
-const NODE_RADIUS = 28;
-const PROGRESS_RADIUS = 24; // Increased progress indicator radius
+const DENVER_NODE_RADIUS = 40;
+const NODE_RADIUS = 35;
+const PROGRESS_RADIUS = 30;
 
 // Minimum vertical spacing between destination nodes
 const MIN_VERTICAL_SPACING = 80;
@@ -253,6 +253,7 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
     svgHeight: 550,
     centralNodeY: 275,
     paddingY: MIN_VERTICAL_SPACING,
+    scale: 1,
   });
   const [visibleNodes, setVisibleNodes] = useState<Set<string>>(new Set());
   const [isAnimating, setIsAnimating] = useState(false);
@@ -308,53 +309,88 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
   useEffect(() => {
     const updateDimensions = () => {
       if (containerRef.current) {
-        const width = containerRef.current.clientWidth;
-        const height = containerRef.current.clientHeight;
-        setContainerDimensions({ width, height });
+        const containerWidth = containerRef.current.clientWidth + 100;
+        const containerHeight = containerRef.current.clientHeight + 100;
 
-        const centralX = Math.max(80, width * 0.15);
-        const progressX = Math.max(240, width * 0.45);
-        const destX = Math.max(400, width * 0.75);
-        const textOffset = Math.max(18, width * 0.035);
+        // Determine if we're in portrait or landscape mode
+        const isPortrait = containerHeight > containerWidth;
 
+        // Base dimensions for the graph
+        const baseWidth = isPortrait
+          ? 900
+          : Math.max(containerWidth * 0.9, 1000);
         const routeCount = routes.length || 1;
-        // Adjusted minimum height slightly for potentially taller legend
-        const calculatedHeight = Math.max(
-          570,
-          height,
-          (routeCount + 1) * MIN_VERTICAL_SPACING
-        );
-        const centralY = calculatedHeight / 2;
 
-        const availableHeight = calculatedHeight * 0.6;
+        // In portrait mode, use full container height
+        const baseHeight = isPortrait
+          ? 800
+          : Math.max(
+              containerHeight * 0.9,
+              700,
+              (routeCount + 1) * MIN_VERTICAL_SPACING + 120
+            );
+
+        // Calculate scale based on container size while maintaining aspect ratio
+        const widthScale = containerWidth / baseWidth;
+        const heightScale = containerHeight / baseHeight;
+
+        // In portrait mode, use height scale to ensure full height usage
+        const scale = isPortrait
+          ? heightScale // Use height scale in portrait mode
+          : Math.min(widthScale, heightScale);
+
+        // Adjust positions based on orientation
+        const centralX = isPortrait ? baseWidth * 0.25 : baseWidth * 0.2;
+        const progressX = isPortrait ? baseWidth * 0.55 : baseWidth * 0.5;
+        const destX = isPortrait ? baseWidth * 0.85 : baseWidth * 0.8;
+        const textOffset = baseWidth * 0.04;
+        const centralY = baseHeight / 2;
+
+        // Calculate vertical spacing - use more height in portrait mode
+        const availableHeight = baseHeight * (isPortrait ? 0.9 : 0.7);
         const minRequiredHeight = (routeCount - 1) * MIN_VERTICAL_SPACING;
-
         let calculatedPaddingY;
+
         if (availableHeight >= minRequiredHeight && routeCount > 1) {
           calculatedPaddingY = availableHeight / (routeCount - 1);
         } else {
           calculatedPaddingY = MIN_VERTICAL_SPACING;
         }
+
         calculatedPaddingY = Math.min(
           Math.max(calculatedPaddingY, MIN_VERTICAL_SPACING),
-          110
+          isPortrait ? 140 : 110 // Allow more vertical spacing in portrait mode
         );
+
+        setContainerDimensions({
+          width: containerWidth,
+          height: containerHeight,
+        });
 
         setLayoutPositions({
           centralNodeX: centralX,
           progressX: progressX,
           destNodeX: destX,
           textOffsetX: textOffset,
-          svgHeight: calculatedHeight,
+          svgHeight: baseHeight,
           centralNodeY: centralY,
           paddingY: calculatedPaddingY,
+          scale: scale,
         });
       }
     };
 
     updateDimensions();
-    window.addEventListener("resize", updateDimensions);
-    return () => window.removeEventListener("resize", updateDimensions);
+    const resizeObserver = new ResizeObserver(updateDimensions);
+    if (containerRef.current) {
+      resizeObserver.observe(containerRef.current);
+    }
+
+    return () => {
+      if (containerRef.current) {
+        resizeObserver.unobserve(containerRef.current);
+      }
+    };
   }, [routes.length]);
 
   const createRouteClickHandler = useCallback(
@@ -574,6 +610,12 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
     visibleNodes,
   ]);
 
+  console.log(
+    "containerDimensions",
+    containerDimensions.height,
+    containerDimensions.width
+  );
+
   // Memoize the central node
   const centralNode = useMemo(() => {
     if (!sourceLocation || containerDimensions.width === 0) return null;
@@ -647,63 +689,93 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
 
   // --- Updated Legend Memo ---
   const legendElement = useMemo(() => {
-    const legendY = layoutPositions.svgHeight - 30;
-    const legendX = 40;
+    const legendX = 200;
+    const legendY = layoutPositions.svgHeight + 20; // Position from bottom
     const iconSize = 24;
-    // textOffsetY is no longer needed for vertical alignment
-    const spacing = 100;
-    const textPadding = 8; // Horizontal padding between icon and text
+    const spacing = 100; // Keep increased spacing between legend items
+    const textPadding = 8;
 
     return (
-      <g transform={`translate(${legendX}, ${legendY})`}>
+      <g
+        className="legend-group"
+        transform={`translate(0, ${-layoutPositions.scale * 50})`}
+      >
+        {/* Background for legend */}
+        <rect
+          x={legendX - 10}
+          y={legendY - 20}
+          width={spacing * 2}
+          height={50}
+          fill="white"
+          rx={4}
+          ry={4}
+        />
+
         {/* Ingress Item */}
-        <g>
-          {/* Icon centered at (iconSize/2, 0) */}
+        <g transform={`translate(${legendX}, ${legendY})`}>
           {getLegendIcon(iconSize / 2, 0, iconSize, "left")}
           <text
-            x={iconSize + textPadding} // Position text after icon + padding
-            y={0} // Align text's baseline to icon's center y
-            dominantBaseline="middle" // Vertically center text relative to y
-            fontSize="12"
+            x={iconSize + textPadding}
+            y={0}
+            dominantBaseline="middle"
+            fontSize="14"
             fill={LEGEND_TEXT_COLOR}
+            style={{ fontWeight: 500 }}
           >
             Ingress
           </text>
         </g>
+
         {/* Egress Item */}
-        <g transform={`translate(${spacing}, 0)`}>
-          {/* Icon centered at (iconSize/2, 0) */}
+        <g transform={`translate(${legendX + spacing}, ${legendY})`}>
           {getLegendIcon(iconSize / 2, 0, iconSize, "right")}
           <text
-            x={iconSize + textPadding} // Position text after icon + padding
-            y={0} // Align text's baseline to icon's center y
-            dominantBaseline="middle" // Vertically center text relative to y
-            fontSize="12"
+            x={iconSize + textPadding}
+            y={0}
+            dominantBaseline="middle"
+            fontSize="14"
             fill={LEGEND_TEXT_COLOR}
+            style={{ fontWeight: 500 }}
           >
             Egress
           </text>
         </g>
       </g>
     );
-  }, [layoutPositions.svgHeight]);
+  }, [layoutPositions.svgHeight, layoutPositions.scale]);
 
   return (
-    <div ref={containerRef} className="w-full h-full">
+    <div
+      ref={containerRef}
+      className="w-full h-full relative flex items-center justify-center overflow-hidden"
+    >
       <svg
-        width="100%"
-        height={layoutPositions.svgHeight}
-        preserveAspectRatio="xMidYMid meet"
-        style={{ fontFamily: "Arial, sans-serif" }}
+        width={containerDimensions.width}
+        height={containerDimensions.height}
+        viewBox={`0 0 ${Math.max(1000, containerDimensions.width)} ${
+          layoutPositions.svgHeight
+        }`}
+        preserveAspectRatio={
+          containerDimensions.height > containerDimensions.width
+            ? "xMidYMid slice"
+            : "xMidYMid meet"
+        }
+        style={{
+          fontFamily: "Arial, sans-serif",
+          width: "100%",
+          height: "100%",
+        }}
       >
-        {/* Central Node */}
-        {centralNode}
+        <g transform={`scale(${layoutPositions.scale})`}>
+          {/* Central Node */}
+          {centralNode}
 
-        {/* Destination Nodes and Connections */}
-        {routeElements}
+          {/* Destination Nodes and Connections */}
+          {routeElements}
 
-        {/* Legend */}
-        {legendElement}
+          {/* Legend */}
+          {legendElement}
+        </g>
       </svg>
     </div>
   );
