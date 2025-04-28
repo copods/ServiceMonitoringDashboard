@@ -262,8 +262,8 @@ const getPathLength = (path: string): number => {
 };
 
 // Add these constants at the top level before the NetworkGraphPanel component
-const LINK_TO_IMPACT_DURATION = 500;
-const LINK_TO_LEAF_DURATION = 500;
+const LINK_TO_IMPACT_DURATION = 300;
+const LINK_TO_LEAF_DURATION = 300;
 
 // --- The React Component ---
 const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
@@ -326,63 +326,78 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
       const newVisibleNodes = new Set<string>();
 
       // Animation timing constants (in ms)
-      const INITIAL_DELAY = 150;
-      const LINK_TO_IMPACT_DURATION = 500;
-      const IMPACT_CIRCLE_DELAY = 150;
-      const LINK_TO_LEAF_DURATION = 500;
-      const LEAF_NODE_DELAY = 150;
-      const PROGRESS_FILL_DELAY = 500;
-      const PROGRESS_FILL_DURATION = 2000;
+      const INITIAL_DELAY = 100;
+      const IMPACT_CIRCLE_DELAY = 100;
+      const LEAF_NODE_DELAY = 100;
+      const PROGRESS_FILL_DELAY = 300;
+      const PROGRESS_FILL_DURATION = 1000;
+      const ROUTE_SEQUENCE_DELAY = 200;
 
       // Step 1: Show central node immediately
       newVisibleNodes.add("central");
       setVisibleNodes(new Set(newVisibleNodes));
 
-      // Step 2: Animate links to impact circles
-      setTimeout(() => {
-        routes.forEach((route) => {
+      // Animate each route sequentially
+      routes.forEach((route, index) => {
+        const routeStartDelay =
+          INITIAL_DELAY +
+          index *
+            (LINK_TO_IMPACT_DURATION +
+              IMPACT_CIRCLE_DELAY +
+              LINK_TO_LEAF_DURATION +
+              LEAF_NODE_DELAY +
+              PROGRESS_FILL_DELAY +
+              ROUTE_SEQUENCE_DELAY);
+
+        // Step 2: Animate link to impact circle for current route
+        setTimeout(() => {
           newVisibleNodes.add(`${route.id}-link-to-impact`);
-        });
-        setVisibleNodes(new Set(newVisibleNodes));
-      }, INITIAL_DELAY);
+          setVisibleNodes(new Set(newVisibleNodes));
+        }, routeStartDelay);
 
-      // Step 3: Show empty impact circles
-      setTimeout(() => {
-        routes.forEach((route) => {
+        // Step 3: Show empty impact circle for current route
+        setTimeout(() => {
           newVisibleNodes.add(`${route.id}-impact`);
-        });
-        setVisibleNodes(new Set(newVisibleNodes));
-      }, INITIAL_DELAY + LINK_TO_IMPACT_DURATION + IMPACT_CIRCLE_DELAY);
+          setVisibleNodes(new Set(newVisibleNodes));
+        }, routeStartDelay + LINK_TO_IMPACT_DURATION + IMPACT_CIRCLE_DELAY);
 
-      // Step 4: Animate links to leaf nodes
-      setTimeout(() => {
-        routes.forEach((route) => {
+        // Step 4: Animate link to leaf node for current route
+        setTimeout(() => {
           newVisibleNodes.add(`${route.id}-link-to-leaf`);
-        });
-        setVisibleNodes(new Set(newVisibleNodes));
-      }, INITIAL_DELAY + LINK_TO_IMPACT_DURATION + IMPACT_CIRCLE_DELAY + IMPACT_CIRCLE_DELAY);
+          setVisibleNodes(new Set(newVisibleNodes));
+        }, routeStartDelay + LINK_TO_IMPACT_DURATION + IMPACT_CIRCLE_DELAY * 2);
 
-      // Step 5: Show leaf nodes
-      setTimeout(() => {
-        routes.forEach((route) => {
+        // Step 5: Show leaf node for current route
+        setTimeout(() => {
           newVisibleNodes.add(route.id);
-        });
-        setVisibleNodes(new Set(newVisibleNodes));
-      }, INITIAL_DELAY + LINK_TO_IMPACT_DURATION + IMPACT_CIRCLE_DELAY + IMPACT_CIRCLE_DELAY + LINK_TO_LEAF_DURATION + LEAF_NODE_DELAY);
+          setVisibleNodes(new Set(newVisibleNodes));
+        }, routeStartDelay + LINK_TO_IMPACT_DURATION + IMPACT_CIRCLE_DELAY * 2 + LINK_TO_LEAF_DURATION);
 
-      // Step 6: Start filling progress circles
-      setTimeout(() => {
-        const newProgressPercentages: { [key: string]: number } = {};
-        routes.forEach((route) => {
-          newProgressPercentages[route.id] = route.impactPercentage;
-        });
-        setProgressPercentages(newProgressPercentages);
-      }, INITIAL_DELAY + LINK_TO_IMPACT_DURATION + IMPACT_CIRCLE_DELAY + IMPACT_CIRCLE_DELAY + LINK_TO_LEAF_DURATION + LEAF_NODE_DELAY + PROGRESS_FILL_DELAY);
+        // Step 6: Start filling progress circle for current route
+        setTimeout(() => {
+          setProgressPercentages((prev) => ({
+            ...prev,
+            [route.id]: route.impactPercentage,
+          }));
+        }, routeStartDelay + LINK_TO_IMPACT_DURATION + IMPACT_CIRCLE_DELAY * 2 + LINK_TO_LEAF_DURATION + PROGRESS_FILL_DELAY);
+      });
+
+      // Calculate total animation duration for all routes
+      const totalDuration =
+        INITIAL_DELAY +
+        routes.length *
+          (LINK_TO_IMPACT_DURATION +
+            IMPACT_CIRCLE_DELAY +
+            LINK_TO_LEAF_DURATION +
+            LEAF_NODE_DELAY +
+            PROGRESS_FILL_DELAY +
+            ROUTE_SEQUENCE_DELAY) +
+        PROGRESS_FILL_DURATION;
 
       // Reset animation flag after all animations complete
       setTimeout(() => {
         setIsAnimating(false);
-      }, INITIAL_DELAY + LINK_TO_IMPACT_DURATION + IMPACT_CIRCLE_DELAY + IMPACT_CIRCLE_DELAY + LINK_TO_LEAF_DURATION + LEAF_NODE_DELAY + PROGRESS_FILL_DELAY + 2500);
+      }, totalDuration);
     }
   }, [sourceLocation, routes]);
 
@@ -617,7 +632,7 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
               strokeDashoffset: visibleNodes.has(`${route.id}-link-to-impact`)
                 ? 0
                 : getPathLength(linePathToProgress),
-              transition: `stroke-dashoffset ${LINK_TO_IMPACT_DURATION}ms ease-in-out, stroke 0.25s ease-out`,
+              transition: `stroke-dashoffset ${LINK_TO_IMPACT_DURATION}ms ease-in-out, stroke 0.2s ease-out`,
             }}
           />
           <path
@@ -632,7 +647,7 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
               strokeDashoffset: visibleNodes.has(`${route.id}-link-to-leaf`)
                 ? 0
                 : getPathLength(linePathToDest),
-              transition: `stroke-dashoffset ${LINK_TO_LEAF_DURATION}ms ease-in-out, stroke 0.25s ease-out`,
+              transition: `stroke-dashoffset ${LINK_TO_LEAF_DURATION}ms ease-in-out, stroke 0.2s ease-out`,
             }}
           />
 
@@ -641,7 +656,7 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
             transform={`translate(${progressX}, ${progressY}) scale(${nodeScale})`}
             style={{
               opacity: visibleNodes.has(`${route.id}-impact`) ? 1 : 0,
-              transition: "opacity 0.5s ease-out",
+              transition: "opacity 0.3s ease-out",
             }}
           >
             {/* Background circle */}
@@ -668,7 +683,7 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
                   strokeDasharray: circumference,
                   strokeDashoffset: circumference,
                   animation: visibleNodes.has(route.id)
-                    ? `fillProgress 2s ease-in-out forwards`
+                    ? `fillProgress 1s ease-in-out forwards`
                     : "none",
                   "--full-dash": `${circumference}px`,
                   "--target-dash": `${targetOffset}px`,
@@ -694,7 +709,7 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
             fontSize={scaledFontSize}
             fill={TEXT_COLOR}
             style={{
-              transition: "opacity 0.5s ease-out",
+              transition: "opacity 0.3s ease-out",
               opacity: visibleNodes.has(`${route.id}-impact`) ? 1 : 0,
             }}
           >
@@ -704,7 +719,7 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
           {/* Destination Node */}
           <g
             style={{
-              transition: "all 0.5s ease-out",
+              transition: "all 0.3s ease-out",
               opacity: visibleNodes.has(route.id) ? 1 : 0,
               transform: visibleNodes.has(route.id) ? "scale(1)" : "scale(0)",
               transformOrigin: `${destNodeX}px ${destY}px`,
@@ -718,8 +733,7 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
               stroke={nodeStrokeColor}
               strokeWidth={nodeStrokeWidth}
               style={{
-                transition:
-                  "stroke 0.25s ease-out, stroke-width 0.25s ease-out",
+                transition: "stroke 0.2s ease-out, stroke-width 0.2s ease-out",
               }}
             />
             {getIconPath(
