@@ -26,7 +26,10 @@ const IssueDetailsBanner: React.FC<IssueDetailsBannerProps> = ({
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setDropdownOpen(false);
       }
     };
@@ -46,7 +49,7 @@ const IssueDetailsBanner: React.FC<IssueDetailsBannerProps> = ({
 
   return (
     // Main container with padding and border
-    <div className="bg-white text-black py-3 pb-0 px-6">
+    <div className="bg-white text-black py-3 pb-0 px-6 sticky top-0 z-20">
       {/* Top Section: Title and Details */}
       <div className="mb-3">
         <h2 className="text-lg font-semibold text-gray-800 flex items-center">
@@ -71,7 +74,11 @@ const IssueDetailsBanner: React.FC<IssueDetailsBannerProps> = ({
             className="flex items-center text-xs font-medium text-gray-700 px-2 py-1 border border-gray-300 rounded hover:bg-gray-50"
           >
             <span>Sort By: Impact from {mainNode}</span>
-            <SvgIcon name={dropdownOpen ? "chevron-up" : "chevron-down"} size={14} className="ml-1" />
+            <SvgIcon
+              name={dropdownOpen ? "chevron-up" : "chevron-down"}
+              size={14}
+              className="ml-1"
+            />
           </button>
 
           {dropdownOpen && (
@@ -81,7 +88,9 @@ const IssueDetailsBanner: React.FC<IssueDetailsBannerProps> = ({
                   type="button" // Add type="button"
                   key={location}
                   className={`block w-full text-left px-4 py-2 text-xs ${
-                    location === mainNode ? "bg-gray-100 font-medium" : "hover:bg-gray-50"
+                    location === mainNode
+                      ? "bg-gray-100 font-medium"
+                      : "hover:bg-gray-50"
                   }`}
                   onClick={() => handleLocationSelect(location)}
                 >

@@ -18,13 +18,18 @@ interface NetworkGraphPanelProps {
 }
 
 // --- Constants for Layout and Styling ---
-// Fixed radius for nodes and progress indicators
-const DENVER_NODE_RADIUS = 40;
-const NODE_RADIUS = 35;
-const PROGRESS_RADIUS = 30;
+// Base radius for nodes and progress indicators - will be scaled based on container size
+const BASE_DENVER_NODE_RADIUS = 40;
+const BASE_NODE_RADIUS = 35;
+const BASE_PROGRESS_RADIUS = 30;
 
 // Minimum vertical spacing between destination nodes
 const MIN_VERTICAL_SPACING = 80;
+const MAX_VERTICAL_SPACING = 120;
+
+// Minimum scale factors to ensure readability
+const MIN_NODE_SCALE = 0.7;
+const MIN_TEXT_SCALE = 0.85;
 
 // Colors to match UI
 const DEFAULT_LINE_COLOR = "#cccccc";
@@ -40,14 +45,14 @@ const SELECTED_NODE_STROKE_COLOR = "#0C6CA2";
 // --- D3 Arc Generators (Updated for new PROGRESS_RADIUS) ---
 const arcGenerator = d3
   .arc()
-  .innerRadius(PROGRESS_RADIUS * 0.75)
-  .outerRadius(PROGRESS_RADIUS)
+  .innerRadius(BASE_PROGRESS_RADIUS * 0.75)
+  .outerRadius(BASE_PROGRESS_RADIUS)
   .startAngle(0);
 
 const backgroundArcGenerator = d3
   .arc()
-  .innerRadius(PROGRESS_RADIUS * 0.75)
-  .outerRadius(PROGRESS_RADIUS)
+  .innerRadius(BASE_PROGRESS_RADIUS * 0.75)
+  .outerRadius(BASE_PROGRESS_RADIUS)
   .startAngle(0)
   .endAngle(2 * Math.PI);
 
@@ -232,6 +237,20 @@ const getLegendIcon = (
   );
 };
 
+interface LayoutPositions {
+  centralNodeX: number;
+  centralNodeY: number;
+  svgWidth: number;
+  svgHeight: number;
+  scale: number;
+  heightScaleFactor: number;
+  progressX: number;
+  destNodeX: number;
+  textOffsetX: number;
+  paddingY: number;
+  nodeScale: number;
+}
+
 // --- The React Component ---
 const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
   locations,
@@ -241,11 +260,11 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
   mainDegradationPercentage,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [containerDimensions, setContainerDimensions] = useState({
-    width: 0,
-    height: 0,
-  });
-  const [layoutPositions, setLayoutPositions] = useState({
+  const [containerDimensions, setContainerDimensions] = useState<{
+    width: number;
+    height: number;
+  }>({ width: 0, height: 0 });
+  const [layoutPositions, setLayoutPositions] = useState<LayoutPositions>({
     centralNodeX: 80,
     progressX: 240,
     destNodeX: 400,
@@ -254,6 +273,9 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
     centralNodeY: 275,
     paddingY: MIN_VERTICAL_SPACING,
     scale: 1,
+    nodeScale: 1,
+    svgWidth: 1000,
+    heightScaleFactor: 1,
   });
   const [visibleNodes, setVisibleNodes] = useState<Set<string>>(new Set());
   const [isAnimating, setIsAnimating] = useState(false);
@@ -308,58 +330,67 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
   useEffect(() => {
     const updateDimensions = () => {
       if (containerRef.current) {
-        const containerWidth = containerRef.current.clientWidth + 100;
-        const containerHeight = containerRef.current.clientHeight + 100;
+        const containerWidth = containerRef.current.clientWidth;
+        const containerHeight = containerRef.current.clientHeight;
 
-        // Determine if we're in portrait or landscape mode
+        // Determine if we're in portrait mode
         const isPortrait = containerHeight > containerWidth;
+
+        // Calculate the minimum required height for the content
+        const routeCount = routes.length || 1;
+        const minRequiredHeight = (routeCount + 1) * MIN_VERTICAL_SPACING;
+
+        // Calculate dynamic node scaling based on container height
+        const heightRatio = Math.max(containerHeight / 800, MIN_NODE_SCALE);
+        const nodeScale = isPortrait
+          ? Math.min(1.2, heightRatio) // Allow larger scale in portrait mode
+          : Math.min(1, heightRatio);
+
+        // Calculate scaled node dimensions
+        const scaledDenverRadius = BASE_DENVER_NODE_RADIUS * nodeScale;
+        const scaledNodeRadius = BASE_NODE_RADIUS * nodeScale;
+        const scaledProgressRadius = BASE_PROGRESS_RADIUS * nodeScale;
 
         // Base dimensions for the graph
         const baseWidth = isPortrait
-          ? 900
-          : Math.max(containerWidth * 0.9, 1000);
-        const routeCount = routes.length || 1;
+          ? Math.max(containerWidth, 700)
+          : Math.max(containerWidth, 1000);
 
-        // In portrait mode, use full container height
         const baseHeight = isPortrait
-          ? 800
-          : Math.max(
-              containerHeight * 0.9,
-              700,
-              (routeCount + 1) * MIN_VERTICAL_SPACING + 120
-            );
+          ? Math.max(containerHeight, minRequiredHeight, 457)
+          : Math.max(containerHeight * 0.9, minRequiredHeight, 477);
 
         // Calculate scale based on container size while maintaining aspect ratio
         const widthScale = containerWidth / baseWidth;
         const heightScale = containerHeight / baseHeight;
 
-        // In portrait mode, use height scale to ensure full height usage
+        // In portrait mode, prioritize height scaling
         const scale = isPortrait
-          ? heightScale // Use height scale in portrait mode
+          ? Math.min(widthScale, heightScale * 2) // Allow more height scaling
           : Math.min(widthScale, heightScale);
 
-        // Adjust positions based on orientation
-        const centralX = isPortrait ? baseWidth * 0.25 : baseWidth * 0.2;
-        const progressX = isPortrait ? baseWidth * 0.55 : baseWidth * 0.5;
-        const destX = isPortrait ? baseWidth * 0.85 : baseWidth * 0.8;
-        const textOffset = baseWidth * 0.04;
-        const centralY = baseHeight / 2;
+        // Calculate vertical spacing based on available height
+        const availableHeight = isPortrait
+          ? baseHeight * 0.85 // Use more height in portrait mode
+          : baseHeight * 0.7;
 
-        // Calculate vertical spacing - use more height in portrait mode
-        const availableHeight = baseHeight * (isPortrait ? 0.9 : 0.7);
-        const minRequiredHeight = (routeCount - 1) * MIN_VERTICAL_SPACING;
-        let calculatedPaddingY;
-
-        if (availableHeight >= minRequiredHeight && routeCount > 1) {
-          calculatedPaddingY = availableHeight / (routeCount - 1);
-        } else {
-          calculatedPaddingY = MIN_VERTICAL_SPACING;
-        }
-
-        calculatedPaddingY = Math.min(
-          Math.max(calculatedPaddingY, MIN_VERTICAL_SPACING),
-          isPortrait ? 140 : 110 // Allow more vertical spacing in portrait mode
+        const verticalSpacing = Math.min(
+          Math.max(
+            availableHeight / (routeCount + 1),
+            MIN_VERTICAL_SPACING * nodeScale + 100
+          ),
+          MAX_VERTICAL_SPACING * nodeScale
         );
+
+        // Calculate horizontal positions with proper spacing
+        const horizontalSpace = baseWidth - scaledDenverRadius * 4;
+        const centralX = baseWidth * (isPortrait ? 0.1 : 0.2);
+        const progressX =
+          centralX + horizontalSpace * (isPortrait ? 0.5 : 0.35);
+        const destX = centralX + horizontalSpace * (isPortrait ? 0.8 : 0.7);
+
+        // Calculate text offset based on node size
+        const textOffset = scaledNodeRadius * 0.5;
 
         setContainerDimensions({
           width: containerWidth,
@@ -372,9 +403,12 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
           destNodeX: destX,
           textOffsetX: textOffset,
           svgHeight: baseHeight,
-          centralNodeY: centralY,
-          paddingY: calculatedPaddingY,
+          centralNodeY: baseHeight / 2,
+          paddingY: verticalSpacing,
           scale: scale,
+          nodeScale: nodeScale,
+          svgWidth: baseWidth,
+          heightScaleFactor: heightScale,
         });
       }
     };
@@ -420,11 +454,22 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
       textOffsetX,
       centralNodeY,
       paddingY,
+      nodeScale = 1,
     } = layoutPositions;
 
     const totalDestinations = routes.length;
     const totalRouteHeight = (totalDestinations - 1) * paddingY;
     const startY = centralNodeY - totalRouteHeight / 2;
+
+    // Scale node dimensions
+    const scaledNodeRadius = BASE_NODE_RADIUS * nodeScale;
+    const scaledProgressRadius = BASE_PROGRESS_RADIUS * nodeScale;
+    const scaledDenverRadius = BASE_DENVER_NODE_RADIUS * nodeScale;
+
+    // Calculate text sizes based on node scale
+    const textScale = Math.max(nodeScale, MIN_TEXT_SCALE);
+    const baseFontSize = 14;
+    const scaledFontSize = Math.round(baseFontSize * textScale);
 
     return routes.map((route, index) => {
       const destinationLocation = locations.find(
@@ -450,15 +495,15 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
       const backgroundArcPath = backgroundArcGenerator({} as any) ?? "";
 
       const linePathToProgress = getCurvePath(
-        centralNodeX + DENVER_NODE_RADIUS,
+        centralNodeX + scaledDenverRadius,
         centralNodeY,
-        progressX - PROGRESS_RADIUS,
+        progressX - scaledProgressRadius,
         progressY
       );
       const linePathToDest = getCurvePath(
-        progressX + PROGRESS_RADIUS,
+        progressX + scaledProgressRadius,
         progressY,
-        destNodeX - NODE_RADIUS,
+        destNodeX - scaledNodeRadius,
         destY
       );
 
@@ -501,7 +546,9 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
           />
 
           {/* Progress Indicator */}
-          <g transform={`translate(${progressX}, ${progressY})`}>
+          <g
+            transform={`translate(${progressX}, ${progressY}) scale(${nodeScale})`}
+          >
             <path d={backgroundArcPath} fill={PROGRESS_BG_COLOR} />
             <path
               d={progressArcPath}
@@ -514,7 +561,7 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
             <text
               textAnchor="middle"
               dominantBaseline="middle"
-              fontSize="13"
+              fontSize={scaledFontSize}
               fontWeight="600"
               fill={TEXT_COLOR}
               style={{
@@ -528,10 +575,10 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
 
           {/* Streams text */}
           <text
-            x={progressX + PROGRESS_RADIUS + textOffsetX / 2}
+            x={progressX + scaledProgressRadius + textOffsetX / 2}
             y={progressY - 18}
             dominantBaseline="middle"
-            fontSize="12"
+            fontSize={scaledFontSize}
             fill={TEXT_COLOR}
             style={{
               transition: "opacity 0.25s ease-out",
@@ -551,7 +598,7 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
             <circle
               cx={destNodeX}
               cy={destY}
-              r={NODE_RADIUS}
+              r={scaledNodeRadius}
               fill="white"
               stroke={nodeStrokeColor}
               strokeWidth={nodeStrokeWidth}
@@ -563,16 +610,16 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
             {getIconPath(
               destNodeX,
               destY,
-              NODE_RADIUS * 0.9,
+              scaledNodeRadius * 0.9,
               false,
               isSelected
             )}
             <text
-              x={destNodeX + NODE_RADIUS + textOffsetX}
+              x={destNodeX + scaledNodeRadius + textOffsetX}
               y={destY - 6}
               dominantBaseline="middle"
               fontWeight="600"
-              fontSize="15"
+              fontSize={scaledFontSize}
               fill={TEXT_COLOR}
               style={{
                 transition: "opacity 0.25s ease-out",
@@ -582,10 +629,10 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
               {destinationLocation.name}
             </text>
             <text
-              x={destNodeX + NODE_RADIUS + textOffsetX}
+              x={destNodeX + scaledNodeRadius + textOffsetX}
               y={destY + 12}
               dominantBaseline="middle"
-              fontSize="14"
+              fontSize={scaledFontSize}
               fill={TEXT_COLOR}
               style={{
                 transition: "opacity 0.25s ease-out",
@@ -615,11 +662,15 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
     containerDimensions.width
   );
 
-  // Memoize the central node with immediate visibility
+  // Memoize the central node
   const centralNode = useMemo(() => {
     if (!sourceLocation || containerDimensions.width === 0) return null;
 
-    const { centralNodeX, centralNodeY } = layoutPositions;
+    const { centralNodeX, centralNodeY, nodeScale = 1 } = layoutPositions;
+
+    const scaledDenverRadius = BASE_DENVER_NODE_RADIUS * nodeScale;
+    const textScale = Math.max(nodeScale, MIN_TEXT_SCALE);
+    const scaledFontSize = Math.round(14 * textScale);
     const isVisible = true; // Always visible
 
     return (
@@ -633,7 +684,7 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
         <circle
           cx={centralNodeX}
           cy={centralNodeY}
-          r={DENVER_NODE_RADIUS}
+          r={scaledDenverRadius}
           fill="white"
           stroke={SELECTED_NODE_STROKE_COLOR}
           strokeWidth="1.5"
@@ -644,16 +695,16 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
         {getIconPath(
           centralNodeX,
           centralNodeY,
-          DENVER_NODE_RADIUS * 0.9,
+          scaledDenverRadius * 0.9,
           true,
           true
         )}
         <text
           x={centralNodeX}
-          y={centralNodeY + DENVER_NODE_RADIUS + 16}
+          y={centralNodeY + scaledDenverRadius + 16}
           textAnchor="middle"
           fontWeight="600"
-          fontSize="15"
+          fontSize={scaledFontSize}
           fill={TEXT_COLOR}
           style={{
             opacity: 1, // Always visible
@@ -663,9 +714,9 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
         </text>
         <text
           x={centralNodeX}
-          y={centralNodeY + DENVER_NODE_RADIUS + 32}
+          y={centralNodeY + scaledDenverRadius + 32}
           textAnchor="middle"
-          fontSize="14"
+          fontSize={scaledFontSize}
           fill={TEXT_COLOR}
           style={{
             opacity: 1, // Always visible
@@ -680,86 +731,19 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
     mainDegradationPercentage,
     containerDimensions.width,
     layoutPositions,
-  ]); // Removed visibleNodes dependency
-
-  // --- Updated Legend Memo ---
-  const legendElement = useMemo(() => {
-    const legendX = 200;
-    const legendY = layoutPositions.svgHeight + 20; // Position from bottom
-    const iconSize = 24;
-    const spacing = 100; // Keep increased spacing between legend items
-    const textPadding = 8;
-
-    return (
-      <g
-        className="legend-group"
-        transform={`translate(0, ${-layoutPositions.scale * 50})`}
-      >
-        {/* Background for legend */}
-        <rect
-          x={legendX - 10}
-          y={legendY - 20}
-          width={spacing * 2}
-          height={50}
-          fill="white"
-          rx={4}
-          ry={4}
-        />
-
-        {/* Ingress Item */}
-        <g transform={`translate(${legendX}, ${legendY})`}>
-          {getLegendIcon(iconSize / 2, 0, iconSize, "left")}
-          <text
-            x={iconSize + textPadding}
-            y={0}
-            dominantBaseline="middle"
-            fontSize="14"
-            fill={LEGEND_TEXT_COLOR}
-            style={{ fontWeight: 500 }}
-          >
-            Ingress
-          </text>
-        </g>
-
-        {/* Egress Item */}
-        <g transform={`translate(${legendX + spacing}, ${legendY})`}>
-          {getLegendIcon(iconSize / 2, 0, iconSize, "right")}
-          <text
-            x={iconSize + textPadding}
-            y={0}
-            dominantBaseline="middle"
-            fontSize="14"
-            fill={LEGEND_TEXT_COLOR}
-            style={{ fontWeight: 500 }}
-          >
-            Egress
-          </text>
-        </g>
-      </g>
-    );
-  }, [layoutPositions.svgHeight, layoutPositions.scale]);
+  ]);
 
   return (
     <div
       ref={containerRef}
-      className="w-full h-full relative flex items-center justify-center overflow-hidden"
+      className="w-full h-full relative overflow-auto bg-[#ffffff]"
+      style={{ minHeight: "400px" }}
     >
       <svg
-        width={containerDimensions.width}
-        height={containerDimensions.height}
-        viewBox={`0 0 ${Math.max(1000, containerDimensions.width)} ${
-          layoutPositions.svgHeight
-        }`}
-        preserveAspectRatio={
-          containerDimensions.height > containerDimensions.width
-            ? "xMidYMid slice"
-            : "xMidYMid meet"
-        }
-        style={{
-          fontFamily: "Arial, sans-serif",
-          width: "100%",
-          height: "100%",
-        }}
+        width="100%"
+        height="100%"
+        viewBox={`0 0 ${containerDimensions.width} ${containerDimensions.height}`}
+        preserveAspectRatio="none"
       >
         <g transform={`scale(${layoutPositions.scale})`}>
           {/* Central Node */}
@@ -767,9 +751,50 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
 
           {/* Destination Nodes and Connections */}
           {routeElements}
-
-          {/* Legend */}
-          {legendElement}
+        </g>
+        {/* Always visible legend at bottom left */}
+        <g
+          className="legend-group"
+          transform={`translate(24, ${containerDimensions.height - 64})`}
+        >
+          {/* Background for legend */}
+          <rect
+            x={-10}
+            y={-20}
+            width={200}
+            height={50}
+            fill="white"
+            rx={4}
+            ry={4}
+          />
+          {/* Ingress Item */}
+          <g>
+            {getLegendIcon(12, 0, 24, "left")}
+            <text
+              x={32}
+              y={0}
+              dominantBaseline="middle"
+              fontSize="14"
+              fill={LEGEND_TEXT_COLOR}
+              style={{ fontWeight: 500 }}
+            >
+              Ingress
+            </text>
+          </g>
+          {/* Egress Item */}
+          <g transform="translate(100, 0)">
+            {getLegendIcon(12, 0, 24, "right")}
+            <text
+              x={32}
+              y={0}
+              dominantBaseline="middle"
+              fontSize="14"
+              fill={LEGEND_TEXT_COLOR}
+              style={{ fontWeight: 500 }}
+            >
+              Egress
+            </text>
+          </g>
         </g>
       </svg>
     </div>

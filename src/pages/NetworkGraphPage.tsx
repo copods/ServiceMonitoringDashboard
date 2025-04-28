@@ -72,7 +72,7 @@ const NetworkGraphPage: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center w-full h-full p-4 bg-[#ffffff]">
+    <div className="flex flex-col items-center justify-center w-full h-full p-4 overflow-auto bg-[#ffffff]">
       {issueBannerProps && (
         <div className="w-full">
           <IssueDetailsBanner {...issueBannerProps} />
