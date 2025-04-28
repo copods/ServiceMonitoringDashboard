@@ -293,6 +293,9 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
   });
   const [visibleNodes, setVisibleNodes] = useState<Set<string>>(new Set());
   const [isAnimating, setIsAnimating] = useState(false);
+  const [progressPercentages, setProgressPercentages] = useState<{
+    [key: string]: number;
+  }>({});
 
   // Store the source location ID to detect changes
   const sourceLocationRef = useRef<string | null>(null);
@@ -315,9 +318,10 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
       // Update the ref to track the current source
       sourceLocationRef.current = currentSourceId;
 
-      // Reset visibility states
+      // Reset visibility states and progress
       setVisibleNodes(new Set());
       setIsAnimating(true);
+      setProgressPercentages({});
 
       const newVisibleNodes = new Set<string>();
 
@@ -327,6 +331,8 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
       const IMPACT_CIRCLE_DELAY = 150;
       const LINK_TO_LEAF_DURATION = 500;
       const LEAF_NODE_DELAY = 150;
+      const PROGRESS_FILL_DELAY = 500;
+      const PROGRESS_FILL_DURATION = 2000;
 
       // Step 1: Show central node immediately
       newVisibleNodes.add("central");
@@ -340,7 +346,7 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
         setVisibleNodes(new Set(newVisibleNodes));
       }, INITIAL_DELAY);
 
-      // Step 3: Show impact circles
+      // Step 3: Show empty impact circles
       setTimeout(() => {
         routes.forEach((route) => {
           newVisibleNodes.add(`${route.id}-impact`);
@@ -364,10 +370,19 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
         setVisibleNodes(new Set(newVisibleNodes));
       }, INITIAL_DELAY + LINK_TO_IMPACT_DURATION + IMPACT_CIRCLE_DELAY + IMPACT_CIRCLE_DELAY + LINK_TO_LEAF_DURATION + LEAF_NODE_DELAY);
 
+      // Step 6: Start filling progress circles
+      setTimeout(() => {
+        const newProgressPercentages: { [key: string]: number } = {};
+        routes.forEach((route) => {
+          newProgressPercentages[route.id] = route.impactPercentage;
+        });
+        setProgressPercentages(newProgressPercentages);
+      }, INITIAL_DELAY + LINK_TO_IMPACT_DURATION + IMPACT_CIRCLE_DELAY + IMPACT_CIRCLE_DELAY + LINK_TO_LEAF_DURATION + LEAF_NODE_DELAY + PROGRESS_FILL_DELAY);
+
       // Reset animation flag after all animations complete
       setTimeout(() => {
         setIsAnimating(false);
-      }, INITIAL_DELAY + LINK_TO_IMPACT_DURATION + IMPACT_CIRCLE_DELAY + IMPACT_CIRCLE_DELAY + LINK_TO_LEAF_DURATION + LEAF_NODE_DELAY + 300);
+      }, INITIAL_DELAY + LINK_TO_IMPACT_DURATION + IMPACT_CIRCLE_DELAY + IMPACT_CIRCLE_DELAY + LINK_TO_LEAF_DURATION + LEAF_NODE_DELAY + PROGRESS_FILL_DELAY + 2500);
     }
   }, [sourceLocation, routes]);
 
@@ -482,6 +497,32 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
     [onRouteSelected]
   );
 
+  // Add a style block for the keyframes animation
+  const [animationStyles] = useState(() => {
+    const styleSheet = document.createElement("style");
+    styleSheet.textContent = `
+      @keyframes fillProgress {
+        from {
+          stroke-dashoffset: var(--full-dash);
+        }
+        to {
+          stroke-dashoffset: var(--target-dash);
+        }
+      }
+    `;
+    document.head.appendChild(styleSheet);
+    return styleSheet;
+  });
+
+  // Cleanup the style element on unmount
+  useEffect(() => {
+    return () => {
+      if (animationStyles) {
+        animationStyles.remove();
+      }
+    };
+  }, [animationStyles]);
+
   // Memoize route rendering logic
   const routeElements = useMemo(() => {
     if (
@@ -530,14 +571,14 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
       const nodeStrokeColor = isSelected
         ? SELECTED_NODE_STROKE_COLOR
         : NODE_STROKE_COLOR;
-      const nodeStrokeWidth = isSelected ? "1.5" : "1";
-      const progressPercent = route.impactPercentage;
+      const nodeStrokeWidth = isSelected ? "2" : "2";
+      const currentProgress = progressPercentages[route.id] || 0;
+      const radius = BASE_PROGRESS_RADIUS * nodeScale;
+      const circumference = 2 * Math.PI * radius;
+      const targetOffset =
+        circumference - (currentProgress / 100) * circumference;
       const progressColor =
-        progressPercent >= 50 ? PROGRESS_HIGH_COLOR : PROGRESS_LOW_COLOR;
-
-      const endAngle = (progressPercent / 100) * 2 * Math.PI;
-      const progressArcPath = arcGenerator({ endAngle } as any) ?? "";
-      const backgroundArcPath = backgroundArcGenerator({} as any) ?? "";
+        currentProgress >= 10 ? PROGRESS_HIGH_COLOR : PROGRESS_LOW_COLOR;
 
       const linePathToProgress = getCurvePath(
         centralNodeX + scaledDenverRadius,
@@ -603,22 +644,45 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
               transition: "opacity 0.5s ease-out",
             }}
           >
-            <path d={backgroundArcPath} fill={PROGRESS_BG_COLOR} />
-            <path
-              d={progressArcPath}
-              fill={progressColor}
-              style={{
-                transition: "fill 0.25s ease-out",
-              }}
+            {/* Background circle */}
+            <circle
+              cx="0"
+              cy="0"
+              r={radius}
+              fill="none"
+              stroke={PROGRESS_BG_COLOR}
+              strokeWidth="6"
+            />
+            {/* Progress circle */}
+            <circle
+              cx="0"
+              cy="0"
+              r={radius}
+              fill="none"
+              stroke={progressColor}
+              strokeWidth="6"
+              strokeLinecap="round"
+              transform="rotate(-90)"
+              style={
+                {
+                  strokeDasharray: circumference,
+                  strokeDashoffset: circumference,
+                  animation: visibleNodes.has(route.id)
+                    ? `fillProgress 2s ease-in-out forwards`
+                    : "none",
+                  "--full-dash": `${circumference}px`,
+                  "--target-dash": `${targetOffset}px`,
+                } as any
+              }
             />
             <text
               textAnchor="middle"
               dominantBaseline="middle"
-              fontSize={scaledFontSize}
+              fontSize={14 * nodeScale}
               fontWeight="600"
               fill={TEXT_COLOR}
             >
-              {progressPercent}%
+              {Math.round(currentProgress)}%
             </text>
           </g>
 
@@ -697,6 +761,7 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
     containerDimensions.width,
     layoutPositions,
     visibleNodes,
+    progressPercentages,
   ]);
 
   console.log(
