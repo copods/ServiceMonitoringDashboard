@@ -326,12 +326,12 @@ const NetworkGraphPanel: React.FC<NetworkGraphPanelProps> = ({
       const newVisibleNodes = new Set<string>();
 
       // Animation timing constants (in ms)
-      const INITIAL_DELAY = 100;
-      const IMPACT_CIRCLE_DELAY = 100;
-      const LEAF_NODE_DELAY = 100;
-      const PROGRESS_FILL_DELAY = 300;
-      const PROGRESS_FILL_DURATION = 1000;
-      const ROUTE_SEQUENCE_DELAY = 200;
+      const INITIAL_DELAY = 60;
+      const IMPACT_CIRCLE_DELAY = 60;
+      const LEAF_NODE_DELAY = 60;
+      const PROGRESS_FILL_DELAY = 100;
+      const PROGRESS_FILL_DURATION = 800;
+      const ROUTE_SEQUENCE_DELAY = 100;
 
       // Step 1: Show central node immediately
       newVisibleNodes.add("central");
