@@ -5,6 +5,7 @@ import MOSDashboard from "pages/MOSDashboard";
 import PolarChartPage from "./../pages/PolarChartPage";
 import CircularBarChartPage from "./../pages/CircularBarChartPage";
 import NetworkGraphPage from "./../pages/NetworkGraphPage";
+import Test from "./../pages/Test";
 
 const AppRoutes: React.FC = () => {
   return (
@@ -14,6 +15,7 @@ const AppRoutes: React.FC = () => {
       <Route path="/polar-chart" element={<PolarChartPage />} />
       <Route path="/circular-bar-chart" element={<CircularBarChartPage />} />
       <Route path="/sankey-chart" element={<NetworkGraphPage />} />
+      <Route path="/test123" element={<Test />} />
     </Routes>
   );
 };
